@@ -19,9 +19,13 @@ const filterText = (text) => {
 
 export default async function handler(req, res) {
   try {
-    const {q} = req.body;
+    let {q} = req.body;
     const {JSDOM} = jsdom;
     const virtualConsole = new jsdom.VirtualConsole();
+
+    q = await q.toString().replaceAll(',', ' AND ')
+
+    console.log(q, 'ini querynya')
 
     const data = await fetch(`https://real-time-web-search.p.rapidapi.com/search?q=${q}&limit=20`, {
       method: 'GET',

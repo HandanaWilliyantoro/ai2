@@ -4,6 +4,7 @@ import getProfile from "./Profile.store";
 function parseGPTResponse(formattedString) {
     const dataChunks = formattedString.split("data:");
     const responseObjectText = dataChunks[dataChunks.length - 1].trim();
+    console.log(responseObjectText)
     if(responseObjectText
         && !responseObjectText.includes('"role":"assistant"') 
         && !responseObjectText.includes('[DONE]') 
