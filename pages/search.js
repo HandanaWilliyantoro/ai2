@@ -49,7 +49,7 @@ const search = observer(() => {
     /* Execute */
     const handleFetchSummarizer = useCallback((val) => {
         const params = {
-            q: questionHistory,
+            q: questionHistory.length > 0 ? questionHistory : router.query.q,
             summaryContent: val.summaryContent
         }
         summarizer.execute(params)

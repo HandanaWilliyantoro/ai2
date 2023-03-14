@@ -1,29 +1,6 @@
 import {makeAutoObservable} from "mobx"
 import getProfile from "./Profile.store";
 
-async function parseGPTResponse(formattedString) {
-    const dataChunks = await formattedString.split("data:");
-    const responseObjectText = await dataChunks[dataChunks.length - 1].trim();
-    const checkResponse = await responseObjectText 
-    && responseObjectText.includes('{"content":') 
-    && !responseObjectText.includes('"role":"assistant"') 
-    && !responseObjectText.includes('[DONE]') 
-    && !responseObjectText.includes('"finish_reason":"stop"')
-    && !responseObjectText.includes('"type": "invalid_request_error",')
-    ? true : false
-    if(checkResponse){
-        const responseObject = await JSON.parse(responseObjectText);
-        const checkResponseObj = await responseObject && responseObject.choices && responseObject.choices.length > 0 && responseObject.choices[0] ? true : false
-        if(checkResponseObj){
-            return responseObject.choices[0].delta.content;
-        } else {
-            return undefined
-        }
-    } else {
-        return undefined
-    }
-}
-
 class ChatStore {
     response = "";
     error = undefined;
@@ -36,14 +13,15 @@ class ChatStore {
 
     async execute(params){
         postChat.loading = true
-        fetch(`/api/chat?history=${JSON.stringify(params)}`, {
-            'method': "GET",
+        fetch(`/api/chat`, {
+            'method': "POST",
             'headers': {
                 'Content-Type': 'application/json',
                 'Connection': 'keep-alive',
                 'Accept': '*/*',
                 'Accept-Encoding': 'gzip, deflate, br'
             },
+            'body': JSON.stringify(params)
         }).then(res => {
             const reader = res.body.getReader();
 
@@ -59,9 +37,9 @@ class ChatStore {
                     console.log('initiate | stop')
                     return;
                 } else {
-                    const decoded = await decoder.decode(value);
-                    const line = await parseGPTResponse(decoded)
-                    postChat.success(line)
+                    const decoded = decoder.decode(value);
+                    console.log(decoded, 'ini decoded ya')
+                    postChat.success(decoded)
                 }
                 read();
             });
