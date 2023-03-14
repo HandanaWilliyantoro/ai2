@@ -56,6 +56,7 @@ class SummarizerStore {
                 } else {
                     const decoded = decoder.decode(value);
                     const line = await parseGPTResponse(decoded)
+                    console.log(decoded, line, 'ini decoded dan line')
                     summarizer.success(line)
                 }
                 read();
