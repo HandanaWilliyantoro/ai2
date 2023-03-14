@@ -4,7 +4,13 @@ import getProfile from "./Profile.store";
 async function parseGPTResponse(formattedString) {
     const dataChunks = await formattedString.split("data:");
     const responseObjectText = await dataChunks[dataChunks.length - 1].trim();
-    const checkResponse = await responseObjectText && responseObjectText.includes('{"content":') ? true : false
+    const checkResponse = await responseObjectText 
+    && responseObjectText.includes('{"content":') 
+    && !responseObjectText.includes('"role":"assistant"') 
+    && !responseObjectText.includes('[DONE]') 
+    && !responseObjectText.includes('"finish_reason":"stop"')
+    && !responseObjectText.includes('"type": "invalid_request_error",')
+    ? true : false
     if(checkResponse){
         const responseObject = await JSON.parse(responseObjectText);
         const checkResponseObj = await responseObject && responseObject.choices && responseObject.choices.length > 0 && responseObject.choices[0] ? true : false
@@ -54,7 +60,6 @@ class ChatStore {
                     return;
                 } else {
                     const decoded = decoder.decode(value);
-                    console.log(decoded, 'ini decoded')
                     const line = await parseGPTResponse(decoded)
                     postChat.success(line)
                 }
