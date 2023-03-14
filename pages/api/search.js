@@ -13,9 +13,9 @@ export default async function handler(req, res) {
 
     const engine = await data.json()
 
-    const search_result = engine.data
+    const sources = await engine.data.slice(0, 5)
 
-    const parsedSources = await search_result.map((a, i) => `Sources [${i+1}]: ${a.snippet}`)
+    const parsedSources = await sources.map((a, i) => `Sources [${i+1}]: ${a.snippet}`)
 
     res.status(200).json({ question: q, response: engine, summaryContent: parsedSources })
   } catch(e) {

@@ -15,11 +15,11 @@ export default function Home() {
     if(e.key === 'Enter'){
       router.push(`/search?q=${search}`)
     }
-  }, [search])
+  }, [search, router.push])
 
   const navigate = useCallback((url) => {
     router.push(url)
-  }, []);
+  }, [router.push]);
 
   return (
     <div className="min-w-screen min-h-screen bg-white flex flex-col items-center justify-center px-5 py-5">

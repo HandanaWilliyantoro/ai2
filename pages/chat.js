@@ -47,6 +47,7 @@ const chat = observer(() => {
     
     //#region FETCH CHAT ANSWER
     const handleFetchAnswer = useCallback((params) => {
+        if(postChat.loading || isLoading) return;
         setIsLoading(true)
         postChat.execute({history: params})
     }, []);
