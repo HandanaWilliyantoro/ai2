@@ -2,18 +2,13 @@ import {makeAutoObservable} from "mobx"
 import getProfile from "./Profile.store";
 
 async function parseGPTResponse(formattedString) {
-    const dataChunks = formattedString.split("data:");
-    const responseObjectText = dataChunks[dataChunks.length - 1].trim();
-    console.log(responseObjectText, 'ini res object text')
-    if(responseObjectText
-        && !responseObjectText.includes('"role":"assistant"') 
-        && !responseObjectText.includes('[DONE]') 
-        && !responseObjectText.includes('"finish_reason":"stop"')
-        && !responseObjectText.includes('"type": "invalid_request_error",')
-        && responseObjectText.includes('{"content":')
-    ){
+    const dataChunks = await formattedString.split("data:");
+    const responseObjectText = await dataChunks[dataChunks.length - 1].trim();
+    const checkResponse = await responseObjectText && responseObjectText.includes('{"content":') ? true : false
+    if(checkResponse){
         const responseObject = await JSON.parse(responseObjectText);
-        if(responseObject && responseObject.choices && responseObject.choices.length > 0 && responseObject.choices[0]){
+        const checkResponseObj = await responseObject && responseObject.choices && responseObject.choices.length > 0 && responseObject.choices[0] ? true : false
+        if(checkResponseObj){
             return responseObject.choices[0].delta.content;
         } else {
             return undefined
@@ -59,6 +54,7 @@ class ChatStore {
                     return;
                 } else {
                     const decoded = decoder.decode(value);
+                    console.log(decoded, 'ini decoded')
                     const line = await parseGPTResponse(decoded)
                     postChat.success(line)
                 }

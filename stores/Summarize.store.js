@@ -2,17 +2,13 @@ import {makeAutoObservable} from "mobx"
 import getProfile from "./Profile.store";
 
 async function parseGPTResponse(formattedString) {
-    const dataChunks = formattedString.split("data:");
-    const responseObjectText = dataChunks[dataChunks.length - 1].trim();
-    if(responseObjectText
-        && !responseObjectText.includes('"role":"assistant"') 
-        && !responseObjectText.includes('[DONE]') 
-        && !responseObjectText.includes('"finish_reason":"stop"')
-        && !responseObjectText.includes('"type": "invalid_request_error",')
-    ){
+    const dataChunks = await formattedString.split("data:");
+    const responseObjectText = await dataChunks[dataChunks.length - 1].trim();
+    const checkResponse = await responseObjectText && responseObjectText.includes('{"content":') ? true : false
+    if(checkResponse){
         const responseObject = await JSON.parse(responseObjectText);
-
-        if(responseObject && responseObject.choices && responseObject.choices.length > 0 && responseObject.choices[0]){
+        const checkResponseObj = await responseObject && responseObject.choices && responseObject.choices.length > 0 && responseObject.choices[0] ? true : false
+        if(checkResponseObj){
             return responseObject.choices[0].delta.content;
         } else {
             return undefined
@@ -50,6 +46,7 @@ class SummarizerStore {
             // read the data
             reader.read().then(async ({ done, value }) => {
                 const decoder = new TextDecoder();
+
                 if (done) {
                     summarizer.finished = true;
                     return;

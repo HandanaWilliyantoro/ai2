@@ -19,8 +19,8 @@ export default async function handler (req) {
             {role: "system", content: `You are a helpful assistant named Handana AI that accurately answers the user's queries based on the given text. answer based on given query language`},
             {role: "user", content: `Provide a 5-10 sentence rephrased answer to the query based on the sources..\n###\nSOURCES\n\n${sources.toString()}\n###\nQUERY\n${q}\n###\nANSWER`}
         ],
-        max_tokens: 500,
-        temperature: 0.2,
+        max_tokens: 2000,
+        temperature: 0.6,
         stream: true,
     }, { responseType: 'stream' })
 

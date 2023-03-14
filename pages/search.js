@@ -110,8 +110,9 @@ const search = observer(() => {
         if(summarizer.isFinished){
             const newSummary = summary.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>");
             setSummary(newSummary)
+            summarizer.reset()
         }
-    }, [summarizer.isFinished, summary])
+    }, [summarizer.isFinished, summarizer.reset])
 
     /* Handle on search input submitted */
     const onSubmitHandlerKeyDown = useCallback((e) => {
@@ -149,9 +150,9 @@ const search = observer(() => {
                         )) : <SourcesSkeleton />}
                     </div>
                     {summary && search_result && (
-                        <div class="flex justify-center mt-5">
-                            <div class="mb-3 w-full">
-                                <div class="relative mb-4 flex w-full flex-wrap items-stretch">
+                        <div className="flex justify-center mt-5">
+                            <div className="mb-3 w-full">
+                                <div className="relative mb-4 flex w-full flex-wrap items-stretch">
                                 <input
                                     type="search"
                                     className="relative font-serif m-0 block w-[1%] min-w-0 flex-auto rounded border border-solid border-neutral-600 bg-transparent bg-clip-padding px-3 py-1.5 text-base font-normal text-neutral-700 outline-none transition duration-300 ease-in-out focus:border-primary-600 focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
