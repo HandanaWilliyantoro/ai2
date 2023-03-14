@@ -4,6 +4,7 @@ import getProfile from "./Profile.store";
 async function parseGPTResponse(formattedString) {
     const dataChunks = await formattedString.split("data:");
     const responseObjectText = await dataChunks[dataChunks.length - 1].trim();
+    console.log(responseObjectText, 'ni response object text')
     const checkResponse = await responseObjectText 
     && responseObjectText.includes('{"content":') 
     && !responseObjectText.includes('"role":"assistant"') 
@@ -60,7 +61,7 @@ class SummarizerStore {
                 if(decoder.decode(value) === 'initiate | stop'){
                     console.log('initiate | stop')
                 } else {
-                    const decoded = decoder.decode(value);
+                    const decoded = await decoder.decode(value);
                     const line = await parseGPTResponse(decoded)
                     console.log(decoded, line, 'ini decoded dan line')
                     summarizer.success(line)

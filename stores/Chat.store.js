@@ -59,7 +59,7 @@ class ChatStore {
                     console.log('initiate | stop')
                     return;
                 } else {
-                    const decoded = decoder.decode(value);
+                    const decoded = await decoder.decode(value);
                     const line = await parseGPTResponse(decoded)
                     postChat.success(line)
                 }
