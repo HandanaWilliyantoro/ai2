@@ -20,7 +20,6 @@ const search = observer(() => {
     const [questionHistory, setQuestionHistory] = useState([])
     const [followUpSearch, setFollowUpSearch] = useState('')
     const [search, setSearch] = useState('')
-    const [isModalSignUpOpened, setIsModalSignUpOpened] = useState(true)
 
     //#region HOOKS
     const router = useRouter()
@@ -97,6 +96,10 @@ const search = observer(() => {
     /* Component Did Mount */
     useEffect(() => {
         if(router.query.q){
+            setQuestionHistory([])
+            setFollowUpSearch('')
+            setSummary(undefined)
+            setSearchResult(undefined)
             setSearch(router.query.q)
             handleFetchSearch(router.query.q)
         }
