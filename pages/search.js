@@ -10,6 +10,7 @@ import SearchPagination from "@/components/SearchPagination";
 import getSearch from "@/stores/Search.store";
 import summarizer from "@/stores/Summarize.store";
 import { observer } from "mobx-react-lite";
+import { showErrorSnackbar } from "@/util/toast";
 
 const search = observer(() => {
     const [summary, setSummary] = useState();
@@ -19,6 +20,7 @@ const search = observer(() => {
     const [questionHistory, setQuestionHistory] = useState([])
     const [followUpSearch, setFollowUpSearch] = useState('')
     const [search, setSearch] = useState('')
+    const [isModalSignUpOpened, setIsModalSignUpOpened] = useState(true)
 
     //#region HOOKS
     const router = useRouter()
@@ -60,7 +62,7 @@ const search = observer(() => {
             setSummary(`${response + summarizer.response}`)
             summarizer.reset()
         } else if (summarizer.error) {
-            console.log(summarizer.error)
+            showErrorSnackbar(summarizer.error)
             summarizer.reset()
         }
     }, [summarizer.response, summarizer.error, summarizer.reset])
@@ -69,7 +71,6 @@ const search = observer(() => {
     //#region FETCH SEARCH RESULTS
     const handleFetchSearch = useCallback(async (q) => {
         const history = await JSON.parse(JSON.stringify(questionHistory))
-        console.log([...history, q], 'ini history')
         setQuestionHistory([...history, q])
         getSearch.execute({q: [...history, q]})
     }, [questionHistory]);
@@ -82,7 +83,7 @@ const search = observer(() => {
             handleFetchSummarizer(getSearch.response)
             getSearch.reset()
         } else if (getSearch.error) {
-            console.log(getSearch.error)
+            showErrorSnackbar(getSearch.error)
             getSearch.reset()
         }
     }, [getSearch.response, getSearch.error, getSearch.reset])
@@ -107,9 +108,8 @@ const search = observer(() => {
     /* Check if summary contains code */
     useEffect(() => {
         if(summarizer.isFinished){
-            const newSummary = summary.replace(/```(.*?)```/g, '<pre><code>$1>/code></pre>');
+            const newSummary = summary.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>");
             setSummary(newSummary)
-            console.log(newSummary, 'ini new summary')
         }
     }, [summarizer.isFinished, summary])
 
@@ -137,10 +137,10 @@ const search = observer(() => {
         <div className="max-w-screen-lg m-auto">
             <Header onSubmitHandlerKeyDown={onSubmitHandlerKeyDown} value={search} setValue={setSearch} onSubmitHandler={onSubmitHandler} />
             <div className="max-w-80 flex flex-row max-md:flex-col">
-                <div className="flex-[0.5] w-[50%] p-4 max-md:w-[100%]">
+                <div className="flex-[0.5] w-[50%] p-4 max-md:w-[100%] md:pt-0">
                     <h4 className="font-sans font-bold my-2 text-sm">Summary</h4>
                     {summary ? (
-                        <p className="font-serif text-xs leading-5 max-md:w-[100%]">{summary}</p>
+                        <div className="font-serif text-xs leading-5 max-md:w-[100%]" dangerouslySetInnerHTML={{__html: summary}} />
                     ) : <SummarySkeleton />}
                     <div className="flex flex-col max-md:w-[100%]">
                         <h4 className="font-sans font-bold my-2 text-sm mt-6">Sources</h4>

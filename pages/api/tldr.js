@@ -20,7 +20,7 @@ export default async function handler (req) {
             {role: "user", content: `Provide a 5-10 sentence rephrased answer to the query based on the sources..\n###\nSOURCES\n\n${sources.toString()}\n###\nQUERY\n${q}\n###\nANSWER`}
         ],
         max_tokens: 500,
-        temperature: 0.7,
+        temperature: 0.2,
         stream: true,
     }, { responseType: 'stream' })
 

@@ -2,35 +2,38 @@ import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
+    name: {
+        type: String,
+        required: false
+    },
     email: {
         type: String,
-        required: true,
+        required: false,
+        unique: true
+    },
+    phone: {
+        type: String,
+        required: false,
         unique: true,
     },
     password: {
         type: String,
-        required: true,
-        maxlength: 200,
-    },
-    status: {
-        type: String,
-        required: true,
-        default: "basic",
-        enum: ['free', 'paid']
-    },
-    phone: {
-        type: String,
-        required: true,
-        default: mongoose.Types.ObjectId()
-    },
-    createdAt: {
-        type: Date,
-        default: new Date()
-    },
-    socialSignIn: {
-        type: Boolean,
-        default: false,
         required: true
+    },
+    role: {
+        type: String,
+        required: false,
+        enum: ["admin", "superadmin", "user"],
+        default: 'user'
+    },
+    premium: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    planExpiry: {
+        type: Number,
+        required: false
     }
   },
   { timestamps: true }

@@ -2,6 +2,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter&family=Work+Sans:wght@700&display=swap');
 
 @tailwind base;
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: black;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #e0e0e0;
+  border-radius: 14px;
+  border: 3px gray;
+}
+
 @tailwind components;
 @tailwind utilities;
 

@@ -4,14 +4,15 @@ import getProfile from "./Profile.store";
 async function parseGPTResponse(formattedString) {
     const dataChunks = formattedString.split("data:");
     const responseObjectText = dataChunks[dataChunks.length - 1].trim();
+    console.log(responseObjectText, 'ini res object text')
     if(responseObjectText
         && !responseObjectText.includes('"role":"assistant"') 
         && !responseObjectText.includes('[DONE]') 
         && !responseObjectText.includes('"finish_reason":"stop"')
         && !responseObjectText.includes('"type": "invalid_request_error",')
+        && responseObjectText.includes('{"content":')
     ){
         const responseObject = await JSON.parse(responseObjectText);
-
         if(responseObject && responseObject.choices && responseObject.choices.length > 0 && responseObject.choices[0]){
             return responseObject.choices[0].delta.content;
         } else {
@@ -22,7 +23,7 @@ async function parseGPTResponse(formattedString) {
     }
 }
 
-class SummarizerStore {
+class ChatStore {
     response = "";
     error = undefined;
     loading = false;
@@ -33,16 +34,15 @@ class SummarizerStore {
     }
 
     async execute(params){
-        summarizer.loading = true
-        fetch(`/api/tldr?q=${params.q}&summaryContent=${JSON.stringify(params.summaryContent)}`, {
-            'method': "POST",
+        postChat.loading = true
+        fetch(`/api/chat?history=${JSON.stringify(params)}`, {
+            'method': "GET",
             'headers': {
                 'Content-Type': 'application/json',
                 'Connection': 'keep-alive',
                 'Accept': '*/*',
                 'Accept-Encoding': 'gzip, deflate, br'
             },
-            'body': JSON.stringify(params)
         }).then(res => {
             const reader = res.body.getReader();
 
@@ -51,45 +51,46 @@ class SummarizerStore {
             reader.read().then(async ({ done, value }) => {
                 const decoder = new TextDecoder();
                 if (done) {
-                    summarizer.finished = true;
+                    postChat.finished = true;
                     return;
                 }
                 if(decoder.decode(value) === 'initiate | stop'){
                     console.log('initiate | stop')
+                    return;
                 } else {
                     const decoded = decoder.decode(value);
                     const line = await parseGPTResponse(decoded)
-                    summarizer.success(line)
+                    postChat.success(line)
                 }
                 read();
             });
             };
             read();
         })
-        .catch(e => summarizer.failed(e))
+        .catch(e => postChat.failed(e))
     }
 
     success(data, premium){
         getProfile.premium = premium;
-        summarizer.response = data
-        summarizer.error = undefined
-        summarizer.loading = false
+        postChat.response = data
+        postChat.error = undefined
+        postChat.loading = false
     }
 
     failed(data){
-        summarizer.error = data;
-        summarizer.loading = false;
-        summarizer.response = "";
+        postChat.error = data;
+        postChat.loading = false;
+        postChat.response = "";
     }
 
     reset() {
-        summarizer.response = "";
-        summarizer.loading = false;
-        summarizer.error = undefined
-        summarizer.finished = false;
+        postChat.response = "";
+        postChat.loading = false;
+        postChat.error = undefined
+        postChat.finished = false;
     }
 }
 
-const summarizer = new SummarizerStore()
+const postChat = new ChatStore()
 
-export default summarizer
+export default postChat

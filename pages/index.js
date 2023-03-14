@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Logo from "@/components/Logo";
 import Search from "@/components/Search";
 import Tagline from "@/components/Tagline";
-import SocialMedia from "@/components/SocialMedia";
+import {RxChatBubble, RxPencil2} from 'react-icons/rx'
 
 export default function Home() {
 
@@ -16,6 +16,10 @@ export default function Home() {
       router.push(`/search?q=${search}`)
     }
   }, [search])
+
+  const navigate = useCallback((url) => {
+    router.push(url)
+  }, []);
 
   return (
     <div className="min-w-screen min-h-screen bg-white flex flex-col items-center justify-center px-5 py-5">
@@ -31,7 +35,10 @@ export default function Home() {
               <div className="h-2 bg-green-500 flex-1"></div>
               <div className="h-2 bg-pink-500 flex-1"></div>
           </div>
-          <SocialMedia />
+          <div className="flex flex-row items-center justify-center py-4">
+            <p onClick={() => navigate('/chat')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-3 transition hover:opacity-50"><RxChatBubble className='w-4 h-4 mr-1' />Chat</p>
+            <p onClick={() => navigate('/write')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-3 transition hover:opacity-50"><RxPencil2 className='w-4 h-4 mr-1' />Write</p>
+          </div>
         </div>
     </div>
   )
