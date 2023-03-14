@@ -1,6 +1,7 @@
 import React, {useState, useCallback, useEffect, useRef} from 'react'
 import {AiOutlineDoubleRight, AiOutlineSync} from 'react-icons/ai'
 import { useRouter } from 'next/router'
+import Persona from '../util/assets/persona.png'
 
 // Stores
 import { observer } from 'mobx-react-lite'
@@ -162,7 +163,7 @@ const chat = observer(() => {
 
         if(history.length === 0 && !answer) {
             return <div className='flex flex-col items-center justify-center w-full h-full'>
-                <img className='w-40 h-40 rounded' src={'https://tinywow.com/results/2023-03-09_15-04/image_ai_image_generator/Ou1dJED3o33XCM6G/tinywow_15898711_PrRfjCoqijSU2nkU.png'} />
+                <img className='w-40 h-40 rounded' src={Persona.src} />
                 <p className='font-sans text-base mt-4'>Current AI Persona</p>
                 <p className='font-bold font-serif text-base'>{persona}</p>
             </div>
