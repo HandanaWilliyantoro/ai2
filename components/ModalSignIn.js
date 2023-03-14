@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 import {useFormik} from "formik";
 import * as Yup from 'yup';
 import { emailRegExp } from '@/util/regex';
-import { showSuccessSnackbar } from '@/util/toast';
+import { showSuccessSnackbar, showErrorSnackbar } from '@/util/toast';
 import { authenticate } from '@/util/auth';
 
 import signIn from '@/stores/SignIn.store';
