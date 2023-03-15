@@ -52,7 +52,7 @@ const search = observer(() => {
             summaryContent: val.summaryContent
         }
         summarizer.execute(params)
-    }, [router.query.q]);
+    }, [router.query.q, questionHistory, summarizer.execute]);
     
     /* Watcher */
     useEffect(() => {

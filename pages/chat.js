@@ -140,6 +140,7 @@ const chat = observer(() => {
     }, [postChat.finished])
 
     const renderBody = useCallback(() => {
+
         if(history.length > 0){
             return <div className='flex flex-col items-start justify-start w-full h-full'>
                 {history.map(a => {
@@ -169,6 +170,10 @@ const chat = observer(() => {
             </div>
         }
     }, [persona, answer, history]);
+
+    useEffect(() => {
+        onClickReset()
+    }, [])
     //#endregion
 
     return (
