@@ -102,6 +102,8 @@ const search = observer(() => {
             setSearchResult(undefined)
             setSearch(router.query.q)
             handleFetchSearch(router.query.q)
+        } else {
+            router.push('/')
         }
     }, [router.query.q]);
 
@@ -204,21 +206,5 @@ const search = observer(() => {
         </div>
     )
 })
-
-export async function getServerSideProps (context) {
-    if(context.query.q){
-        return {
-            props: {
-                q: context.query.q
-            }
-        }
-    } else {
-        return {
-            redirect: {
-                destination: '/',
-            },
-        }
-    }
-}
 
 export default search
