@@ -130,9 +130,9 @@ const search = observer(() => {
             setSearchResult(undefined)
             setQuestionHistory([])
             setFollowUpSearch('')
-          router.push(`/search?q=${search}`)
+            router.push(`/search?q=${search}`)
         }
-    }, [search, setSummary, setSearchResult, setQuestionHistory, setFollowUpSearch])
+    }, [search, setSummary, setSearchResult, setQuestionHistory, setFollowUpSearch, router.push])
 
     const onSubmitHandler = useCallback(() => {
         setSummary("")
@@ -140,7 +140,7 @@ const search = observer(() => {
         setQuestionHistory([])
         setFollowUpSearch('')
         router.push(`/search?q=${search}`)
-    }, [search, setSummary, setSearchResult, setQuestionHistory, setFollowUpSearch]);
+    }, [search, setSummary, setSearchResult, setQuestionHistory, setFollowUpSearch, router.push]);
     //#endregion
 
     return (
