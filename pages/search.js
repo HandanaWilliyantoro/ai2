@@ -95,6 +95,9 @@ const search = observer(() => {
 
     /* Component Did Mount */
     useEffect(() => {
+
+        if(!router.isReady) return;
+
         if(router.query.q){
             setQuestionHistory([])
             setFollowUpSearch('')
@@ -105,7 +108,7 @@ const search = observer(() => {
         } else {
             router.push('/')
         }
-    }, [router.query.q]);
+    }, [router.isReady]);
 
     /* Onclick enter follow up input */
     const onKeyDownFollowUpEnter = useCallback((e) => {
@@ -163,11 +166,9 @@ const search = observer(() => {
                             <div className="mb-3 w-full">
                                 <div className="relative mb-4 flex w-full flex-wrap items-stretch">
                                 <input
-                                    type="search"
+                                    type="text"
                                     className="relative font-serif m-0 block w-[1%] min-w-0 flex-auto rounded border border-solid border-neutral-600 bg-transparent bg-clip-padding px-3 py-1.5 text-base font-normal text-neutral-700 outline-none transition duration-300 ease-in-out focus:border-primary-600 focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
                                     placeholder="Ask follow up question"
-                                    aria-label="Ask follow up question"
-                                    aria-describedby="button-addon2" 
                                     value={followUpSearch}
                                     onChange={e => setFollowUpSearch(e.target.value)}
                                     onKeyDown={onKeyDownFollowUpEnter}
