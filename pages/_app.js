@@ -15,7 +15,7 @@ import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast';
 
 const App = ({ Component, pageProps }) => {
 
-  const [modalType, setModalType] = useState('verify');
+  const [modalType, setModalType] = useState('sign-up');
   const [secret, setSecret] = useState('')
   const [userData, setUserData] = useState({})
 
