@@ -25,7 +25,8 @@ const ModalSignUp = observer(({
     onRequestClose,
     setModalType,
     setSecret,
-    setUserData
+    setUserData,
+    userData
 }) => {
 
     //#region SEND VERIFICATION
@@ -34,7 +35,6 @@ const ModalSignUp = observer(({
             email: val.email,
             password: val.password
         }
-
         setUserData(params);
         sendVerification.execute({email: val.email})
     }, [setUserData]);
@@ -43,6 +43,7 @@ const ModalSignUp = observer(({
     useEffect(() => {
         if(sendVerification.response) {
             setModalType('verify');
+            localStorage.setItem('user', JSON.stringify(userData))
             localStorage.setItem('secret', sendVerification.response.secret)
             setSecret(sendVerification.response.secret)
             showSuccessSnackbar(sendVerification.response.text)

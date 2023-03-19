@@ -74,15 +74,17 @@ const ModalVerifyCode = observer(({
       verifyEmail.reset()
     }
   }, [verifyEmail.response, verifyEmail.reset, verifyEmail.error])
+  
   //#endregion
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onRequestClose} ariaHideApp={false} style={customStyles}>
         <div className='flex flex-col items-start justify-center p-4 py-1'>
-            <div className='flex flex-row items-center justify-between py-2'>
+            <div className='flex flex-row items-center justify-between py-2 w-full'>
                 <BiArrowBack onClick={() => setModalType('sign-up')} width={45} height={45} className='cursor-pointer' />
-                <p className='font-sans text-base mr-auto ml-2 font-bold'>Verify your email</p>
+                <p className='font-sans text-base text-center mx-auto font-bold'>Verify your email</p>
             </div>
+            <p className='text-xs text-center font-serif w-full py-2 text-gray-500'>Verification code has been sent to <br/><span className='font-bold'>{userData?.email}</span></p>
             <div className='my-4 '>
               <ReactInputVerificationCode
                 placeholder={0}
@@ -92,7 +94,7 @@ const ModalVerifyCode = observer(({
                 autoFocus
               />
             </div>
-            <button disabled={isLoading} onClick={onSubmit} className='bg-black text-base text-white py-2 w-full rounded border transition hover:border-black hover:text-black hover:bg-white'>{isLoading ? "Loading.." : "Verify"}</button>
+            <button disabled={isLoading} onClick={onSubmit} className='bg-black text-sm font-sans text-white py-2 w-full rounded border transition hover:border-black hover:text-black hover:bg-white'>{isLoading ? "Loading.." : "Submit verification code"}</button>
         </div>
     </Modal>
   )

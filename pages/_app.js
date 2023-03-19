@@ -30,7 +30,7 @@ const App = ({ Component, pageProps }) => {
   const renderModalAuth = useCallback((type) => {
     switch(type){
       case 'sign-up':
-        return <ModalSignUp setUserData={setUserData} setSecret={setSecret} setModalType={setModalType} isOpen={type === 'sign-up'} />
+        return <ModalSignUp userData={userData} setUserData={setUserData} setSecret={setSecret} setModalType={setModalType} isOpen={type === 'sign-up'} />
       case 'sign-in': 
         return <ModalSignIn setModalType={setModalType} isOpen={type === 'sign-in'} />
       case 'verify':
