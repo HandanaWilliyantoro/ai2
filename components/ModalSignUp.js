@@ -43,6 +43,7 @@ const ModalSignUp = observer(({
     useEffect(() => {
         if(sendVerification.response) {
             setModalType('verify');
+            localStorage.setItem('secret', sendVerification.response.secret)
             setSecret(sendVerification.response.secret)
             showSuccessSnackbar(sendVerification.response.text)
             sendVerification.reset()

@@ -54,7 +54,12 @@ const ModalVerifyCode = observer(({
   //#region VERIFY EMAIL
   const onSubmit = useCallback(() => {
     setIsLoading(true)
-    verifyEmail.execute({confirmationCode, secret});
+    if(secret && confirmationCode){
+      verifyEmail.execute({confirmationCode, secret});
+    } else {
+      const userSecret = localStorage.getItem('secret')
+      verifyEmail.execute({secret: userSecret, confirmationCode})
+    }
   }, [secret, confirmationCode]);
 
   /* Watcher */
