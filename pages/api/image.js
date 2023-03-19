@@ -1,6 +1,6 @@
 export default async function handler (req, res){
     try {
-        const {q, commercial} = req.body;
+        const {q} = req.body;
         
         const options = {
             method: 'GET',
@@ -10,11 +10,9 @@ export default async function handler (req, res){
             }
         };
         
-        let response = await fetch(`https://real-time-image-search.p.rapidapi.com/search?query=${q}&commercial=${commercial}`, options)
+        let response = await fetch(`https://real-time-image-search.p.rapidapi.com/search?query=${q}`, options)
 
         response = await response.json()
-
-        console.log(response, 'ini responsenya ya')
 
         if(response.data && response.data.length > 0){
             res.status(200).json({text: 'Fetch image search successfull', code: 200, data: response.data})
