@@ -108,7 +108,7 @@ const search = observer(() => {
         } else {
             router.push('/')
         }
-    }, [router.isReady]);
+    }, [router.isReady, router.query.q]);
 
     /* Onclick enter follow up input */
     const onKeyDownFollowUpEnter = useCallback((e) => {

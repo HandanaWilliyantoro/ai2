@@ -24,8 +24,6 @@ const App = ({ Component, pageProps }) => {
     const isLoggedIn = localStorage.getItem('token');
     if(isLoggedIn !== null){
       setModalType(undefined);
-    } else {
-      setModalType('sign-up')
     }
   }, [])
 

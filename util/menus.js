@@ -1,10 +1,15 @@
-import {RxMagnifyingGlass, RxChatBubble, RxPencil2} from 'react-icons/rx'
+import {RxMagnifyingGlass, RxChatBubble, RxPencil2, RxImage} from 'react-icons/rx'
 
 const menus = [
     {
         label: 'Search',
         slug: '/',
         icon: <RxMagnifyingGlass className='w-4 h-4 ml-2' />
+    },
+    {
+        label: 'Image',
+        slug: '/image',
+        icon: <RxImage className='w-4 h-4' />
     },
     {
         label: 'Chat',

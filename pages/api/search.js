@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     const data = await fetch(`https://real-time-web-search.p.rapidapi.com/search?q=${q}&limit=20`, {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Key': '4eb68c2ad1msh2c6664f78ca391ep11b4bajsnfb0317b70d3f',
+        'X-RapidAPI-Key': process.env.RAPID_API_KEY,
         'X-RapidAPI-Host': 'real-time-web-search.p.rapidapi.com',
       },
     })
