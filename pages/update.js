@@ -29,6 +29,7 @@ const Update = () => {
     <div className='max-w-screen-md border-2 h-screen m-auto flex flex-col'>
       <Header />
       <div className='flex flex-col h-full p-4 py-0 overflow-y-scroll'>
+        <p className='text-sm font-bold text-center ml-4 mt-6 mb-4 font-sans'>Stay ahead with our latest update!</p>
         {content.map(a => (
           <div className='flex flex-row items-center justify-center w-full border-2 p-4 py-3 my-2 rounded max-md:p-2'>
             <p className='font-bold bg-green-200 mr-4 font-sans text-center py-2 text-xs flex-[0.15] rounded max-md:mr-4 max-md:px-2'>{a.date}</p>

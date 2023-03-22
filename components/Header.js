@@ -24,6 +24,7 @@ const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
             <div className='flex-[0.1] max-md:flex max-md:flex-row max-md:justify-between max-md:items-center max-md:w-full max-md:px-4'>
                 <Logo textSize={"text-lg"} />
                 <div className='hidden max-md:flex max-md:items-center'>
+                    <RxUpdate onClick={() => navigate('/update')} className='cursor-pointer mx-2 mr-0 w-5 h-5' />
                     <IoMdLogOut onClick={logout} color='red' className='cursor-pointer mx-2 mr-0 w-5 h-5' />
                 </div>
             </div>
