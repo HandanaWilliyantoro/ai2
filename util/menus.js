@@ -1,25 +1,36 @@
 import {RxMagnifyingGlass, RxChatBubble, RxPencil2, RxImage} from 'react-icons/rx'
+import {SlPuzzle} from 'react-icons/sl'
 
 const menus = [
     {
         label: 'Search',
         slug: '/',
-        icon: <RxMagnifyingGlass className='w-4 h-4 ml-2' />
+        icon: <RxMagnifyingGlass className='w-3 h-3 ml-2' />,
+        premium: false
     },
     {
         label: 'Image',
         slug: '/image',
-        icon: <RxImage className='w-4 h-4' />
+        icon: <RxImage className='w-3 h-3' />,
+        premium: false
     },
     {
         label: 'Chat',
         slug: '/chat',
-        icon: <RxChatBubble className='w-4 h-4' />
+        icon: <RxChatBubble className='w-3 h-3' />,
+        premium: false
     },
     {
         label: 'Write',
         slug: '/write',
-        icon: <RxPencil2 className='w-4 h-4' />
+        icon: <RxPencil2 className='w-3 h-3' />,
+        premium: false
+    },
+    {
+        label: 'Tools',
+        slug: '/tools',
+        icon: <SlPuzzle className="w-3 h-3" />,
+        premium: true
     }
 ]
 

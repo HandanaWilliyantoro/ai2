@@ -1,10 +1,11 @@
 import React, { useCallback } from 'react'
 import { useRouter } from 'next/router'
-import {IoMdLogOut} from 'react-icons/io'
+import { IoMdLogOut } from 'react-icons/io'
 import Logo from './Logo'
 import {menus} from '@/util/menus'
 import { signOut } from 'next-auth/react'
 import { RxMagnifyingGlass, RxUpdate } from 'react-icons/rx'
+import { AiFillThunderbolt } from 'react-icons/ai'
 
 const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
     const router = useRouter()
