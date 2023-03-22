@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react'
 import { useRouter } from 'next/router'
-import {SiTiktok, SiInstagram, SiLinkedin} from "react-icons/si"
 import {IoMdLogOut} from 'react-icons/io'
 import Logo from './Logo'
 import {menus} from '@/util/menus'
 import { signOut } from 'next-auth/react'
-import { RxMagnifyingGlass } from 'react-icons/rx'
+import { RxMagnifyingGlass, RxUpdate } from 'react-icons/rx'
 
 const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
     const router = useRouter()
@@ -43,6 +42,7 @@ const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
             </div>
             </div>
             <div className='flex-[0.4] flex flex-row items-center justify-end px-0 max-md:hidden'>
+                <RxUpdate onClick={() => navigate('/update')} className='cursor-pointer mx-2 mr-0 ml-3 w-5 h-5' />
                 <IoMdLogOut onClick={logout} color='red' className='cursor-pointer mx-2 mr-0 ml-3 w-5 h-5' />
             </div>
         </div>
