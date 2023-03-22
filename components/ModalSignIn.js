@@ -5,6 +5,8 @@ import * as Yup from 'yup';
 import { emailRegExp } from '@/util/regex';
 import { showSuccessSnackbar, showErrorSnackbar } from '@/util/toast';
 import { authenticate } from '@/util/auth';
+import {useSession, signIn as socialSignIn, signOut} from "next-auth/react";
+import { SiGoogle } from 'react-icons/si';
 
 import signIn from '@/stores/SignIn.store';
 import { observer } from 'mobx-react-lite';
@@ -28,25 +30,44 @@ const ModalSignIn = observer(({
     setModalType
 }) => {
 
+    const {data, authenticate} = useSession();
+
+    //#region GOOGLE SIGN IN
+    /* Execute */
+    useEffect(() => {
+        if(data && data.accessToken && status === 'authenticated'){
+            authenticate(data.user, data.accessToken)
+            setModalType(undefined)
+        }
+    }, [data]);
+    //#endregion
+
+    //#region HANDLER
+    const onClickGoogleSignIn = useCallback((e) => {
+        e.preventDefault();
+        socialSignIn('google')
+    }, [socialSignIn])
+    //#endregion
+
     //#region SIGN IN
     const onSubmit = useCallback((val) => {
         const params = {
-        email: val.email,
-        password: val.password
+            email: val.email,
+            password: val.password
         }
         signIn.execute(params);
-    }, []);
+    }, [signIn.execute]);
 
     /* Watcher */
     useEffect(() => {
         if(signIn.response){
-        showSuccessSnackbar('Sign in successfull')
-        authenticate(signIn.response.user, signIn.response.token);
-        setModalType(undefined)
-        signIn.reset()
+            showSuccessSnackbar('Sign in successfull')
+            authenticate(signIn.response.user, signIn.response.token);
+            setModalType(undefined)
+            signIn.reset()
         } else if (signIn.error) {
-        showErrorSnackbar(signIn.error)
-        signIn.reset()
+            showErrorSnackbar(signIn.error)
+            signIn.reset()
         }
     }, [signIn.error, signIn.response, signIn.reset])
     //#endregion
@@ -73,20 +94,22 @@ const ModalSignIn = observer(({
 
     return (
         <Modal ariaHideApp={false} isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
-            <div className='flex flex-col items-start justify-center p-4'>
-                <h4 className='font-sans text-lg font-bold text-black'>Sign In</h4>
-                <p className='text-xs font-serif text-gray-400 mt-1'>Discover The Power of AI + Search Engine with Handana</p>
-                <form onSubmit={formik.handleSubmit}>
-                    <div className='flex flex-col my-5'>
-                        <input name='email' value={formik.values.email} onChange={formik.handleChange} type="email" className='pb-1 pt-0 px-2 font-serif pl-0 border-b border-black outline-0 text-xs' placeholder='Email' />
+            <div className='flex flex-col items-start justify-center p-4 w-full'>
+                <h4 className='font-sans text-lg font-bold text-black text-center w-full'>Sign In</h4>
+                <p className='text-xs font-serif text-gray-400 mt-1 w-full text-center'>Discover The Power of AI + Search Engine with Handana</p>
+                <form className='w-full' onSubmit={formik.handleSubmit}>
+                    <div className='flex flex-col my-5 w-full'>
+                        <input name='email' value={formik.values.email} onChange={formik.handleChange} type="email" className='pb-1 pt-0 px-2 font-serif pl-0 border-b border-black outline-0 text-xs w-full' placeholder='Email' />
                     </div>
                     <div className='flex flex-col my-5'>
                         <input name="password" value={formik.values.password} onChange={formik.handleChange} type="password" className='pb-1 pt-0 px-2 font-serif pl-0 border-b border-black outline-0 text-xs' placeholder='Password' />
                     </div>
                     {formik.errors && <p className='font-serif text-red-500 text-xs mb-2'>{Object.values(formik.errors).toString().replaceAll(',', ', ')}</p>}
-                    <button disabled={signIn.loading} type='submit' className='bg-black text-white text-xs font-sans py-2 px-4 rounded'>{signIn.loading ? "Loading.." : "Sign In"}</button>
+                    <button disabled={signIn.loading} type='submit' className='bg-black w-full text-white text-xs font-sans py-2 px-4 rounded'>{signIn.loading ? "Loading.." : "Sign In"}</button>
+                    <p className='font-sans text-xs my-3 w-full text-center'>Or</p>
                 </form>
-                <p className='mt-3 font-serif text-xs'>Don't have an account? Click <span onClick={() => setModalType('sign-up')} className='text-blue-500 hover:underline cursor-pointer'>here</span></p>
+                <button className='font-serif text-xs rounded mb-3 flex flex-row justify-center items-center border-black w-full border py-2' onClick={onClickGoogleSignIn}><SiGoogle className='w-3 h-3 mr-2' /> Continue with Google</button>
+                <p className='mt-3 w-full text-center font-serif text-xs'>Don't have an account? Click <span onClick={() => setModalType('sign-up')} className='text-blue-500 hover:underline cursor-pointer'>here</span></p>
             </div>
         </Modal>
     )

@@ -4,8 +4,11 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup'
 import { emailRegExp } from '@/util/regex';
 import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast';
-
+import { signIn, useSession } from "next-auth/react";
+import { SiGoogle } from 'react-icons/si';
 import { observer } from 'mobx-react-lite';
+import { authenticate } from '@/util/auth';
+
 import sendVerification from '@/stores/SendVerification.store';
 
 const customStyles = {
@@ -28,6 +31,8 @@ const ModalSignUp = observer(({
     setUserData,
     userData
 }) => {
+
+    const {data, status} = useSession()
 
     //#region SEND VERIFICATION
     const onSubmit = useCallback((val) => {
@@ -55,6 +60,21 @@ const ModalSignUp = observer(({
     }, [sendVerification.response, sendVerification.error, sendVerification.reset])
     //#endregion
 
+    //#region HANDLER
+    const googleAuth = useCallback(() => {
+        signIn('google')
+    }, []);
+
+    /* Watcher */
+    useEffect(() => {
+        if(data && status === 'authenticated'){
+            console.log(data, 'ini datanya ya')
+            authenticate(data.user, data.accessToken)
+            setModalType(undefined)
+        }
+    }, [data])
+    //#endregion
+
     const schema = Yup.object({
         email: Yup.string().matches(emailRegExp, 'Email is not valid').required('email field is required'),
         password: Yup.string()
@@ -79,10 +99,10 @@ const ModalSignUp = observer(({
 
     return (
         <Modal isOpen={isOpen} ariaHideApp={false} onRequestClose={onRequestClose} style={customStyles}>
-            <div className='flex flex-col items-start justify-center p-4 bg-white'>
-                <h4 className='font-sans text-lg font-bold text-black'>Sign Up</h4>
-                <p className='text-xs font-serif text-gray-400 mt-1'>Discover The Power of AI + Search Engine with Handana</p>
-                <form onSubmit={formik.handleSubmit}>
+            <div className='flex flex-col items-start w-full justify-center p-4 bg-white'>
+                <h4 className='font-sans text-lg w-full text-center font-bold text-black'>Sign Up</h4>
+                <p className='text-xs font-serif text-gray-400 mt-1 w-full text-center'>Discover The Power of AI + Search Engine with Handana</p>
+                <form className='w-full' onSubmit={formik.handleSubmit}>
                     <div className='flex flex-col my-5'>
                         <input value={formik.values.email} name="email" onChange={formik.handleChange} type="email" className='pb-1 pt-0 px-2 font-serif pl-0 border-b border-black outline-0 text-xs' placeholder='Email' />
                     </div>
@@ -93,9 +113,11 @@ const ModalSignUp = observer(({
                         <input value={formik.values.confirmPassword} name="confirmPassword" onChange={formik.handleChange} type="password" className='pb-1 pt-0 px-2 font-serif pl-0 border-b border-black outline-0 text-xs' placeholder='Confirm Password' />
                     </div>
                     {formik.errors && <p className='font-serif text-red-500 text-xs mb-2'>{Object.values(formik.errors).toString().replaceAll(',', ', ')}</p>}
-                    <button disabled={sendVerification.loading} type="submit" className='bg-black text-white text-xs font-sans py-2 px-4 rounded mt-1'>{sendVerification.loading ? "Loading.." : "Sign Up"}</button>
+                    <button disabled={sendVerification.loading} type="submit" className='bg-black text-white text-xs font-sans py-2 px-4 rounded mt-1 w-full'>{sendVerification.loading ? "Loading.." : "Sign Up"}</button>
+                    <p className='font-sans text-xs my-3 w-full text-center'>Or</p>
                 </form>
-                <p className='mt-3 font-serif text-xs'>Have an account? Click <span onClick={() => setModalType('sign-in')} className='text-blue-500 hover:underline cursor-pointer'>here</span></p>
+                <button className='font-serif text-xs rounded mb-3 flex flex-row justify-center items-center border-black w-full border py-2' onClick={googleAuth}><SiGoogle className='w-3 h-3 mr-2' /> Continue with Google</button>
+                <p className='mt-3 font-serif text-center w-full text-xs'>Have an account? Click <span onClick={() => setModalType('sign-in')} className='text-blue-500 hover:underline cursor-pointer'>here</span></p>
             </div>
         </Modal>
     )

@@ -11,7 +11,7 @@ class PostSignInStore {
 
     execute(params){
         signIn.loading = true
-        fetch(`/api/auth/signin`, {
+        fetch(`/api/auth/sign-in`, {
             'method': "POST",
             'headers': {
                 'Content-Type': 'application/json',

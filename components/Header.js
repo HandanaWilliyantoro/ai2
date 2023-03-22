@@ -4,15 +4,17 @@ import {SiTiktok, SiInstagram, SiLinkedin} from "react-icons/si"
 import {IoMdLogOut} from 'react-icons/io'
 import Logo from './Logo'
 import {menus} from '@/util/menus'
+import { signOut } from 'next-auth/react'
 import { RxMagnifyingGlass } from 'react-icons/rx'
 
 const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
     const router = useRouter()
 
-    const logout = useCallback(() => {
-        localStorage.clear()
+    const logout = useCallback(async () => {
+        await signOut()
+        await localStorage.clear()
         window.location.reload()
-    }, []);
+    }, [signOut]);
 
     const navigate = useCallback((url) => {
         router.push(url)

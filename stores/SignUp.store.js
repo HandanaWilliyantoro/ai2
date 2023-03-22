@@ -11,7 +11,7 @@ class PostSignUpStore {
 
     execute(params){
         signUp.loading = true
-        fetch(`/api/auth/signup`, {
+        fetch(`/api/auth/sign-up`, {
             'method': "POST",
             'headers': {
                 'Content-Type': 'application/json',

@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState, useMemo} from 'react';
 import { observer } from 'mobx-react-lite';
 import { ToastContainer } from 'react-toastify';
 
@@ -6,15 +6,11 @@ import ModalSignIn from '@/components/ModalSignIn';
 import ModalSignUp from '@/components/ModalSignUp';
 import ModalVerifyCode from '@/components/ModalVerifyCode';
 
-/* Store */
-import signIn from '@/stores/SignIn.store';
-
 import 'react-toastify/dist/ReactToastify.css';
 import '@/styles/globals.css'
-import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast';
+import { SessionProvider } from 'next-auth/react';
 
 const App = ({ Component, pageProps }) => {
-
   const [modalType, setModalType] = useState('sign-up');
   const [secret, setSecret] = useState('')
   const [userData, setUserData] = useState({})
@@ -42,11 +38,11 @@ const App = ({ Component, pageProps }) => {
   //#endregion
 
   return (
-    <>
+    <SessionProvider session={pageProps.session}>
       {renderModalAuth(modalType)}
       <ToastContainer autoClose={8000} />
       <Component {...pageProps} />
-    </>
+    </SessionProvider>
   )
 }
 
