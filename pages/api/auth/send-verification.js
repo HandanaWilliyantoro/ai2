@@ -56,7 +56,6 @@ export default async function handler (req, res) {
                 console.log('Error Occurs');
                 res.status(401).json({code: 401, text: err})
             } else {
-                console.log('Email sent successfully');
                 const secret = await createToken({confirmationCode})
                 res.status(200).json({text: 'Send confirmation code successfull, check your email', code: 200, secret})
             }

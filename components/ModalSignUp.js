@@ -68,7 +68,6 @@ const ModalSignUp = observer(({
     /* Watcher */
     useEffect(() => {
         if(data && status === 'authenticated'){
-            console.log(data, 'ini datanya ya')
             authenticate(data.user, data.accessToken)
             setModalType(undefined)
         }

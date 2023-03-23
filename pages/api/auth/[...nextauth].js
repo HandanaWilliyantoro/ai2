@@ -48,7 +48,6 @@ export const authOptions = {
             }
             return true
         } catch(e) {
-            console.log(e, 'ini e')
             return false
         }
     },

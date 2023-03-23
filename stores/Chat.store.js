@@ -38,7 +38,6 @@ class ChatStore {
                     return;
                 } else {
                     const decoded = decoder.decode(value);
-                    console.log(decoded, 'ini decoded ya')
                     postChat.success(decoded)
                 }
                 read();
