@@ -26,12 +26,6 @@ const menus = [
         icon: <RxPencil2 className='w-3 h-3' />,
         premium: false
     },
-    {
-        label: 'Tools',
-        slug: '/tools',
-        icon: <SlPuzzle className="w-3 h-3" />,
-        premium: true
-    }
 ]
 
 const writeOptions = [
