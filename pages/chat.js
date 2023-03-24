@@ -22,8 +22,10 @@ const personas = [
     'Motivational Speaker',
     'Debater',
     'Dream Interpreter',
-    'Gaslighter',
     'Historian',
+    'Mental Health Adviser',
+    'Chef',
+    'DIY Expert'
 ]
 
 const chat = observer(() => {
@@ -143,13 +145,13 @@ const chat = observer(() => {
 
         if(history.length > 0){
             return <div className='flex flex-col items-start justify-start w-full h-full'>
-                {history.map(a => {
+                {history.map((a, i) => {
                     if(a.role === 'user'){
-                        return <div className='text-left text-sm p-4'>
+                        return <div key={i} className='text-left text-sm p-4'>
                             <p className='font-serif text-black'>{a.content.input ?? a.content}</p>
                         </div>
                     } else if (a.role === 'assistant') {
-                        return <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full'>
+                        return <div key={i} className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full'>
                             <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
                         </div>
                     }
