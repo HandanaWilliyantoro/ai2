@@ -21,6 +21,11 @@ const content = [
     date: '22/03/2023',
     title: 'Update Feature',
     description: "Stay up-to-date with Handana AI's latest features and improvements! Our new update feature keeps you informed of all the latest advancements, ensuring that you always have access to the most cutting-edge AI technology available."
+  },
+  {
+    date: '23/03/2023',
+    title: 'New Persona on Chat Feature',
+    description: "Add Mental Health Adviser, DIY Expert and Chef Persona."
   }
 ]
 
