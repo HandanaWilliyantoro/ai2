@@ -37,21 +37,21 @@ const Art = observer(() => {
     //#endregion
 
     return (
-        <div className='max-w-screen-lg mx-auto border-x-2 overflow-y-scroll h-screen relative max-md:flex max-md:flex-col'>
+        <div className='max-w-screen-lg mx-auto border-x-2 overflow-y-scroll bg-white h-screen relative max-md:flex max-md:flex-col'>
             <Header />
             <div className='flex flex-row items-center justify-between mx-4'>
-                <p onClick={() => router.push('/image/search')} className='font-serif cursor-pointer text-sm transition hover:opacity-50 flex items-center'><RxArrowLeft className='mr-1 w-4 h-4' />Search Image</p>
+                <p onClick={() => router.push('/image/search')} className='font-serif cursor-pointer text-sm transition hover:opacity-50 text-black flex items-center'><RxArrowLeft className='mr-1 w-4 h-4' />Search Image</p>
                 <p className='font-serif mt-2 text-lg text-gray-400 font-bold ml-4 py-2 max-md:text-sm'>Image / Art Generator</p>
             </div>
             <div className='min-h-[calc(100vh-135px)] flex flex-row items-start justify-start w-full mt-4 pb-8 max-md:pb-4 max-md:min-h-[calc(100vh-190px)] max-md:flex-col'>
                 <div className='flex-[0.5] flex flex-col items-start justify-start min-h-[calc(100vh-135px)] max-md:min-h-[auto] max-md:max-h-[300px] w-full border-black'>
                     <div className='flex-col flex items-start mx-4 mb-2 w-3/4'>
                         <label className='text-xs font-serif mb-1'>Prompt</label>
-                        <input value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Ex: an astronaut riding a horse on mars" className='rounded border-2 p-1 pl-2 py-2 w-full font-serif text-xs outline-none'  />
+                        <input value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Ex: an astronaut riding a horse on mars" className='rounded bg-white text-black border-2 p-1 pl-2 py-2 w-full font-serif text-xs outline-none'  />
                     </div>
                     <div className='flex-col flex items-start justify-start ml-4 my-2 w-3/4'>
                         <label className='text-xs font-serif mb-1'>Style</label>
-                        <select value={style} onChange={e => setStyle(e.target.value)} placeholder="Ex: Realistic" className='rounded border-2 p-1 pr-4 w-full font-serif py-2 text-xs outline-none'>
+                        <select value={style} onChange={e => setStyle(e.target.value)} placeholder="Ex: Realistic" className='rounded border-2 p-1 bg-white text-black pr-4 w-full font-serif py-2 text-xs outline-none'>
                             <option value={'Realistic'}>Realistic</option>
                             <option value={'Elegant'}>Elegant</option>
                             <option value={'Artisitic'}>Artisitic</option>
@@ -59,7 +59,7 @@ const Art = observer(() => {
                     </div>
                     <div className='flex-col flex items-start justify-start ml-4 my-2 w-3/4'>
                         <label className='text-xs font-serif mb-1'>Quality</label>
-                        <select value={quality} onChange={e => setQuality(e.target.value)} placeholder="Ex: Realistic" className='rounded border-2 p-1 pr-4 w-full py-2 font-serif text-xs outline-none'>
+                        <select value={quality} onChange={e => setQuality(e.target.value)} placeholder="Ex: Realistic" className='rounded border-2 bg-white text-black p-1 pr-4 w-full py-2 font-serif text-xs outline-none'>
                             <option value={'4k'}>4k</option>
                             <option value={'8k'}>8k</option>
                         </select>

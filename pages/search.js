@@ -147,7 +147,7 @@ const search = observer(() => {
     //#endregion
 
     return (
-        <div className="max-w-screen-lg m-auto">
+        <div className="max-w-screen-lg m-auto bg-white text-black">
             <Header onSubmitHandlerKeyDown={onSubmitHandlerKeyDown} value={search} setValue={setSearch} onSubmitHandler={onSubmitHandler} />
             <div className="max-w-80 flex flex-row max-md:flex-col">
                 <div className="flex-[0.5] w-[50%] p-4 max-md:w-[100%] md:pt-0">

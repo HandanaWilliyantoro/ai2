@@ -100,7 +100,7 @@ const Write = observer(() => {
     //#endregion
 
     return (
-        <div className='max-w-screen-lg m-auto border h-screen overflow-y-hidden max-md:overflow-y-scroll max-md:[&::-webkit-scrollbar]:hidden max-md:[-ms-overflow-style:"none"] max-md:[scrollbar-width:"none"]'>
+        <div className='max-w-screen-lg bg-white text-black m-auto border h-screen overflow-y-hidden max-md:overflow-y-scroll max-md:[&::-webkit-scrollbar]:hidden max-md:[-ms-overflow-style:"none"] max-md:[scrollbar-width:"none"]'>
             <Header onSubmitHandlerKeyDown={onSubmitHandlerKeyDown} onSubmitHandler={onSubmitHandler} value={search} setValue={setSearch} />
             <div className='flex flex-row items-start flex-1 h-full max-md:flex-col'>
                 <div className='flex-[0.25] bg-gray-100 overflow-y-scroll max-h-[calc(100vh-5rem)] border-black border-r-0 py-2 px-4 max-md:hidden'>
@@ -125,14 +125,14 @@ const Write = observer(() => {
                             {form.length > 0 && form.map(a => (
                                 <div className='flex flex-col w-[calc(100%-4rem)] my-2'>
                                     <label className='text-xs font-sans mb-1'>{a.label}</label>
-                                    <textarea className='font-sans p-2 outline-none border border-black rounded text-xs' onChange={handleOnChangeInput} placeholder={a.placeholder} value={a.value} name={a.name} />
+                                    <textarea className='font-sans text-black bg-white p-2 outline-none border border-black rounded text-xs' onChange={handleOnChangeInput} placeholder={a.placeholder} value={a.value} name={a.name} />
                                 </div>
                             ))}
                             <button onClick={onClickSubmit} className='text-xs bg-black text-white py-2 px-4 rounded ml-auto mt-2 mr-[2rem]'>{postWrite.loading ? "Loading.." : "Submit"}</button>
                         </div>
                         <div className='flex-[0.5] border h-full border-l-1 overflow-y-scroll'>
                             {answer && answer.length > 0 ? (
-                                answer.map((a, i) => <p key={i} className={'font-sans text-xs whitespace-pre-line p-4'}>{a.text}</p>)
+                                answer.map((a, i) => <p key={i} className={'font-sans text-black text-xs whitespace-pre-line p-4'}>{a.text}</p>)
                             ) : (
                                 <Loading text={postWrite.loading ? 'Generating Answer' : 'Answer will be displayed here'} />
                             )}

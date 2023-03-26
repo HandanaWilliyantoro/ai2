@@ -165,10 +165,10 @@ const chat = observer(() => {
         }
 
         if(history.length === 0 && !answer) {
-            return <div className='flex flex-col items-center justify-center w-full h-full'>
+            return <div className='flex flex-col bg-white items-center justify-center w-full h-full'>
                 <img className='w-40 h-40 rounded' src={Persona.src} />
-                <p className='font-sans text-base mt-4'>Current AI Persona</p>
-                <p className='font-bold font-serif text-base'>{persona}</p>
+                <p className='font-sans text-black text-base mt-4'>Current AI Persona</p>
+                <p className='font-bold text-black font-serif text-base'>{persona}</p>
             </div>
         }
     }, [persona, answer, history]);
@@ -179,7 +179,7 @@ const chat = observer(() => {
     //#endregion
 
     return (
-        <div className='max-w-screen-md m-auto h-screen relative border'>
+        <div className='max-w-screen-md m-auto h-screen relative border bg-white'>
             {/* Header */}
             <Header onSubmitHandlerKeyDown={onSubmitHandlerKeyDown} onSubmitHandler={onSubmitHandler} value={search} setValue={setSearch} />
 
@@ -191,20 +191,20 @@ const chat = observer(() => {
             {/* Footer */}
             <div className='absolute w-full max-w-screen-md bg-white bottom-0 flex flex-col items-start pb-4'>
                 <div className='flex flex-row items-center py-2 w-full'>
-                    <p className='font-serif text-xs ml-4'>Current Personality:</p>
-                    <select onChange={onChangePersona} defaultValue={persona} className='text-xs border-2 rounded ml-2 font-sans outline-none py-1'>
+                    <p className='font-serif text-xs ml-4 text-black'>Current Personality:</p>
+                    <select onChange={onChangePersona} defaultValue={persona} className='text-xs border-2 bg-white text-black border-black rounded ml-2 font-sans outline-none py-1'>
                         {personas.map(a => (
                             <option key={a} className='font-sans py-2' value={a}>{a}</option>
                         ))}
                     </select>
-                    <div onClick={() => onClickReset()} className='flex flex-row items-center ml-auto mr-10 cursor-pointer transition hover:opacity-60'>
+                    <div onClick={() => onClickReset()} className='flex flex-row text-black items-center ml-auto mr-10 cursor-pointer transition hover:opacity-60'>
                         <AiOutlineSync />
                         <p className='text-xs ml-1'>Reset</p>
                     </div>
                 </div>
                 <div className='w-full flex flex-row items-center justify-center'>
-                    <input disabled={isLoading} onKeyDown={onClickEnter} value={input} onChange={onChangeInput} placeholder='Write me a tiktok ads copy' className='w-full mx-2 px-3 py-2 outline-none border-2 rounded font-sans' />
-                    <AiOutlineDoubleRight onClick={onClickArrow} className='w-5 h-5 mr-2 cursor-pointer' />
+                    <input disabled={isLoading} onKeyDown={onClickEnter} value={input} onChange={onChangeInput} placeholder='Write me a tiktok ads copy' className='w-full text-black bg-white mx-2 px-3 py-2 outline-none border-2 rounded font-sans' />
+                    <AiOutlineDoubleRight onClick={onClickArrow} className='w-5 h-5 mr-2 text-black cursor-pointer' />
                 </div>
             </div>
         </div>

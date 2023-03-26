@@ -1,5 +1,4 @@
-import {RxMagnifyingGlass, RxChatBubble, RxPencil2, RxImage} from 'react-icons/rx'
-import {SlPuzzle} from 'react-icons/sl'
+import {RxMagnifyingGlass, RxChatBubble, RxPencil2, RxImage, RxPencil1} from 'react-icons/rx'
 
 const menus = [
     {
@@ -221,7 +220,101 @@ const writeOptions = [
     ]},
 ]
 
+const toolOptions = [
+    {
+        name: 'Blog Generator',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Unleash your creativity with our blog generator!'
+    },
+    {
+        name: 'Unique Value Proposition',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Clearly state the benefit of your offer!'
+    },
+    {
+        name: 'Unique Selling Proposition',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Differentiate your products from your competitor!'
+    },
+    {
+        name: 'Instagram Caption',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Generate a caption for instagram post!'
+    },
+    {
+        name: 'Linkedin Post',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Get more out of Linkedin!'
+    },
+    {
+        name: 'Landing Page Copy',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Generate a landing page copy in seconds!'
+    },
+    {
+        name: 'Title Generator',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Generate an attention grabbing titles that gets click!'
+    },
+    {
+        name: 'Cold Email Generator',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Write cold email that actually works!'
+    },
+    {
+        name: 'Event Invitation Email',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Persuasive email to increase attendance'
+    },
+    {
+        name: 'Personal Statement',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Create strong, unique, personal statement effortlessly!'
+    },
+    {
+        name: 'Linkedin Bio',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Create a custom bio that helps you stand out!'
+    },
+    {
+        name: 'Summarizer',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Get the main point of any text!'
+    },
+    {
+        name: "Explain Like I'm Five",
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Explain a complex or obscure topic in the simplest term!'
+    },
+    {
+        name: 'Startup Idea',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Generate your next startup idea!'
+    },
+    {
+        name: 'Quora Answer',
+        icon: <RxPencil1 className='w-6 h-6' />,
+        slug: '/tools/blog-generator',
+        description: 'Quick and reliable answer to all wise question!'
+    },
+]
+
 export {
     menus,
-    writeOptions
+    writeOptions,
+    toolOptions
 }

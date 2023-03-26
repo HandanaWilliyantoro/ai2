@@ -7,7 +7,7 @@ import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast';
 import { signIn, useSession } from "next-auth/react";
 import { SiGoogle } from 'react-icons/si';
 import { observer } from 'mobx-react-lite';
-import { authenticate } from '@/util/auth';
+import { authenticate as formAuthenticate } from '@/util/auth';
 
 import sendVerification from '@/stores/SendVerification.store';
 
@@ -69,7 +69,7 @@ const ModalSignUp = observer(({
     useEffect(() => {
         if(data && status === 'authenticated'){
             console.log(data, 'ini datanya ya')
-            authenticate(data.user, data.accessToken)
+            formAuthenticate(data.user, data.accessToken)
             setModalType(undefined)
         }
     }, [data])
@@ -104,20 +104,20 @@ const ModalSignUp = observer(({
                 <p className='text-xs font-serif text-gray-400 mt-1 w-full text-center'>Discover The Power of AI + Search Engine with Handana</p>
                 <form className='w-full' onSubmit={formik.handleSubmit}>
                     <div className='flex flex-col my-5'>
-                        <input value={formik.values.email} name="email" onChange={formik.handleChange} type="email" className='pb-1 pt-0 px-2 font-serif pl-0 border-b border-black outline-0 text-xs' placeholder='Email' />
+                        <input value={formik.values.email} name="email" onChange={formik.handleChange} type="email" className='pb-1 bg-white text-black pt-0 px-2 font-serif pl-0 border-b border-black outline-0 text-xs' placeholder='Email' />
                     </div>
                     <div className='flex flex-col my-5'>
-                        <input value={formik.values.password} name="password" onChange={formik.handleChange} type="password" className='pb-1 pt-0 px-2 font-serif pl-0 border-b border-black outline-0 text-xs' placeholder='Password' />
+                        <input value={formik.values.password} name="password" onChange={formik.handleChange} type="password" className='pb-1 text-black bg-white pt-0 px-2 font-serif pl-0 border-b border-black outline-0 text-xs' placeholder='Password' />
                     </div>
                     <div className='flex flex-col my-5'>
-                        <input value={formik.values.confirmPassword} name="confirmPassword" onChange={formik.handleChange} type="password" className='pb-1 pt-0 px-2 font-serif pl-0 border-b border-black outline-0 text-xs' placeholder='Confirm Password' />
+                        <input value={formik.values.confirmPassword} name="confirmPassword" onChange={formik.handleChange} type="password" className='pb-1 text-black bg-white pt-0 px-2 font-serif pl-0 border-b border-black outline-0 text-xs' placeholder='Confirm Password' />
                     </div>
                     {formik.errors && <p className='font-serif text-red-500 text-xs mb-2'>{Object.values(formik.errors).toString().replaceAll(',', ', ')}</p>}
                     <button disabled={sendVerification.loading} type="submit" className='bg-black text-white text-xs font-sans py-2 px-4 rounded mt-1 w-full'>{sendVerification.loading ? "Loading.." : "Sign Up"}</button>
-                    <p className='font-sans text-xs my-3 w-full text-center'>Or</p>
+                    <p className='font-sans text-xs my-3 w-full text-center text-black'>Or</p>
                 </form>
-                <button className='font-serif text-xs rounded mb-3 flex flex-row justify-center items-center border-black w-full border py-2' onClick={googleAuth}><SiGoogle className='w-3 h-3 mr-2' /> Continue with Google</button>
-                <p className='mt-3 font-serif text-center w-full text-xs'>Have an account? Click <span onClick={() => setModalType('sign-in')} className='text-blue-500 hover:underline cursor-pointer'>here</span></p>
+                <button className='font-serif text-xs rounded mb-3 flex flex-row justify-center items-center border-black w-full border py-2 text-black' onClick={googleAuth}><SiGoogle className='w-3 h-3 mr-2 text-black' /> Continue with Google</button>
+                <p className='mt-3 font-serif text-center w-full text-xs text-black'>Have an account? Click <span onClick={() => setModalType('sign-in')} className='text-blue-500 hover:underline cursor-pointer'>here</span></p>
             </div>
         </Modal>
     )
