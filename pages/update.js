@@ -26,6 +26,11 @@ const content = [
     date: '23/03/2023',
     title: 'New Persona on Chat Feature',
     description: "Add Mental Health Adviser, DIY Expert and Chef Persona."
+  },
+  {
+    date: '26/03/2023',
+    title: 'Hotfix UI on Dark Mode Screen',
+    description: "Bringing clarity to the darkness of your screen."
   }
 ]
 
