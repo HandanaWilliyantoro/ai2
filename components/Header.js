@@ -31,7 +31,7 @@ const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
             </div>
             <div className='flex-[0.5] flex flex-col w-full p-4 py-0 mt-auto max-md:flex-[0.8] max-md:p-2'>
                 <div className="relative w-full">
-                <input onKeyDown={(e) => onSubmitHandlerKeyDown(e)} onChange={e => setValue(e.target.value)} value={value} type="text" className="w-full font-sans rounded-full text-sm pl-4 pr-10 py-1 border-2 border-black-200 hover:border-gray-300 focus:outline-none focus:border-blue-500 transition-colors md:-mb-4" placeholder="Search..."/>
+                <input onKeyDown={(e) => onSubmitHandlerKeyDown(e)} onChange={e => setValue(e.target.value)} value={value} type="text" className="w-full text-black bg-white font-sans rounded-full text-sm pl-4 pr-10 py-1 border-2 border-black-200 hover:border-gray-300 focus:outline-none focus:border-blue-500 transition-colors md:-mb-4" placeholder="Search..."/>
                 <button onClick={onSubmitHandler} className="block w-7 h-7 pl-1 font-serif text-center text-xl leading-0 absolute top-0.5 right-2 text-gray-400 focus:outline-none hover:text-gray-900 transition-colors"><RxMagnifyingGlass /></button>
                 <div className='flex flex-row mt-3 pb-2'>
                     {menus.map(a => (
