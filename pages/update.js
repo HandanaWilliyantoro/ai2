@@ -41,7 +41,7 @@ const Update = () => {
       <div className='flex flex-col h-full p-4 py-0 overflow-y-scroll bg-white'>
         <p className='text-sm font-bold text-center ml-4 mt-6 mb-4 font-sans text-black'>Stay ahead with our latest update!</p>
         {content.map(a => (
-          <div className='flex flex-row border-gray-200 items-center justify-center bg-white w-full border-2 p-4 py-3 my-2 rounded max-md:p-2'>
+          <div className='flex flex-row border-gray-300 items-center justify-center bg-white w-full border-2 p-4 py-3 my-2 rounded max-md:p-2'>
             <p className='font-bold bg-green-200 mr-4 font-sans text-center py-2 text-xs flex-[0.15] text-black rounded max-md:mr-4 max-md:px-2'>{a.date}</p>
             <div className='flex flex-col items-start ml-4 flex-[0.85] justify-start max-md:ml-0'>
               <h4 className='font-serif font-bold text-sm text-black mb-2'>{a.title}</h4>
