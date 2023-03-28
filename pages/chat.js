@@ -1,16 +1,17 @@
 import React, {useState, useCallback, useEffect, useRef} from 'react'
-import {AiOutlineDoubleRight, AiOutlineSync} from 'react-icons/ai'
+import {AiOutlineDoubleRight, AiOutlineSync, AiFillThunderbolt, AiFillCopy} from 'react-icons/ai'
+import {BsFillSendFill} from 'react-icons/bs'
 import { useRouter } from 'next/router'
-import ModalPersona from '@/components/ModalPersona'
 import Persona from '../util/assets/persona.png'
-
 // Stores
 import { observer } from 'mobx-react-lite'
 import postChat from '@/stores/Chat.store'
 
 // Components
+import ModalPersona from '@/components/ModalPersona'
+import ModalAction from '@/components/ModalSend'
 import Header from '@/components/Header'
-import { showErrorSnackbar } from '@/util/toast'
+import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast'
 
 const chat = observer(() => {
 
@@ -122,6 +123,8 @@ const chat = observer(() => {
     const [search, setSearch] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [isModalPersonaOpened, setIsModalPersonaOpened] = useState(false)
+    const [isModalActionOpened, setIsModalActionOpened] = useState(false)
+    const [selectedAction, setSelectedAction] = useState('')
 
     const divRef = useRef(null);
     const router = useRouter();
@@ -178,11 +181,6 @@ const chat = observer(() => {
         setInput(e.target.value)
     }, [])
 
-    const onChangePersona = useCallback((e) => {
-        setPersona(e.target.value)
-        setHistory([])
-    }, [])
-
     const onClickEnter = useCallback((e) => {
 
         if(isLoading) return;
@@ -229,6 +227,12 @@ const chat = observer(() => {
         }
     }, [postChat.finished])
 
+    const onClickCopy = useCallback((text) => {
+        navigator.clipboard.writeText(text);
+
+        showSuccessSnackbar(`Copy to clipboard!`)
+    }, []);
+
     const renderBody = useCallback(() => {
         if(history.length > 0){
             return <div className='flex flex-col items-start justify-start w-full h-full'>
@@ -238,8 +242,12 @@ const chat = observer(() => {
                             <p className='font-serif text-black'>{a.content.input ?? a.content}</p>
                         </div>
                     } else if (a.role === 'assistant') {
-                        return <div key={i} className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full'>
+                        return <div key={i} className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
                             <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
+                            <div className='flex flex-row items-center justify-start mt-4'>
+                                <p onClick={() => onSelectAction(a.content)} className='font-sans text-xs font-bold flex flex-row items-center mr-4 transition cursor-pointer hover:opacity-50'><BsFillSendFill className='mr-1' /> Send</p>
+                                <p onClick={() => onClickCopy(a.content)} className='font-sans text-xs font-bold flex flex-row items-center transition cursor-pointer hover:opacity-50'><AiFillCopy className='mr-1' /> Copy</p>
+                            </div>
                         </div>
                     }
                 })}
@@ -279,8 +287,13 @@ const chat = observer(() => {
         setPersona(newPersona)
     }, [persona]);
 
+    const onSelectAction = useCallback((val) => {
+        setIsModalActionOpened(true);
+        setSelectedAction(val)
+    }, [])
+
     useEffect(() => {
-        onClickReset()
+        // onClickReset()
     }, [])
     //#endregion
 
@@ -293,6 +306,14 @@ const chat = observer(() => {
                 persona={persona}
                 setPersona={setPersona}
                 onSelectPersona={onSelectPersona}
+            />
+
+            {/* Modal Action */}
+            <ModalAction
+                isOpen={isModalActionOpened}
+                onRequestClose={() => setIsModalActionOpened(!isModalActionOpened)}
+                data={selectedAction}
+                setSelectedAction={setSelectedAction}
             />
 
             {/* Header */}
