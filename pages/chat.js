@@ -1,6 +1,7 @@
 import React, {useState, useCallback, useEffect, useRef} from 'react'
 import {AiOutlineDoubleRight, AiOutlineSync} from 'react-icons/ai'
 import { useRouter } from 'next/router'
+import ModalPersona from '@/components/ModalPersona'
 import Persona from '../util/assets/persona.png'
 
 // Stores
@@ -11,31 +12,116 @@ import postChat from '@/stores/Chat.store'
 import Header from '@/components/Header'
 import { showErrorSnackbar } from '@/util/toast'
 
-const personas = [
-    'General',
-    'Full Stack Developer',
-    'Legal Advisor',
-    'Writer',
-    'Travel Guide',
-    'Advertiser',
-    'Stand-up Comedian',
-    'Motivational Speaker',
-    'Debater',
-    'Dream Interpreter',
-    'Historian',
-    'Mental Health Adviser',
-    'Chef',
-    'DIY Expert'
-]
-
 const chat = observer(() => {
 
     const [history, setHistory] = useState([]);
     const [input, setInput] = useState('')
-    const [persona, setPersona] = useState('General')
+    const [persona, setPersona] = useState([
+        {
+            title: 'General',
+            description: 'Engage in meaningful conversations with our friendly general persona.',
+            selected: true
+        },
+        {
+            title: 'Full stack developer',
+            description: 'Building seamless solutions through intelligent conversations with our full stack developer AI persona.',
+            selected: false,
+        },
+        {
+            title: 'Legal Advisor',
+            description: 'Expert legal advice at your fingertips',
+            selected: false
+        },
+        {
+            title: 'Writer',
+            description: 'Unlock your writing potential with our creative and insightful AI writer persona.',
+            selected: false
+        },
+        {
+            title: 'Travel Guide',
+            description: 'Embark on unforgettable journeys with the guidance of our experienced AI travel advisor persona.',
+            selected: false
+        },
+        {
+            title: 'Advertiser',
+            description: 'Maximize your reach with the strategic insights of our AI advertiser persona.',
+            selected: false,
+        },
+        {
+            title: 'Stand-up comedian',
+            description: 'Laugh out loud with our witty and entertaining AI stand-up comedian persona.',
+            selected: false,
+        },
+        {
+            title: 'Motivational Speaker',
+            description: 'Find inspiration and reach your goals with the uplifting guidance',
+            selected: false
+        },
+        {
+            title: 'Debater',
+            description: 'Sharpen your arguments and challenge your beliefs with our intelligent AI debater persona.',
+            selected: false,
+        },
+        {
+            title: 'Dream Interpreter',
+            description: 'Unlock the secrets of your subconscious mind',
+            selected: false
+        },
+        {
+            title: 'Historian',
+            description: 'Discover the past and gain valuable insights into the present',
+            selected: false
+        },
+        {
+            title: 'Mental health advisor',
+            description: 'Find peace of mind and support on your mental health journey with our caring and knowledgeable AI advisor persona.',
+            selected: false
+        },
+        {
+            title: 'Chef',
+            description: 'Experience culinary delight with the guidance of our skilled and innovative AI chef persona.',
+            selected: false
+        },
+        {
+            title: 'DIY Expert',
+            description: 'Unleash your inner handyman with the expert advice of our innovative and creative AI DIY expert persona.',
+            selected: false
+        },
+        {
+            title: 'English Translator',
+            description: 'Translating language barriers into seamless conversations.',
+            selected: false,
+        },
+        {
+            title: 'Storyteller',
+            description: 'Let me take you on a journey through the power of words.',
+            selected: false
+        },
+        {
+            title: 'Composer',
+            description: 'Compose your world with the melodies of your imagination.',
+            selected: false
+        },
+        {
+            title: 'Philosopher',
+            description: "Exploring the depths of life's biggest questions, together.",
+            selected: false
+        },
+        {
+            title: 'Accountant',
+            description: 'Chat on us to keep your finances in order.',
+            selected: false
+        },
+        {
+            title: 'Lunatic',
+            description: 'Unlocking the absurdity of life, one chat at a time.',
+            selected: false
+        }
+    ])
     const [answer, setAnswer] = useState('');
     const [search, setSearch] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const [isModalPersonaOpened, setIsModalPersonaOpened] = useState(false)
 
     const divRef = useRef(null);
     const router = useRouter();
@@ -103,14 +189,15 @@ const chat = observer(() => {
 
         if(e.key === 'Enter'){
             const parsedHistory = JSON.parse(JSON.stringify(history))
+            const selectedPersona = persona.find(a => a.selected).title
             scrollToBottom()
             if(parsedHistory.length > 0){
                 setHistory([...parsedHistory, {role: 'user', content: input}])
                 const params = [...parsedHistory, {role: 'user', content: input}]
                 handleFetchAnswer(params)
             } else {
-                setHistory([...parsedHistory, {role: 'user', content: {input, persona}}])
-                const params = [...parsedHistory, {role: 'user', content: {input, persona}}]
+                setHistory([...parsedHistory, {role: 'user', content: {input, persona: selectedPersona}}])
+                const params = [...parsedHistory, {role: 'user', content: {input, persona: selectedPersona}}]
                 handleFetchAnswer(params)
             }
         }
@@ -118,6 +205,7 @@ const chat = observer(() => {
 
     const onClickArrow = useCallback(() => {
         if(isLoading) return;
+        const selectedPersona = persona.find(a => a.selected).title
         const parsedHistory = JSON.parse(JSON.stringify(history))
         scrollToBottom()
         if(parsedHistory.length > 0){
@@ -125,8 +213,8 @@ const chat = observer(() => {
             const params = [...parsedHistory, {role: 'user', content: input}]
             handleFetchAnswer(params)
         } else {
-            setHistory([...parsedHistory, {role: 'user', content: {input, persona}}])
-            const params = [...parsedHistory, {role: 'user', content: {input, persona}}]
+            setHistory([...parsedHistory, {role: 'user', content: {input, persona: selectedPersona}}])
+            const params = [...parsedHistory, {role: 'user', content: {input, persona: selectedPersona}}]
             handleFetchAnswer(params)
         }
     }, [input, history, persona]);
@@ -142,7 +230,6 @@ const chat = observer(() => {
     }, [postChat.finished])
 
     const renderBody = useCallback(() => {
-
         if(history.length > 0){
             return <div className='flex flex-col items-start justify-start w-full h-full'>
                 {history.map((a, i) => {
@@ -168,10 +255,29 @@ const chat = observer(() => {
             return <div className='flex flex-col bg-white items-center justify-center w-full h-full'>
                 <img className='w-40 h-40 rounded' src={Persona.src} />
                 <p className='font-sans text-black text-base mt-4'>Current AI Persona</p>
-                <p className='font-bold text-black font-serif text-base'>{persona}</p>
+                <p className='font-bold text-black font-serif text-base'>{persona.find(a => a.selected === true).title}</p>
             </div>
         }
     }, [persona, answer, history]);
+
+    const onSelectPersona = useCallback(async (a) => {
+        const i = persona.findIndex(el => el === a);
+        let parsePersona = await JSON.parse(JSON.stringify(persona));
+        const newPersona = await parsePersona.map((element, index) => {
+            if(index === i){
+                return {
+                    ...element,
+                    selected: true
+                }
+            } else {
+                return {
+                    ...element,
+                    selected: false
+                }
+            }
+        })
+        setPersona(newPersona)
+    }, [persona]);
 
     useEffect(() => {
         onClickReset()
@@ -180,23 +286,36 @@ const chat = observer(() => {
 
     return (
         <div className='max-w-screen-md m-auto h-screen relative border bg-white'>
+            {/* Modal Persona */}
+            <ModalPersona
+                isOpen={isModalPersonaOpened}
+                onRequestClose={() => setIsModalPersonaOpened(!isModalPersonaOpened)}
+                persona={persona}
+                setPersona={setPersona}
+                onSelectPersona={onSelectPersona}
+            />
+
             {/* Header */}
             <Header onSubmitHandlerKeyDown={onSubmitHandlerKeyDown} onSubmitHandler={onSubmitHandler} value={search} setValue={setSearch} />
 
             {/* Body */}
-            <div className='h-[calc(100vh-180px)] overflow-y-scroll max-md:h-[calc(100vh-245px)]'>
+            <div className='h-[calc(100vh-180px)] overflow-y-scroll max-md:h-[calc(100vh-225px)]'>
                 {renderBody()}
             </div>
 
             {/* Footer */}
             <div className='absolute w-full max-w-screen-md bg-white bottom-0 flex flex-col items-start pb-4'>
                 <div className='flex flex-row items-center py-2 w-full'>
-                    <p className='font-serif text-xs ml-4 text-black'>Current Personality:</p>
-                    <select onChange={onChangePersona} defaultValue={persona} className='text-xs border-2 bg-white text-black border-black rounded ml-2 font-sans outline-none py-1'>
+                    <p onClick={() => setIsModalPersonaOpened(!isModalPersonaOpened)} className='font-serif text-xs ml-4 text-black flex flex-row items-center hover:underline cursor-pointer'>See Persona Library <AiOutlineDoubleRight className='w-2 h-2 ml-1' /></p>
+                    {/* <select onChange={onChangePersona} defaultValue={persona} className='text-xs border-2 bg-white text-black cursor-pointer border-gray-300 rounded ml-2 font-sans outline-none py-1'>
                         {personas.map(a => (
-                            <option key={a} className='font-sans py-2' value={a}>{a}</option>
+                            <option key={a} className='font-sans py-2' value={a}>
+                                <div className='p-4'>
+                                    <p>{a}</p>
+                                </div>
+                            </option>
                         ))}
-                    </select>
+                    </select> */}
                     <div onClick={() => onClickReset()} className='flex flex-row text-black items-center ml-auto mr-10 cursor-pointer transition hover:opacity-60'>
                         <AiOutlineSync />
                         <p className='text-xs ml-1'>Reset</p>
