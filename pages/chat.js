@@ -227,8 +227,8 @@ const chat = observer(() => {
         }
     }, [postChat.finished])
 
-    const onClickCopy = useCallback((text) => {
-        navigator.clipboard.writeText(text);
+    const onClickCopy = useCallback(async (text) => {
+        await navigator.clipboard.writeText(text);
 
         showSuccessSnackbar(`Copy to clipboard!`)
     }, []);
@@ -245,8 +245,8 @@ const chat = observer(() => {
                         return <div key={i} className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
                             <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
                             <div className='flex flex-row items-center justify-start mt-4'>
-                                <p onClick={() => onSelectAction(a.content)} className='font-sans text-xs font-bold flex flex-row items-center mr-4 transition cursor-pointer hover:opacity-50'><BsFillSendFill className='mr-1' /> Send</p>
-                                <p onClick={() => onClickCopy(a.content)} className='font-sans text-xs font-bold flex flex-row items-center transition cursor-pointer hover:opacity-50'><AiFillCopy className='mr-1' /> Copy</p>
+                                <p onClick={() => onSelectAction(a.content)} className='font-sans text-black text-xs font-bold flex flex-row items-center mr-4 transition cursor-pointer hover:opacity-50'><BsFillSendFill className='mr-1' /> Send</p>
+                                <p onClick={() => onClickCopy(a.content)} className='font-sans text-black text-xs font-bold flex flex-row items-center transition cursor-pointer hover:opacity-50'><AiFillCopy className='mr-1' /> Copy</p>
                             </div>
                         </div>
                     }
