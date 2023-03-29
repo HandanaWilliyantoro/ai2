@@ -141,7 +141,7 @@ const ModalSend = ({
                     </div>
                 )
         }
-    }, [selected, data, sendEmailTo, emailSubject, waNumber])
+    }, [selected, data, sendEmailTo, emailSubject, waNumber, isOpen])
     //#endregion
 
     return (
@@ -153,7 +153,7 @@ const ModalSend = ({
                 </div>
                 <div className='flex flex-col items-start justify-start p-2 w-full'>
                     <label className='font-sans text-xs mb-1 ml-1 text-black'>Application</label>
-                    <select className='outline-none border-2 bg-white text-black font-serif p-1 w-full rounded text-xs cursor-pointer' onChange={(e) => onSelect(e.target.value)} defaultValue={'email'} >
+                    <select className='outline-none border-2 bg-white text-black font-serif p-1 w-full rounded text-xs cursor-pointer' onChange={(e) => onSelect(e.target.value)} defaultValue={selected} >
                         {services.map(a => (
                             <option className='text-xs font-sans cursor-pointer font-bold my-2' value={a.value}>
                                 <div className='flex flex-row items-center justify-start py-2'>
