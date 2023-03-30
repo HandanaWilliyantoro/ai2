@@ -287,7 +287,7 @@ const chat = observer(() => {
                 {createArt.loading && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
                         <ImageSkeleton />
-                        <p className="mt-1 font-sans text-sm font-bold">Generating Art..</p>
+                        <p className="mt-1 font-sans text-sm font-bold text-black">Generating Art..</p>
                     </div>
                 )}
             </div>
@@ -372,7 +372,7 @@ const chat = observer(() => {
                         ))}
                     </select> */}
                     <div className='group relative ml-auto mr-2 flex justify-center'>
-                        <AiOutlineInfoCircle />
+                        <AiOutlineInfoCircle className='text-black' />
                         <span class="absolute bottom-10 w-[250px] scale-0 right-0 rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
                             <p className='font-bold mb-2 text-sm'>Advance Operator</p>
                             <p className="font-sans text-xs">Art Generator : use !image operator to generate image (ex: !image an indonesian man)</p>
