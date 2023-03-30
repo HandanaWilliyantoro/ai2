@@ -7,7 +7,7 @@ export default async function handler (req, res){
         const {prompt} = req.body;
         const openJourneyModel = await replicate.models.get('prompthero/openjourney');
         const openJourneyPrediction = await openJourneyModel.predict({ 
-            prompt: `mdjrny-v4 style portrait of ${prompt}, 4k`,
+            prompt: `mdjrny-v4 style portrait of ${prompt}, 8k`,
             width: 512,
             height: 512,
             steps: 30, 

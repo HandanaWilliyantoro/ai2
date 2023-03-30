@@ -16,6 +16,7 @@
     "formik": "^2.2.9",
     "googleapis": "^112.0.0",
     "jsonwebtoken": "^9.0.0",
+    "langchain": "^0.0.43",
     "mobx": "^6.8.0",
     "mobx-react-lite": "^3.4.0",
     "mongoose": "^7.0.0",

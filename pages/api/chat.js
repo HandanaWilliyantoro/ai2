@@ -96,13 +96,13 @@ const handler = async (req) => {
   const { history } = (await req.json())
 
   const messages = history.map(a => {
-    if(a.content.input) {
+    if(a.content.input && a.content.persona) {
         const contentIncludePersona = createPersona(a.content.persona, a.content.input)
         return contentIncludePersona
     } else {
         return {role: a.role, content: a.content}
     }
-})
+  })
 
   if (!history) {
     return new Response("No prompt in the request", { status: 400 });

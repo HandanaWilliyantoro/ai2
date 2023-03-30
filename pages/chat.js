@@ -1,17 +1,19 @@
-import React, {useState, useCallback, useEffect, useRef} from 'react'
-import {AiOutlineDoubleRight, AiOutlineSync, AiFillThunderbolt, AiFillCopy} from 'react-icons/ai'
+import React, {useState, useCallback, useEffect, useRef, createElement} from 'react'
+import {AiOutlineDoubleRight, AiOutlineSync, AiOutlineInfoCircle, AiFillCopy} from 'react-icons/ai'
 import {BsFillSendFill} from 'react-icons/bs'
 import { useRouter } from 'next/router'
 import Persona from '../util/assets/persona.png'
 // Stores
 import { observer } from 'mobx-react-lite'
 import postChat from '@/stores/Chat.store'
+import createArt from '@/stores/Art.store'
 
 // Components
 import ModalPersona from '@/components/ModalPersona'
 import ModalAction from '@/components/ModalSend'
 import Header from '@/components/Header'
 import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast'
+import ImageSkeleton from '@/components/ImageSkeleton'
 
 const chat = observer(() => {
 
@@ -139,12 +141,34 @@ const chat = observer(() => {
     
     //#region FETCH CHAT ANSWER
     const handleFetchAnswer = useCallback((params) => {
-        if(postChat.loading || isLoading) return;
-        setIsLoading(true)
-        postChat.execute({history: params})
-    }, []);
+        if(isLoading) return;
+        setIsLoading(true);
+        const contentChecker = params && params.length > 1 ? params[params.length - 1].content :  params[params.length - 1].content.input
+        if(contentChecker.split(' ')[0] === '!image'){
+            const processedPrompt = contentChecker.replace('!image ', '')
+            createArt.execute({prompt: processedPrompt ?? 'dummy'})
+        } else {
+            postChat.execute({history: params})
+        }
+    }, [input]);
 
-    /* Watcher */
+    /* Watcher Image */
+    useEffect(() => {
+        if(createArt.response){
+            const parsedHistory = JSON.parse(JSON.stringify(history))
+            setHistory([...parsedHistory, {role: 'assistant', content: createArt.response}])
+            setInput('')
+            setIsLoading(false)
+            createArt.reset()
+        } else if (createArt.error) {
+            setIsLoading(false);
+            setInput('')
+            showErrorSnackbar(createArt.error)
+            createArt.reset()
+        }
+    }, [createArt.response, createArt.error, createArt.reset]);
+
+    /* Watcher Text */
     useEffect(() => {
         if(postChat.response){
             setIsLoading(false)
@@ -243,7 +267,11 @@ const chat = observer(() => {
                         </div>
                     } else if (a.role === 'assistant') {
                         return <div key={i} className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
-                            <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
+                            {/\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(a.content) ? (
+                                <img onClick={() => window.open(a.content, '_blank')} className='w-[275px] h-[275px] cursor-pointer object-center rounded transition hover:opacity-50' src={a.content} alt='generated ai image' />
+                            ) : (
+                                <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
+                            )}
                             <div className='flex flex-row items-center justify-start mt-4'>
                                 <p onClick={() => onSelectAction(a.content)} className='font-sans text-black text-xs font-bold flex flex-row items-center mr-4 transition cursor-pointer hover:opacity-50'><BsFillSendFill className='mr-1' /> Send</p>
                                 <p onClick={() => onClickCopy(a.content)} className='font-sans text-black text-xs font-bold flex flex-row items-center transition cursor-pointer hover:opacity-50'><AiFillCopy className='mr-1' /> Copy</p>
@@ -253,7 +281,13 @@ const chat = observer(() => {
                 })}
                 {answer && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full'>
-                            <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
+                        <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
+                    </div>
+                )}
+                {createArt.loading && (
+                    <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
+                        <ImageSkeleton />
+                        <p className="mt-1 font-sans text-sm font-bold">Generating Art..</p>
                     </div>
                 )}
             </div>
@@ -337,7 +371,14 @@ const chat = observer(() => {
                             </option>
                         ))}
                     </select> */}
-                    <div onClick={() => onClickReset()} className='flex flex-row text-black items-center ml-auto mr-10 cursor-pointer transition hover:opacity-60'>
+                    <div className='group relative ml-auto mr-2 flex justify-center'>
+                        <AiOutlineInfoCircle />
+                        <span class="absolute bottom-10 w-[250px] scale-0 right-0 rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
+                            <p className='font-bold mb-2 text-sm'>Advance Operator</p>
+                            <p className="font-sans text-xs">Art Generator : use !image operator to generate image (ex: !image an indonesian man)</p>
+                        </span>
+                    </div>
+                    <div onClick={() => onClickReset()} className='flex flex-row text-black items-center mr-10 cursor-pointer transition hover:opacity-60'>
                         <AiOutlineSync />
                         <p className='text-xs ml-1'>Reset</p>
                     </div>
