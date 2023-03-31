@@ -126,7 +126,8 @@ const chat = observer(() => {
     const [isLoading, setIsLoading] = useState(false)
     const [isModalPersonaOpened, setIsModalPersonaOpened] = useState(false)
     const [isModalActionOpened, setIsModalActionOpened] = useState(false)
-    const [selectedAction, setSelectedAction] = useState('')
+    const [selectedAction, setSelectedAction] = useState('');
+    const [conversationId, setConversationId] = useState()
 
     const divRef = useRef(null);
     const router = useRouter();
@@ -137,7 +138,7 @@ const chat = observer(() => {
 
     useEffect(() => {
         scrollToBottom()
-    }, [history])
+    }, [history.length])
     
     //#region FETCH CHAT ANSWER
     const handleFetchAnswer = useCallback((params) => {
@@ -148,9 +149,14 @@ const chat = observer(() => {
             const processedPrompt = contentChecker.replace('!image ', '')
             createArt.execute({prompt: processedPrompt ?? 'dummy'})
         } else {
-            postChat.execute({history: params})
+            if(history.length < 1){
+                const findPersona = persona.find(a => a.selected).title
+                postChat.execute({query: input, persona: findPersona})
+            } else {
+                postChat.execute({query: input, conversationId})
+            }
         }
-    }, [input]);
+    }, [input, conversationId, persona, history]);
 
     /* Watcher Image */
     useEffect(() => {
@@ -172,8 +178,9 @@ const chat = observer(() => {
     useEffect(() => {
         if(postChat.response){
             setIsLoading(false)
-            const response = JSON.parse(JSON.stringify(answer))
-            setAnswer(`${response + postChat.response}`)
+            const parsedHistory = JSON.parse(JSON.stringify(history))
+            setHistory([...parsedHistory, {role: 'assistant', content: postChat.response.data}])
+            setConversationId(postChat.response.conversationId)
             setInput('')
             postChat.reset()
         } else if (postChat.error) {
@@ -241,16 +248,6 @@ const chat = observer(() => {
         }
     }, [input, history, persona]);
 
-    /* Watcher when request has finisihed */
-    useEffect(() => {
-        if(postChat.finished){
-            const parsedHistory = JSON.parse(JSON.stringify(history))
-            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
-            setAnswer('')
-            setInput('')
-        }
-    }, [postChat.finished])
-
     const onClickCopy = useCallback(async (text) => {
         await navigator.clipboard.writeText(text);
 
@@ -279,11 +276,6 @@ const chat = observer(() => {
                         </div>
                     }
                 })}
-                {answer && (
-                    <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full'>
-                        <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
-                    </div>
-                )}
                 {createArt.loading && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
                         <ImageSkeleton />
@@ -318,8 +310,9 @@ const chat = observer(() => {
                 }
             }
         })
+        onClickReset()
         setPersona(newPersona)
-    }, [persona]);
+    }, [persona, onClickReset]);
 
     const onSelectAction = useCallback((val) => {
         setIsModalActionOpened(true);
@@ -373,7 +366,7 @@ const chat = observer(() => {
                     </select> */}
                     <div className='group relative ml-auto mr-2 flex justify-center'>
                         <AiOutlineInfoCircle className='text-black' />
-                        <span className="absolute bottom-10 w-[250px] scale-0 right-0 rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
+                        <span class="absolute bottom-10 w-[250px] scale-0 right-0 rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
                             <p className='font-bold mb-2 text-sm'>Advance Operator</p>
                             <p className="font-sans text-xs">Art Generator : use !image operator to generate image (ex: !image an indonesian man)</p>
                         </span>
