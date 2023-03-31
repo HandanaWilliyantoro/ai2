@@ -87,7 +87,7 @@ const writeOptions = [
             placeholder: 'Example: I went to east coast park with my family',
             value: "",
             name: 'extra1',
-            label: 'What do you want to include? (optional)'
+            label: 'What do you want to include?'
         },
     ]},
     {"name":"Reply to Email", "description": "Make your email replies more efficient", "slug":"reply-to-email","specialFeature":false, form: [
@@ -134,10 +134,10 @@ const writeOptions = [
     ]},
     {"name":"Headline Generator", "description":"Make your headlines pop with our headline generator!","slug":"headline-generator","specialFeature":false, form: [
         {
-            placeholder: 'Topic: (example: Website Design)',
+            placeholder: 'example: Website Design',
             value: "",
             name: 'keywords',
-            label: 'Job Role and skills'
+            label: 'Article Topic'
         },
     ]},
     {"name":"Job Description", "description":"Quickly generate job descriptions for any position", "slug":"job-description","specialFeature":false, form: [

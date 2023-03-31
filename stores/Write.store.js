@@ -12,7 +12,7 @@ class WriteStore {
 
     async execute(params){
         postWrite.loading = true
-        fetch(`https://api.askhandana.com/answer/${params.slug}`, {
+        fetch(`/api/answer`, {
             'method': "POST",
             'headers': {
                 'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ class WriteStore {
                 postWrite.failed(response.text)
             }
         })
-        .catch(e => getSearch.failed(e))
+        .catch(e => postWrite.failed(e))
     }
 
     success(data){

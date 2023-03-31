@@ -3,6 +3,8 @@ import {AiOutlineDoubleRight, AiOutlineSync, AiOutlineInfoCircle, AiFillCopy} fr
 import {BsFillSendFill} from 'react-icons/bs'
 import { useRouter } from 'next/router'
 import Persona from '../util/assets/persona.png'
+import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast'
+
 // Stores
 import { observer } from 'mobx-react-lite'
 import postChat from '@/stores/Chat.store'
@@ -12,8 +14,8 @@ import createArt from '@/stores/Art.store'
 import ModalPersona from '@/components/ModalPersona'
 import ModalAction from '@/components/ModalSend'
 import Header from '@/components/Header'
-import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast'
 import ImageSkeleton from '@/components/ImageSkeleton'
+import ChatSkeleton from '@/components/ChatSkeleton'
 
 const chat = observer(() => {
 
@@ -276,6 +278,11 @@ const chat = observer(() => {
                         </div>
                     }
                 })}
+                {postChat.loading && (
+                    <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
+                        <ChatSkeleton />
+                    </div>
+                )}
                 {createArt.loading && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
                         <ImageSkeleton />

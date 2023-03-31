@@ -95,8 +95,6 @@ const handler = async (req, res) => {
       query = await createPersona(persona, query)
     }
 
-    console.log(query, conversationId, persona, 'ini q conversationid sama persona')
-
     const data = await fetch(`https://chatgpt-ai-chat-bot.p.rapidapi.com/ask`, {
       method: 'POST',
       headers: {
@@ -109,7 +107,9 @@ const handler = async (req, res) => {
 
     const response = await data.json()
 
-    res.status(200).json({ code: 200, text: 'fetch chat successful', data: response })
+    const jsonResponse = await {response: response.response.replace(/\n/g,'\n\n'), conversationId: response.conversationId}
+
+    res.status(200).json({ code: 200, text: 'fetch chat successful', data: jsonResponse })
   } catch(e) {
     console.log(e)
     res.status(500).json({text: 'internal server error', code: 500, error: e})

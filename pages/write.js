@@ -131,8 +131,8 @@ const Write = observer(() => {
                             <button onClick={onClickSubmit} className='text-xs bg-black text-white py-2 px-4 rounded ml-auto mt-2 mr-[2rem]'>{postWrite.loading ? "Loading.." : "Submit"}</button>
                         </div>
                         <div className='flex-[0.5] border h-full border-l-1 overflow-y-scroll'>
-                            {answer && answer.length > 0 ? (
-                                answer.map((a, i) => <p key={i} className={'font-sans text-black text-xs whitespace-pre-line p-4'}>{a.text}</p>)
+                            {answer ? (
+                                <p className={'font-sans text-black text-xs whitespace-pre-line p-4'}>{answer.replace(/\n/g,'\n\n')}</p>
                             ) : (
                                 <Loading text={postWrite.loading ? 'Generating Answer' : 'Answer will be displayed here'} />
                             )}
