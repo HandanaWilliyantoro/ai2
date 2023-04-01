@@ -50,7 +50,7 @@ export default async function handler (req, res) {
                 'X-RapidAPI-Key': '4eb68c2ad1msh2c6664f78ca391ep11b4bajsnfb0317b70d3f',
                 'X-RapidAPI-Host': 'chatgpt-ai-chat-bot.p.rapidapi.com'
             },
-            body: JSON.stringify({query: prompt})
+            body: JSON.stringify({query: prompt, wordLimit: 4096})
         };
 
         let data = await fetch('https://chatgpt-ai-chat-bot.p.rapidapi.com/ask', options)

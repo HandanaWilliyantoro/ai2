@@ -364,15 +364,6 @@ const chat = observer(() => {
             <div className='absolute w-full max-w-screen-md bg-white bottom-0 flex flex-col items-start pb-4'>
                 <div className='flex flex-row items-center py-2 w-full'>
                     <p onClick={() => setIsModalPersonaOpened(!isModalPersonaOpened)} className='font-serif text-xs ml-4 text-black flex flex-row items-center hover:underline cursor-pointer'>See Persona Library <AiOutlineDoubleRight className='w-2 h-2 ml-1' /></p>
-                    {/* <select onChange={onChangePersona} defaultValue={persona} className='text-xs border-2 bg-white text-black cursor-pointer border-gray-300 rounded ml-2 font-sans outline-none py-1'>
-                        {personas.map(a => (
-                            <option key={a} className='font-sans py-2' value={a}>
-                                <div className='p-4'>
-                                    <p>{a}</p>
-                                </div>
-                            </option>
-                        ))}
-                    </select> */}
                     <div className='group relative ml-auto mr-2 flex justify-center'>
                         <AiOutlineInfoCircle className='text-black' />
                         <span className="absolute bottom-10 w-[250px] scale-0 right-0 rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
