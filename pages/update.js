@@ -31,6 +31,16 @@ const content = [
     date: '25/03/2023',
     title: 'Hotfix UI on Dark Mode Screen',
     description: "Bringing clarity to the darkness of your screen."
+  },
+  {
+    date: '27/03/2023',
+    title: 'Advance operator for image generator',
+    description: "Now you can use !image to generate image"
+  },
+  {
+    date: '31/03/2023',
+    title: 'Hotfix write section',
+    description: "Fix write tools cannot be accessed"
   }
 ]
 

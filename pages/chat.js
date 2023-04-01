@@ -152,10 +152,12 @@ const chat = observer(() => {
             createArt.execute({prompt: processedPrompt ?? 'dummy'})
         } else {
             if(history.length < 1){
+                const query = input.toLowerCase()
                 const findPersona = persona.find(a => a.selected).title
-                postChat.execute({query: input, persona: findPersona})
+                postChat.execute({query, persona: findPersona})
             } else {
-                postChat.execute({query: input, conversationId})
+                const query = input.toLowerCase()
+                postChat.execute({query, conversationId})
             }
         }
     }, [input, conversationId, persona, history]);
@@ -373,7 +375,7 @@ const chat = observer(() => {
                     </select> */}
                     <div className='group relative ml-auto mr-2 flex justify-center'>
                         <AiOutlineInfoCircle className='text-black' />
-                        <span class="absolute bottom-10 w-[250px] scale-0 right-0 rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
+                        <span className="absolute bottom-10 w-[250px] scale-0 right-0 rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
                             <p className='font-bold mb-2 text-sm'>Advance Operator</p>
                             <p className="font-sans text-xs">Art Generator : use !image operator to generate image (ex: !image an indonesian man)</p>
                         </span>
