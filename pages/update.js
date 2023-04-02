@@ -41,6 +41,11 @@ const content = [
     date: '31/03/2023',
     title: 'Hotfix write section',
     description: "Fix write tools cannot be accessed"
+  },
+  {
+    date: '01/04/2023',
+    title: 'Code generator feature',
+    description: "Code in a Flash with Our Generator!"
   }
 ]
 
