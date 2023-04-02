@@ -51,6 +51,20 @@ const writeOptions = [
             label: 'Text'
         }
     ]},
+    {"name":"Blog Generator", "description": "Say goodbye to writer's block with our blog generator!", "slug":"blog-generator","specialFeature":false, form: [
+        {
+            placeholder: 'Example: The Benefit of Meditation',
+            value: "",
+            name: 'keywords',
+            label: 'Blog Topic'
+        },
+        {
+            placeholder: 'Example: Technology, economics',
+            value: "",
+            name: 'extra1',
+            label: 'Keywords'
+        },
+    ]},
     {"name":"Paraphraser", "description": "Make your content shine with our easy to use content paraphraser","slug":"content-rewriter","specialFeature":false, form: [
         {
             placeholder: 'Example: Most companies try to stay ahead of the curve',

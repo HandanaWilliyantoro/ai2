@@ -6,6 +6,8 @@ function promptGenerator (payload) {
             return `You are a grammar corrector feature in a writing tool. A user has written the following sentence: "${payload.keywords}" Correct the grammar of the sentence and provide the corrected version, without explaining the correction.`
         case 'content-rewriter':
             return `You are a paraphraser feature in a writing tool. A user has written the following sentence: "${payload.keywords}" Paraphrase the sentence and provide the new version, without explaining the paraphrase.`
+        case 'blog-generator':
+            return `I want you to act as a blog generator. Generate a blog post about ${payload.keywords}, including examples of how it can impact ${payload.extra1}.`
         case 'paragraph-writer':
             return `You are a paragraph writer feature in a writing tool. Write a paragraph about ${payload.keywords}. The paragraph should be concise, informative, and well-structured.`
         case 'sentence-expander':
