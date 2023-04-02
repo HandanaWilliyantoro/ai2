@@ -22,28 +22,14 @@ class SummarizerStore {
                 'Accept-Encoding': 'gzip, deflate, br'
             },
             'body': JSON.stringify(params)
-        }).then(res => {
-            const reader = res.body.getReader();
-
-            const read = () => {
-            // read the data
-            reader.read().then(async ({ done, value }) => {
-                const decoder = new TextDecoder();
-
-                if (done) {
-                    summarizer.finished = true;
-                    return;
-                }
-                if(decoder.decode(value) === 'initiate | stop'){
-                    console.log('initiate | stop')
-                } else {
-                    const decoded = decoder.decode(value);
-                    summarizer.success(decoded)
-                }
-                read();
-            });
-            };
-            read();
+        })
+        .then(res => res.json())
+        .then(response => {
+            if(response.data){
+                summarizer.success(response.data)
+            } else {
+                summarizer.failed(response.text)
+            }
         })
         .catch(e => summarizer.failed(e))
     }

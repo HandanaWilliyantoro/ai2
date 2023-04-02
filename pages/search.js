@@ -57,7 +57,7 @@ const search = observer(() => {
     /* Watcher */
     useEffect(() => {
         if(summarizer.response){
-            handleSummary(summarizer.response)
+            setSummary(summarizer.response)
             summarizer.reset()
         } else if (summarizer.error) {
             showErrorSnackbar(summarizer.error)
@@ -88,11 +88,6 @@ const search = observer(() => {
     //#endregion
 
     //#region HANDLER
-    const handleSummary = useCallback(async (sum) => {
-        const response = summary ? await JSON.parse(JSON.stringify(summary)) : ''
-        setSummary(`${response + sum}`)
-    }, [setSummary, summary])
-
     /* Component Did Mount */
     useEffect(() => {
 
