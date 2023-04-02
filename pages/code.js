@@ -23,6 +23,7 @@ const Code = observer(() => {
     const [input, setInput] = useState('')
     const [lang, setLang] = useState('Javascript')
     const [isLoading, setIsLoading] = useState(false)
+    const [search, setSearch] = useState('')
 
     //#region HANDLE CODE
     const handleFetchCode = useCallback((language, query) => {
@@ -84,15 +85,23 @@ const Code = observer(() => {
             formattedCode += `${"\t".repeat(indentLevel)}${line}\n`;
           }
         }
-
-        console.log(formattedCode, 'ini formmated Code')
         return formattedCode;
     }, [])
+
+    const onSubmitHandler = useCallback(() => {
+        router.push(`/search?q=${search}`)
+    }, [search])
+
+    const onSubmitHandlerKeyDown = useCallback((e) => {
+        if(e.key === 'Enter'){
+            router.push(`/search?q=${search}`)
+        }
+    }, [search]);
     //#endregion
 
     return (
         <div className='max-w-screen-lg flex flex-col bg-white border-2 border-black-500 h-screen m-auto'>
-            <Header />
+            <Header onSubmitHandler={onSubmitHandler} onSubmitHandlerKeyDown={onSubmitHandlerKeyDown} setValue={setSearch} value={search} />
             <div className='flex flex-col mt-4 bg-white items-center justify-start h-[calc(100vh-4rem)] overflow-y-scroll'>
                 <p className='text-3xl text-center text-black font-sans font-bold my-8 mb-2 max-md:mt-4'>Write Less, Code More.</p>
                 <p className='text-sm font-serif text-black text-center max-md:mx-4 max-md:my-1'>Unleash the power of code with just a click - let our generator do the trick!</p>
