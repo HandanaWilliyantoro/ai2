@@ -28,7 +28,11 @@ const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
             <div className='flex-[0.1] max-md:flex max-md:flex-row max-md:justify-between max-md:items-center max-md:w-full max-md:px-4'>
                 <Logo textSize={"text-lg"} />
                 <div className='hidden max-md:flex max-md:items-center'>
+<<<<<<< HEAD
                     <button onClick={() => router.push('/donate')} className='text-xs animate-pulse py-2 px-4 rounded outline-none font-serif text-white bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent'>Donate</button>
+=======
+                    <img onClick={() => window.open('https://www.buymeacoffee.com/handana', '_blank')} src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" className='w-[120px] h-[35px] cursor-pointer transition hover:opacity-50' />
+>>>>>>> 5fce9cf6cdee74c4ec9620c575b1aade0303abd3
                     <RxUpdate onClick={() => navigate('/update')} color='black' className='cursor-pointer mx-2 mr-0 w-5 h-5' />
                     <IoMdLogOut onClick={logout} color='red' className='cursor-pointer mx-2 mr-0 w-5 h-5' />
                 </div>
@@ -48,7 +52,11 @@ const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
             </div>
             </div>
             <div className='flex-[0.4] flex flex-row items-center justify-end px-0 max-md:hidden'>
+<<<<<<< HEAD
                 <button onClick={() => router.push('/donate')} className='text-xs animate-pulse font-bold tracking-wider py-1 px-2 rounded transition hover:opacity-70 outline-none font-serif text-white bg-gradient-to-r from-red-400 via-pink-500 to-purple-500 text-transparent'>Donate</button>
+=======
+                <img onClick={() => window.open('https://www.buymeacoffee.com/handana', '_blank')} src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" className='w-[120px] h-[35px] cursor-pointer transition hover:opacity-50' />
+>>>>>>> 5fce9cf6cdee74c4ec9620c575b1aade0303abd3
                 <RxUpdate onClick={() => navigate('/update')} className='cursor-pointer mx-2 mr-0 ml-3 w-5 h-5' />
                 <IoMdLogOut onClick={logout} color='red' className='cursor-pointer mx-2 mr-0 ml-3 w-5 h-5' />
             </div>
