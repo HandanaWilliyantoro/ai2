@@ -1,12 +1,16 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useRouter } from 'next/router'
 import { IoMdLogOut } from 'react-icons/io'
-import Logo from './Logo'
 import {menus} from '@/util/menus'
 import { signOut } from 'next-auth/react'
 import { RxMagnifyingGlass, RxUpdate } from 'react-icons/rx'
 
+import Logo from './Logo'
+
 const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
+
+    const [isModalDonateOpened, setIsModalDonateOpened] = useState(false)
+
     const router = useRouter()
 
     const logout = useCallback(async () => {
@@ -24,6 +28,7 @@ const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
             <div className='flex-[0.1] max-md:flex max-md:flex-row max-md:justify-between max-md:items-center max-md:w-full max-md:px-4'>
                 <Logo textSize={"text-lg"} />
                 <div className='hidden max-md:flex max-md:items-center'>
+                    <button onClick={() => router.push('/donate')} className='text-xs animate-pulse py-2 px-4 rounded outline-none font-serif text-white bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent'>Donate</button>
                     <RxUpdate onClick={() => navigate('/update')} color='black' className='cursor-pointer mx-2 mr-0 w-5 h-5' />
                     <IoMdLogOut onClick={logout} color='red' className='cursor-pointer mx-2 mr-0 w-5 h-5' />
                 </div>
@@ -43,6 +48,7 @@ const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
             </div>
             </div>
             <div className='flex-[0.4] flex flex-row items-center justify-end px-0 max-md:hidden'>
+                <button onClick={() => router.push('/donate')} className='text-xs animate-pulse font-bold tracking-wider py-1 px-2 rounded transition hover:opacity-70 outline-none font-serif text-white bg-gradient-to-r from-red-400 via-pink-500 to-purple-500 text-transparent'>Donate</button>
                 <RxUpdate onClick={() => navigate('/update')} className='cursor-pointer mx-2 mr-0 ml-3 w-5 h-5' />
                 <IoMdLogOut onClick={logout} color='red' className='cursor-pointer mx-2 mr-0 ml-3 w-5 h-5' />
             </div>
