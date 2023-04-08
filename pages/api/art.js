@@ -1,3 +1,14 @@
+import fs from 'fs'
+
+async function encodeBufferAsBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
 export default async function handler (req, res) {
     try {
 
@@ -24,8 +35,8 @@ export default async function handler (req, res) {
         
         const data = await fetch('https://dezgo.p.rapidapi.com/text2image', options)
     
-        const buffer = await data.buffer()
-        const base64Image = await buffer.toString('base64');
+        const buffer = await data.arrayBuffer();
+        const base64Image = await encodeBufferAsBase64(buffer);
 
         if(base64Image){
             res.status(200).json({code: 200, text: 'create art success', data: `data:image/png;base64, ${base64Image}`});
