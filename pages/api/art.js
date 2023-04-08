@@ -25,7 +25,6 @@ export default async function handler (req, res) {
         const data = await fetch('https://dezgo.p.rapidapi.com/text2image', options)
     
         const buffer = await data.buffer()
-
         const base64Image = await buffer.toString('base64');
 
         if(base64Image){
@@ -38,7 +37,8 @@ export default async function handler (req, res) {
         console.log(e)
         res.status(500).json({
             text: 'internal server error',
-            code: 500   
+            code: 500,
+            error: e
         })
     }
 }

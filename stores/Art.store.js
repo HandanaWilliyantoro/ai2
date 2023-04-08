@@ -27,9 +27,9 @@ class ArtStore {
                 createArt.failed(response.text)
             }
         })
-        .catch(e => {
-            console.log(e)
-            createArt.failed(e)
+        .catch(error => {
+            console.log(error.e)
+            createArt.failed('internal server error')
         })
     }
     
