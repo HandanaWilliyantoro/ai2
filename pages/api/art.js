@@ -4,7 +4,7 @@ export default async function handler (req, res) {
         const {prompt} = req.body
 
         const encodedParams = new URLSearchParams();
-        encodedParams.append("prompt", input);
+        encodedParams.append("prompt", prompt);
         encodedParams.append("guidance", "7");
         encodedParams.append("steps", "30");
         encodedParams.append("sampler", "euler_a");
@@ -37,7 +37,7 @@ export default async function handler (req, res) {
         res.status(500).json({
             text: 'internal server error',
             code: 500,
-            error: e.message
+            data: e.message
         })
     }
 }
