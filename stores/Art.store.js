@@ -23,10 +23,14 @@ class ArtStore {
             if(response.data){
                 createArt.success(response.data)
             } else {
+                console.log(response)
                 createArt.failed(response.text)
             }
         })
-        .catch(e => createArt.failed(e))
+        .catch(e => {
+            console.log(e)
+            createArt.failed(e)
+        })
     }
     
     success(data){
