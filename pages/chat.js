@@ -268,8 +268,8 @@ const chat = observer(() => {
                         </div>
                     } else if (a.role === 'assistant') {
                         return <div key={i} className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
-                            {/\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(a.content) ? (
-                                <img onClick={() => window.open(a.content, '_blank')} className='w-[275px] h-[275px] cursor-pointer object-center rounded transition hover:opacity-50' src={a.content} alt='generated ai image' />
+                            {a.content && a.content.includes('base64') ? (
+                                <img className='w-[275px] h-[275px] cursor-pointer object-center rounded transition hover:opacity-50' src={a.content} alt='generated ai image' />
                             ) : (
                                 <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
                             )}

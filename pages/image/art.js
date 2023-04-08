@@ -72,7 +72,7 @@ const Art = observer(() => {
                             <Loading text={`Generating Art for "${prompt}"`} />
                         </div>
                     ) : (
-                        <img onClick={() => window.open(image || DefaultImg.src, '_blank')} className='w-full transition cursor-pointer hover:opacity-50 h-auto object-cover object-center rounded' src={image || DefaultImg.src} alt={image.uri} />
+                        <img className='w-full transition cursor-pointer hover:opacity-50 h-auto object-cover object-center rounded' src={image || DefaultImg.src} alt={image.uri} />
                     )}
                 </div>
             </div>

@@ -1,23 +1,44 @@
-import Replicate from 'replicate-js';
-
-const replicate = new Replicate({token: process.env.REPLICATE_TOKEN});
-
-export default async function handler (req, res){
+export default async function handler (req, res) {
     try {
-        const {prompt} = req.body;
-        const openJourneyModel = await replicate.models.get('prompthero/openjourney');
-        const openJourneyPrediction = await openJourneyModel.predict({ 
-            prompt: `mdjrny-v4 style portrait of ${prompt}, 8k`,
-            width: 512,
-            height: 512,
-            steps: 30, 
-            intermediate_outputs: true, 
-            batch_size: 2,
-            num_outputs: 1
-        });
-        res.status(200).json({code: 200, text: "Create AI Art Successful", data: openJourneyPrediction[0]})
+
+        const {prompt} = req.body
+
+        const encodedParams = new URLSearchParams();
+        encodedParams.append("prompt", prompt);
+        encodedParams.append("guidance", "7");
+        encodedParams.append("steps", "30");
+        encodedParams.append("sampler", "euler_a");
+        encodedParams.append("upscale", "1");
+        encodedParams.append("negative_prompt", "ugly, tiling, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, extra limbs, disfigured, deformed, body out of frame, blurry, bad anatomy, blurred, watermark, grainy, signature, cut off, draft");
+        encodedParams.append("model", "epic_diffusion_1_1");
+        
+        const options = {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded',
+                'X-RapidAPI-Key': '4eb68c2ad1msh2c6664f78ca391ep11b4bajsnfb0317b70d3f',
+                'X-RapidAPI-Host': 'dezgo.p.rapidapi.com'
+            },
+            body: encodedParams
+        };
+        
+        const data = await fetch('https://dezgo.p.rapidapi.com/text2image', options)
+    
+        const buffer = await data.buffer()
+
+        const base64Image = await buffer.toString('base64');
+
+        if(base64Image){
+            res.status(200).json({code: 200, text: 'create art success', data: `data:image/png;base64, ${base64Image}`});
+        } else {
+            res.status(401).json({text: 'image not found', code: 401})
+        }
+
     } catch(e) {
         console.log(e)
-        res.status(500).json({text: 'Something went wrong', code: 500})
+        res.status(500).json({
+            text: 'internal server error',
+            code: 500   
+        })
     }
 }
