@@ -29,7 +29,6 @@ export default async function handler (req, res) {
         const base64Image = await buffer.toString('base64');
 
         if(base64Image){
-            console.log(base64Image, 'ini base 64 image')
             res.status(200).json({code: 200, text: 'create art success', data: `data:image/png;base64, ${base64Image}`});
         } else {
             res.status(401).json({text: 'image not found', code: 401})
