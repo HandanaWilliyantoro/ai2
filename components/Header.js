@@ -29,7 +29,6 @@ const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
                 <Logo textSize={"text-lg"} />
                 <div className='hidden max-md:flex max-md:items-center'>
                     <img onClick={() => window.open('https://www.buymeacoffee.com/handana', '_blank')} src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" className='w-[120px] h-[35px] cursor-pointer transition hover:opacity-50' />
-                    <RxUpdate onClick={() => navigate('/update')} color='black' className='cursor-pointer mx-2 mr-0 w-5 h-5' />
                     <IoMdLogOut onClick={logout} color='red' className='cursor-pointer mx-2 mr-0 w-5 h-5' />
                 </div>
             </div>
@@ -49,7 +48,6 @@ const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
             </div>
             <div className='flex-[0.4] flex flex-row items-center justify-end px-0 max-md:hidden'>
                 <img onClick={() => window.open('https://www.buymeacoffee.com/handana', '_blank')} src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" className='w-[120px] h-[35px] cursor-pointer transition hover:opacity-50' />
-                <RxUpdate onClick={() => navigate('/update')} className='cursor-pointer mx-2 mr-0 ml-3 w-5 h-5' />
                 <IoMdLogOut onClick={logout} color='red' className='cursor-pointer mx-2 mr-0 ml-3 w-5 h-5' />
             </div>
         </div>

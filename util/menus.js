@@ -1,5 +1,5 @@
 import {RxMagnifyingGlass, RxChatBubble, RxPencil2, RxImage, RxPencil1} from 'react-icons/rx'
-import {BsCodeSlash} from 'react-icons/bs'
+import {BsCardList} from 'react-icons/bs'
 
 const menus = [
     {
@@ -9,15 +9,15 @@ const menus = [
         premium: false
     },
     {
-        label: 'Image',
-        slug: '/image',
-        icon: <RxImage className='w-3 h-3' />,
-        premium: false
-    },
-    {
         label: 'Chat',
         slug: '/chat',
         icon: <RxChatBubble className='w-3 h-3' />,
+        premium: false
+    },
+    {
+        label: 'Image',
+        slug: '/image',
+        icon: <RxImage className='w-3 h-3' />,
         premium: false
     },
     {
@@ -26,12 +26,6 @@ const menus = [
         icon: <RxPencil2 className='w-3 h-3' />,
         premium: false
     },
-    {
-        label: 'Code',
-        slug: '/code',
-        icon: <BsCodeSlash className='w-3 h-3' />,
-        premium: false
-    }
 ]
 
 const writeOptions = [
