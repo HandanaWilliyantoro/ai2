@@ -27,27 +27,28 @@ const handler = async (req, res) => {
     const response = await data.json()
 
     const encodedParams = new URLSearchParams();
-    
-    encodedParams.append("source_language", "en");
-    encodedParams.append("target_language", "id");
+
+    encodedParams.append("from", "en");
+    encodedParams.append("to", "id");
     encodedParams.append("text", response.response.replace(/\n/g,'\n\n'));
 
     const options = {
       method: 'POST',
+      url: 'https://translo.p.rapidapi.com/api/v3/translate',
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
         'X-RapidAPI-Key': '4eb68c2ad1msh2c6664f78ca391ep11b4bajsnfb0317b70d3f',
-        'X-RapidAPI-Host': 'text-translator2.p.rapidapi.com'
+        'X-RapidAPI-Host': 'translo.p.rapidapi.com'
       },
       body: encodedParams
-    };  
+    };
 
-    const responseData = await fetch('https://text-translator2.p.rapidapi.com/translate', options)
+    const responseData = await fetch('https://translo.p.rapidapi.com/api/v3/translate', options)
 
     const resJson = await responseData.json()
 
-    if(resJson.data.translatedText){
-      res.status(200).json({ code: 200, text: 'fetch summary successful', data:  resJson.data.translatedText})
+    if(resJson.translated_text){
+      res.status(200).json({ code: 200, text: 'fetch summary successful', data:  resJson.translated_text})
     } else {
       res.status(404).json({text: 'failed to fetch summary', code: 404})
     }
