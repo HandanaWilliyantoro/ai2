@@ -8,9 +8,6 @@ export default function Document() {
         <Main />
         <NextScript />
       </body>
-      <script type="text/javascript"
-      src="https://app.sandbox.midtrans.com/snap/snap.js"
-      data-client-key={process.env.MIDTRANS_CLIENT_KEY} />
     </Html>
   )
 }
