@@ -28,7 +28,7 @@ const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
             <div className='flex-[0.1] max-md:flex max-md:flex-row max-md:justify-between max-md:items-center max-md:w-full max-md:px-4'>
                 <Logo textSize={"text-lg"} />
                 <div className='hidden max-md:flex max-md:items-center'>
-                    <img onClick={() => window.open('https://trakteer.id/handana-ai', '_blank')} src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" className='w-[120px] h-[35px] cursor-pointer transition hover:opacity-50' />
+                    <img onClick={() => window.open('https://trakteer.id/handana-ai', '_blank')} src="https://cdn.trakteer.id/images/embed/trbtn-red-6.png" alt="Buy Me A Coffee" className='w-[120px] h-[35px] cursor-pointer transition hover:opacity-50' />
                     <IoMdLogOut onClick={logout} color='red' className='cursor-pointer mx-2 mr-0 w-5 h-5' />
                 </div>
             </div>
