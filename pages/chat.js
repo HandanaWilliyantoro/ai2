@@ -1,9 +1,10 @@
-import React, {useState, useCallback, useEffect, useRef, createElement} from 'react'
+import React, {useState, useCallback, useEffect, useRef} from 'react'
 import {AiOutlineDoubleRight, AiOutlineSync, AiOutlineInfoCircle, AiFillCopy} from 'react-icons/ai'
 import {BsFillSendFill} from 'react-icons/bs'
 import { useRouter } from 'next/router'
 import Persona from '../util/assets/persona.png'
 import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast'
+import { getSession, useSession } from 'next-auth/react'
 
 // Stores
 import { observer } from 'mobx-react-lite'
@@ -16,8 +17,10 @@ import ModalAction from '@/components/ModalSend'
 import Header from '@/components/Header'
 import ImageSkeleton from '@/components/ImageSkeleton'
 import ChatSkeleton from '@/components/ChatSkeleton'
+import ModalAuthentication from '@/components/ModalAuthentication'
 
 const chat = observer(() => {
+    const {status} = useSession()
 
     const [history, setHistory] = useState([]);
     const [input, setInput] = useState('')
@@ -130,6 +133,7 @@ const chat = observer(() => {
     const [isModalActionOpened, setIsModalActionOpened] = useState(false)
     const [selectedAction, setSelectedAction] = useState('');
     const [conversationId, setConversationId] = useState()
+    const [isAuthenticated, setIsAuthenticated] = useState(status === 'authenticated' ? true : undefined)
 
     const divRef = useRef(null);
     const router = useRouter();
@@ -237,7 +241,19 @@ const chat = observer(() => {
     }, [input, history, persona, scrollToBottom]);
 
     const onClickArrow = useCallback(() => {
+
+        if(!input && isAuthenticated) {
+            showErrorSnackbar('Question input field cannot be empty')
+            return
+        };
+
         if(isLoading) return;
+
+        if(!isAuthenticated){
+            setIsAuthenticated(false)
+            return;
+        }
+
         const selectedPersona = persona.find(a => a.selected).title
         const parsedHistory = JSON.parse(JSON.stringify(history))
         scrollToBottom()
@@ -250,7 +266,7 @@ const chat = observer(() => {
             const params = [...parsedHistory, {role: 'user', content: {input, persona: selectedPersona}}]
             handleFetchAnswer(params)
         }
-    }, [input, history, persona]);
+    }, [input, history, persona, isAuthenticated]);
 
     const onClickCopy = useCallback(async (text) => {
         await navigator.clipboard.writeText(text);
@@ -330,11 +346,26 @@ const chat = observer(() => {
 
     useEffect(() => {
         onClickReset()
-    }, [])
+        function checkUserData() {
+            const item = localStorage.getItem('token')
+        
+            if(item){
+                setIsAuthenticated(true)
+            }
+        }
+    
+        window.addEventListener('storage', checkUserData)
+    
+        return () => {
+            window.removeEventListener('storage', checkUserData)
+        }
+    }, [isAuthenticated])
     //#endregion
 
     return (
         <div className='max-w-screen-md m-auto h-screen relative border bg-white'>
+            {isAuthenticated === false && <ModalAuthentication setIsAuthenticated={setIsAuthenticated} />}
+
             {/* Modal Persona */}
             <ModalPersona
                 isOpen={isModalPersonaOpened}
@@ -371,14 +402,14 @@ const chat = observer(() => {
                             <p className="font-sans text-xs">Art Generator : use !image operator to generate image (ex: !image an indonesian man)</p>
                         </span>
                     </div>
-                    <div onClick={() => onClickReset()} className='flex flex-row text-black items-center mr-10 cursor-pointer transition hover:opacity-60'>
+                    <div onClick={() => onClickReset()} className='flex flex-row text-black items-center mr-4 cursor-pointer transition hover:opacity-60'>
                         <AiOutlineSync />
                         <p className='text-xs ml-1'>Reset</p>
                     </div>
                 </div>
                 <div className='w-full flex flex-row items-center justify-center'>
                     <input disabled={isLoading} onKeyDown={onClickEnter} value={input} onChange={onChangeInput} placeholder='Write me a tiktok ads copy' className='w-full text-black bg-white mx-2 px-3 py-2 outline-none border-2 rounded font-sans' />
-                    <AiOutlineDoubleRight onClick={onClickArrow} className='w-5 h-5 mr-2 text-black cursor-pointer' />
+                    <button onClick={onClickArrow} className='px-4 py-2.5 w-1/6 max-md:w-1/3 bg-black text-white font-serif text-sm font-bold rounded mr-3'>{isAuthenticated ? 'Submit' : 'Sign In'}</button>
                 </div>
             </div>
         </div>
@@ -386,3 +417,11 @@ const chat = observer(() => {
 })
 
 export default chat
+
+export const getServerSideProps = async (context) => {
+    const session = await getSession(context);
+
+    return {
+        props: {session}
+    }
+}

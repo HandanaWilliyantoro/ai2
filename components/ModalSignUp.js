@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup'
 import { emailRegExp } from '@/util/regex';
 import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast';
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { SiGoogle } from 'react-icons/si';
 import { observer } from 'mobx-react-lite';
 import { authenticate as formAuthenticate } from '@/util/auth';
@@ -29,7 +29,9 @@ const ModalSignUp = observer(({
     setModalType,
     setSecret,
     setUserData,
-    userData
+    userData,
+    setIsAuthenticated,
+    isAuthenticated
 }) => {
 
     const {data, status} = useSession()
@@ -68,11 +70,11 @@ const ModalSignUp = observer(({
     /* Watcher */
     useEffect(() => {
         if(data && status === 'authenticated'){
-            console.log(data, 'ini datanya ya')
+            setIsAuthenticated(true)
             formAuthenticate(data.user, data.accessToken)
             setModalType(undefined)
         }
-    }, [data])
+    }, [data, isAuthenticated])
     //#endregion
 
     const schema = Yup.object({
@@ -98,9 +100,9 @@ const ModalSignUp = observer(({
     });
 
     return (
-        <Modal isOpen={isOpen} ariaHideApp={false} onRequestClose={onRequestClose} style={customStyles}>
+        <Modal isOpen={isOpen} onRequestClose={onRequestClose} ariaHideApp={false} style={customStyles}>
             <div className='flex flex-col items-start w-full justify-center p-4 bg-white'>
-                <h4 className='font-sans text-lg w-full text-center font-bold text-black'>Sign Up</h4>
+                <h4 className='font-sans text-lg w-full text-center font-bold text-black'>Sign Up to Continue</h4>
                 <p className='text-xs font-serif text-gray-400 mt-1 w-full text-center'>Discover The Power of AI + Search Engine with Handana</p>
                 <form className='w-full' onSubmit={formik.handleSubmit}>
                     <div className='flex flex-col my-5'>

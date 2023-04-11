@@ -28,8 +28,8 @@ const ModalPersona = ({
                 <AiOutlineCloseCircle onClick={onRequestClose} className='w-4 h-5 text-black cursor-pointer transition hover:opacity-50' />
             </div>
             <div className='flex flex-col w-full items-start justify-start max-h-[60vh] p-2 overflow-y-scroll'>
-                {persona && persona.map(a => (
-                    <div className='flex flex-row items-center justify-start w-full py-2 pr-2'>
+                {persona && persona.map((a, i) => (
+                    <div key={i} className='flex flex-row items-center justify-start w-full py-2 pr-2'>
                         <input onClick={() => onSelectPersona(a)} className='cursor-pointer checked:before:bg-white accent-white' type={'checkbox'} checked={a.selected} />
                         <div className='ml-4 max-w-[300px]'>
                             <p className='text-sm font-bold font-serif mb-1 text-black'>{a.title}</p>

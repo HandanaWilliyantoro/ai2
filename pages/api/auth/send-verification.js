@@ -50,7 +50,7 @@ export default async function handler (req, res) {
             text: `Your confirmation code is : ${confirmationCode}`
         }
 
-        await transporter.sendMail(mailOptions, async function(err, data) {
+        transporter.sendMail(mailOptions, async function(err, data) {
 
             if(err) {
                 console.log('Error Occurs');
