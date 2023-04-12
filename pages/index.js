@@ -11,10 +11,16 @@ export default function Home() {
 
   const router = useRouter()
 
-  const onSubmitHandler = useCallback((e) => {
+  const onSubmitHandlerKeydown = useCallback((e) => {
     if(e.key === 'Enter'){
+      e.preventDefault()
       router.push(`/search?q=${search}`)
     }
+  }, [search, router.push])
+
+  const onSubmitHandler = useCallback((e) => {
+    e.preventDefault()
+    router.push(`/search?q=${search}`)
   }, [search, router.push])
 
   const navigate = useCallback((url) => {
@@ -26,7 +32,7 @@ export default function Home() {
         <div className="w-full md:w-auto mx-auto rounded-xl bg-gray-100 shadow-lg p-8 text-gray-800 relative overflow-hidden resize-x min-w-40 max-w-3xl flex flex-col items-center justify-center">
           <Logo />
           <Tagline />
-          <Search onSubmitHandler={onSubmitHandler} onChange={e => setSearch(e.target.value)} value={search} />
+          <Search onSubmitHandlerKeydown={onSubmitHandlerKeydown} onSubmitHandler={onSubmitHandler} onChange={e => setSearch(e.target.value)} value={search} />
           <div className="absolute top-0 left-0 w-full h-2 flex">
               <div className="h-2 bg-blue-500 flex-1"></div>
               <div className="h-2 bg-red-500 flex-1"></div>

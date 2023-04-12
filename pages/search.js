@@ -124,6 +124,7 @@ const search = observer(() => {
     /* Handle on search input submitted */
     const onSubmitHandlerKeyDown = useCallback((e) => {
         if(e.key === 'Enter'){
+            e.preventDefault()
             setSummary("")
             setSearchResult(undefined)
             setQuestionHistory([])
@@ -132,7 +133,8 @@ const search = observer(() => {
         }
     }, [search, setSummary, setSearchResult, setQuestionHistory, setFollowUpSearch, router.push])
 
-    const onSubmitHandler = useCallback(() => {
+    const onSubmitHandler = useCallback((e) => {
+        e.preventDefault()
         setSummary("")
         setSearchResult(undefined)
         setQuestionHistory([])

@@ -74,6 +74,7 @@ const Write = observer(() => {
 
     const onSubmitHandlerKeyDown = useCallback((e) => {
         if(e.key === 'Enter'){
+            e.preventDefault()
             router.push(`/search?q=${search}`)
         }
     }, [search]);
