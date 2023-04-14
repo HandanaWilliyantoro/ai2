@@ -1,0 +1,34 @@
+[
+    {
+        "title": "Mainan Anak",
+        "url": "https://tokopedia.com/mainan",
+        "domain": "https://tokopedia.com",
+        "snippet": "mainan anak nomor 1 se indonesia",
+        "keywords": ["mainan", "anak", "topi"],
+        "type": "search"
+    },
+    {
+        "title": "Mobil Bekas",
+        "url": "https://tokopedia.com/mainan",
+        "domain": "https://tokopedia.com",
+        "snippet": "mainan anak nomor 1 se indonesia",
+        "keywords": ["mobil", "kendaraan", "car"],
+        "type": "search"
+    },
+    {
+        "title": "Pelatan Fitness",
+        "url": "https://tokopedia.com/mainan",
+        "domain": "https://tokopedia.com",
+        "snippet": "mainan anak nomor 1 se indonesia",
+        "keywords": ["fitness", "kebugaran", "kurus"],
+        "type": "search"
+    },
+    {
+        "title": "Laptop",
+        "url": "https://tokopedia.com/mainan",
+        "domain": "https://tokopedia.com",
+        "snippet": "mainan anak nomor 1 se indonesia",
+        "keywords": ["laptop", "pc", "gaming"],
+        "type": "search"
+    }
+]

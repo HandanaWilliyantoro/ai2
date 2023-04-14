@@ -123,6 +123,11 @@ const search = observer(() => {
 
     /* Handle on search input submitted */
     const onSubmitHandlerKeyDown = useCallback((e) => {
+
+        if(search === router.query.q){
+            return;
+        }
+
         if(e.key === 'Enter'){
             e.preventDefault()
             setSummary("")
@@ -134,6 +139,9 @@ const search = observer(() => {
     }, [search, setSummary, setSearchResult, setQuestionHistory, setFollowUpSearch, router.push])
 
     const onSubmitHandler = useCallback((e) => {
+        if(search === router.query.q){
+            return;
+        }
         e.preventDefault()
         setSummary("")
         setSearchResult(undefined)
