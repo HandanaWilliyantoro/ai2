@@ -132,7 +132,6 @@ const chat = observer(() => {
     const [isModalPersonaOpened, setIsModalPersonaOpened] = useState(false)
     const [isModalActionOpened, setIsModalActionOpened] = useState(false)
     const [selectedAction, setSelectedAction] = useState('');
-    const [conversationId, setConversationId] = useState()
     const [isAuthenticated, setIsAuthenticated] = useState(status === 'authenticated' ? true : undefined)
 
     const divRef = useRef(null);
@@ -156,15 +155,12 @@ const chat = observer(() => {
             createArt.execute({prompt: processedPrompt ?? 'dummy'})
         } else {
             if(history.length < 1){
-                const query = input.toLowerCase()
-                const findPersona = persona.find(a => a.selected).title
-                postChat.execute({query, persona: findPersona})
+                postChat.execute({history: params})
             } else {
-                const query = input.toLowerCase()
-                postChat.execute({query, conversationId})
+                postChat.execute({history: params})
             }
         }
-    }, [input, conversationId, persona, history]);
+    }, [input, persona, history]);
 
     /* Watcher Image */
     useEffect(() => {
@@ -186,9 +182,8 @@ const chat = observer(() => {
     useEffect(() => {
         if(postChat.response){
             setIsLoading(false)
-            const parsedHistory = JSON.parse(JSON.stringify(history))
-            setHistory([...parsedHistory, {role: 'assistant', content: postChat.response.data}])
-            setConversationId(postChat.response.conversationId)
+            const response = JSON.parse(JSON.stringify(answer))
+            setAnswer(`${response + postChat.response}`)
             setInput('')
             postChat.reset()
         } else if (postChat.error) {
@@ -221,20 +216,20 @@ const chat = observer(() => {
     }, [])
 
     const onClickEnter = useCallback((e) => {
-        e.preventDefault()
-
-        if(isLoading) return;
-
-        if(!isAuthenticated){
-            setIsAuthenticated(false)
-            return;
-        }
-
-        if(!input) {
-            return
-        };
-
         if(e.key === 'Enter'){
+            e.preventDefault()
+
+            if(isLoading) return;
+    
+            if(!isAuthenticated){
+                setIsAuthenticated(false)
+                return;
+            }
+    
+            if(!input) {
+                return
+            };
+
             const parsedHistory = JSON.parse(JSON.stringify(history))
             const selectedPersona = persona.find(a => a.selected).title
             scrollToBottom()
@@ -283,6 +278,16 @@ const chat = observer(() => {
         showSuccessSnackbar(`Copy to clipboard!`)
     }, []);
 
+    /* Watcher when response has finished */
+    useEffect(() => {
+        if(postChat.finished){
+            const parsedHistory = JSON.parse(JSON.stringify(history))
+            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
+            setAnswer('')
+            setInput('')
+        }
+    }, [postChat.finished])
+
     const renderBody = useCallback(() => {
         if(history.length > 0){
             return <div className='flex flex-col items-start justify-start w-full h-full'>
@@ -316,8 +321,14 @@ const chat = observer(() => {
                         <p className="mt-1 font-sans text-sm font-bold text-black">Generating Art..</p>
                     </div>
                 )}
+                {answer && (
+                    <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full'>
+                            <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
+                    </div>
+                )}
             </div>
         }
+
 
         if(history.length === 0 && !answer) {
             return <div className='flex flex-col bg-white items-center justify-center w-full h-full'>
@@ -417,7 +428,7 @@ const chat = observer(() => {
                     </div>
                 </div>
                 <div className='w-full flex flex-row items-center justify-center'>
-                    <input disabled={isLoading} onKeyDown={onClickEnter} value={input} onChange={onChangeInput} placeholder='Write me a tiktok ads copy' className='w-full text-black bg-white mx-2 px-3 py-2 outline-none border-2 rounded font-sans' />
+                    <input disabled={isLoading} maxLength={200} onKeyDown={onClickEnter} value={input} onChange={onChangeInput} placeholder='Write me a tiktok ads copy' className='w-full text-black bg-white mx-2 px-3 py-2 outline-none border-2 rounded font-sans' />
                     <button onClick={onClickArrow} className='px-4 py-2.5 w-1/6 max-md:w-1/3 bg-black text-white font-serif text-sm font-bold rounded mr-3 border-2 border-black'>{isAuthenticated ? 'Submit' : 'Sign In'}</button>
                 </div>
             </div>
