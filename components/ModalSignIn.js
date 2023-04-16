@@ -27,25 +27,29 @@ const ModalSignIn = observer(({
     isOpen,
     onRequestClose,
     loading,
-    setModalType
+    setModalType,
+    setIsAuthenticated,
+    isAuthenticated
 }) => {
 
-    const {data, authenticate} = useSession();
+    const {data, status} = useSession();
 
     //#region GOOGLE SIGN IN
     /* Execute */
     useEffect(() => {
-        if(data && data.accessToken && status === 'authenticated'){
-            authenticate(data.user, data.accessToken)
+        if(status == 'authenticated'){
+            formAuthenticate(data.user, data.accessToken)
+            showSuccessSnackbar('You have successfully logged in')
             setModalType(undefined)
+            setIsAuthenticated(true)
         }
-    }, [data]);
+    }, [status, isAuthenticated]);
     //#endregion
 
     //#region HANDLER
     const onClickGoogleSignIn = useCallback((e) => {
         e.preventDefault();
-        socialSignIn('google')
+        socialSignIn('google', {redirect: false})
     }, [socialSignIn])
     //#endregion
 
@@ -62,6 +66,7 @@ const ModalSignIn = observer(({
     useEffect(() => {
         if(signIn.response){
             showSuccessSnackbar('Sign in successfull')
+            setIsAuthenticated(true)
             formAuthenticate(signIn.response.user, signIn.response.token);
             setModalType(undefined)
             signIn.reset()
@@ -95,7 +100,7 @@ const ModalSignIn = observer(({
     return (
         <Modal ariaHideApp={false} isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
             <div className='flex flex-col items-start justify-center p-4 w-full'>
-                <h4 className='font-sans text-lg font-bold text-black text-center w-full'>Sign In</h4>
+                <h4 className='font-sans text-lg font-bold text-black text-center w-full'>Sign In to Continue</h4>
                 <p className='text-xs font-serif text-gray-400 mt-1 w-full text-center'>Discover The Power of AI + Search Engine with Handana</p>
                 <form className='w-full' onSubmit={formik.handleSubmit}>
                     <div className='flex flex-col my-5 w-full'>

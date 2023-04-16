@@ -86,6 +86,7 @@ const Search = observer(() => {
 
     const onSubmitHandlerKeyDown = useCallback((e) => {
         if(e.key === 'Enter'){
+            e.preventDefault()
             router.push(`/image/search?q=${search}`)
         }
     }, [search])

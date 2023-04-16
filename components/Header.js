@@ -9,8 +9,6 @@ import Logo from './Logo'
 
 const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
 
-    const [isModalDonateOpened, setIsModalDonateOpened] = useState(false)
-
     const router = useRouter()
 
     const logout = useCallback(async () => {

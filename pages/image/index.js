@@ -11,12 +11,17 @@ export default function ImageHome() {
 
   const router = useRouter()
 
-  const onSubmitHandler = useCallback((e) => {
+  const onSubmitHandlerKeydown = useCallback((e) => {
     if(e.key === 'Enter'){
+      e.preventDefault()
       router.push(`/image/search?q=${search}`)
     }
   }, [search, router.push])
 
+  const onSubmitHandler = useCallback((e) => {
+    e.preventDefault()
+    router.push(`/image/search?q=${search}`)
+  }, [search, router.push])
 
   return (
     <div className="min-w-screen min-h-screen bg-white flex flex-col items-center justify-center px-5 py-5">
@@ -26,7 +31,7 @@ export default function ImageHome() {
             <p className="font-serif text-xs ml-auto font-bold text-transparent bg-gradient-to-r from-yellow-600 via-blue-600 to-red-600 bg-clip-text animate-text">Image Search</p>
           </div>
           <Tagline />
-          <Search onSubmitHandler={onSubmitHandler} onChange={e => setSearch(e.target.value)} value={search} />
+          <Search onSubmitHandlerKeydown={onSubmitHandlerKeydown} onSubmitHandler={onSubmitHandler} onChange={e => setSearch(e.target.value)} value={search} />
           <div className="absolute top-0 left-0 w-full h-2 flex">
               <div className="h-2 bg-blue-500 flex-1"></div>
               <div className="h-2 bg-red-500 flex-1"></div>

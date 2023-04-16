@@ -4,7 +4,6 @@ import {BiArrowBack} from 'react-icons/bi'
 import ReactInputVerificationCode from 'react-input-verification-code';
 import { showSuccessSnackbar, showErrorSnackbar } from '@/util/toast';
 import { authenticate } from '@/util/auth';
-
 import signUp from '@/stores/SignUp.store';
 import verifyEmail from '@/stores/VerifyEmail.store';
 import { observer } from 'mobx-react-lite';
@@ -25,7 +24,8 @@ const ModalVerifyCode = observer(({
     onRequestClose,
     secret,
     setModalType,
-    userData
+    userData,
+    setIsAuthenticated
 }) => {
   const [confirmationCode, setConfirmationCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -40,6 +40,7 @@ const ModalVerifyCode = observer(({
     if(signUp.response){
       setIsLoading(false)
       setModalType(undefined)
+      setIsAuthenticated(true)
       showSuccessSnackbar('Sign up successfull')
       authenticate(signUp.response.user, signUp.response.token);
       signUp.reset();
