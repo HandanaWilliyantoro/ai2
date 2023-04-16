@@ -1,5 +1,3 @@
-import { OpenAIStream } from "../../util/stream";
-
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("Missing env var from OpenAI");
 }

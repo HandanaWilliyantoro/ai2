@@ -11,6 +11,7 @@ import getSearch from "@/stores/Search.store";
 import summarizer from "@/stores/Summarize.store";
 import { observer } from "mobx-react-lite";
 import { showErrorSnackbar } from "@/util/toast";
+import summarizerBackup from "@/stores/SummarizeBackup.store";
 
 const search = observer(() => {
     const [summary, setSummary] = useState();
@@ -23,9 +24,7 @@ const search = observer(() => {
 
     //#region HOOKS
     const router = useRouter()
-
     const paginationRef = useRef(null)
-
     const scrollToBottom = () => {
         paginationRef.current?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
     }
@@ -42,6 +41,32 @@ const search = observer(() => {
         setFollowUpSearch('')
         handleFetchSearch(followUpSearch)
     }, [questionHistory, followUpSearch]);
+    //#endregion
+
+    //#region FETCH SUMMARIZER BACKUP
+    const handleFetchSummarizerBackup = useCallback(() => {
+        const params = {
+            q: questionHistory.length > 0 ? questionHistory : router.query.q,
+            summaryContent: search_result.summaryContent
+        }
+        summarizerBackup.execute(params)
+    }, [questionHistory, router, search_result])
+
+    const handleSummary = useCallback(async (sum) => {
+        const response = summary ? await JSON.parse(JSON.stringify(summary)) : ''
+        setSummary(`${response + sum}`)
+    }, [setSummary, summary])
+
+    /* Watcher */
+    useEffect(() => {
+        if(summarizerBackup.response){
+            handleSummary(summarizerBackup.response)
+            summarizerBackup.reset()
+        } else if (summarizerBackup.error) {
+            showErrorSnackbar(summarizerBackup.error)
+            summarizerBackup.reset()
+        }
+    }, [summarizerBackup.response, summarizerBackup.error, summarizerBackup.reset]);
     //#endregion
     
     //#region FETCH SUMMARIZER
@@ -60,7 +85,7 @@ const search = observer(() => {
             setSummary(summarizer.response)
             summarizer.reset()
         } else if (summarizer.error) {
-            showErrorSnackbar(summarizer.error)
+            handleFetchSummarizerBackup()
             summarizer.reset()
         }
     }, [summarizer.response, summarizer.error, summarizer.reset])

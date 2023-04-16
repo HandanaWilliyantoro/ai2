@@ -18,6 +18,7 @@ import Header from '@/components/Header'
 import ImageSkeleton from '@/components/ImageSkeleton'
 import ChatSkeleton from '@/components/ChatSkeleton'
 import ModalAuthentication from '@/components/ModalAuthentication'
+import postChatBackup from '@/stores/ChatBackup.store'
 
 const chat = observer(() => {
     const {status} = useSession()
@@ -132,6 +133,7 @@ const chat = observer(() => {
     const [isModalPersonaOpened, setIsModalPersonaOpened] = useState(false)
     const [isModalActionOpened, setIsModalActionOpened] = useState(false)
     const [selectedAction, setSelectedAction] = useState('');
+    const [conversationId, setConversationId] = useState()
     const [isAuthenticated, setIsAuthenticated] = useState(status === 'authenticated' ? true : undefined)
 
     const divRef = useRef(null);
@@ -144,6 +146,45 @@ const chat = observer(() => {
     useEffect(() => {
         scrollToBottom()
     }, [history.length])
+
+    //#region FETCH CHAT BACKUP ANSWER
+    const handleFetchBackupChat = useCallback(() => {
+        const parsedHistory = JSON.parse(JSON.stringify(history))
+        if(parsedHistory.length > 0){
+            const params = [...parsedHistory, {role: 'user', content: input}]
+            postChatBackup.execute({history: params})
+        } else {
+            const params = [...parsedHistory, {role: 'user', content: {input, persona}}]
+            postChatBackup.execute({history: params})
+        }
+    }, [history, input])
+
+    /* Watcher */
+    useEffect(() => {
+        if(postChatBackup.response){
+            setIsLoading(false)
+            const response = JSON.parse(JSON.stringify(answer))
+            setAnswer(`${response + postChatBackup.response}`)
+            setInput('')
+            postChatBackup.reset()
+        } else if (postChatBackup.error) {
+            setIsLoading(false)
+            showErrorSnackbar(postChatBackup.error);
+            setInput('')
+            postChatBackup.reset();
+        }
+    }, [postChatBackup.response, postChatBackup.error, postChatBackup.reset])
+
+    /* Watcher Finish */
+    useEffect(() => {
+        if(postChatBackup.finished){
+            const parsedHistory = JSON.parse(JSON.stringify(history))
+            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
+            setAnswer('')
+            setInput('')
+        }
+    }, [postChatBackup.finished])
+    //#endregion
     
     //#region FETCH CHAT ANSWER
     const handleFetchAnswer = useCallback((params) => {
@@ -155,12 +196,15 @@ const chat = observer(() => {
             createArt.execute({prompt: processedPrompt ?? 'dummy'})
         } else {
             if(history.length < 1){
-                postChat.execute({history: params})
+                const query = input.toLowerCase()
+                const findPersona = persona.find(a => a.selected).title
+                postChat.execute({query, persona: findPersona})
             } else {
-                postChat.execute({history: params})
+                const query = input.toLowerCase()
+                postChat.execute({query, conversationId})
             }
         }
-    }, [input, persona, history]);
+    }, [input, conversationId, persona, history]);
 
     /* Watcher Image */
     useEffect(() => {
@@ -182,14 +226,13 @@ const chat = observer(() => {
     useEffect(() => {
         if(postChat.response){
             setIsLoading(false)
-            const response = JSON.parse(JSON.stringify(answer))
-            setAnswer(`${response + postChat.response}`)
+            const parsedHistory = JSON.parse(JSON.stringify(history))
+            setHistory([...parsedHistory, {role: 'assistant', content: postChat.response.data}])
+            setConversationId(postChat.response.conversationId)
             setInput('')
             postChat.reset()
         } else if (postChat.error) {
-            setIsLoading(false)
-            showErrorSnackbar(postChat.error);
-            setInput('')
+            handleFetchBackupChat()
             postChat.reset();
         }
     }, [postChat.response, postChat.error, postChat.reset])
@@ -218,7 +261,7 @@ const chat = observer(() => {
     const onClickEnter = useCallback((e) => {
         if(e.key === 'Enter'){
             e.preventDefault()
-
+    
             if(isLoading) return;
     
             if(!isAuthenticated){
@@ -229,7 +272,6 @@ const chat = observer(() => {
             if(!input) {
                 return
             };
-
             const parsedHistory = JSON.parse(JSON.stringify(history))
             const selectedPersona = persona.find(a => a.selected).title
             scrollToBottom()
@@ -278,16 +320,6 @@ const chat = observer(() => {
         showSuccessSnackbar(`Copy to clipboard!`)
     }, []);
 
-    /* Watcher when response has finished */
-    useEffect(() => {
-        if(postChat.finished){
-            const parsedHistory = JSON.parse(JSON.stringify(history))
-            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
-            setAnswer('')
-            setInput('')
-        }
-    }, [postChat.finished])
-
     const renderBody = useCallback(() => {
         if(history.length > 0){
             return <div className='flex flex-col items-start justify-start w-full h-full'>
@@ -310,7 +342,7 @@ const chat = observer(() => {
                         </div>
                     }
                 })}
-                {postChat.loading && (
+                {(postChat.loading || postChatBackup.loading) && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
                         <ChatSkeleton />
                     </div>
@@ -328,7 +360,6 @@ const chat = observer(() => {
                 )}
             </div>
         }
-
 
         if(history.length === 0 && !answer) {
             return <div className='flex flex-col bg-white items-center justify-center w-full h-full'>
@@ -428,7 +459,7 @@ const chat = observer(() => {
                     </div>
                 </div>
                 <div className='w-full flex flex-row items-center justify-center'>
-                    <input disabled={isLoading} maxLength={200} onKeyDown={onClickEnter} value={input} onChange={onChangeInput} placeholder='Write me a tiktok ads copy' className='w-full text-black bg-white mx-2 px-3 py-2 outline-none border-2 rounded font-sans' />
+                    <input disabled={isLoading} onKeyDown={onClickEnter} value={input} onChange={onChangeInput} placeholder='Write me a tiktok ads copy' className='w-full text-black bg-white mx-2 px-3 py-2 outline-none border-2 rounded font-sans' />
                     <button onClick={onClickArrow} className='px-4 py-2.5 w-1/6 max-md:w-1/3 bg-black text-white font-serif text-sm font-bold rounded mr-3 border-2 border-black'>{isAuthenticated ? 'Submit' : 'Sign In'}</button>
                 </div>
             </div>
