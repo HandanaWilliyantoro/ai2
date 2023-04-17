@@ -2,7 +2,7 @@ import React from 'react'
 
 const PrivacyPolicy = () => {
   return (
-    <div className='max-w-[70vw] p-4'>
+    <div className='max-w-[70vw] p-4 max-md:max-w-[100vw]'>
         <h1 className='text-xl font-bold font-serif my-2'>Privacy Policy</h1>
         <h2 className='text-lg font-serif my-2'>Privacy policy for Handana AI</h2>
         <p className='font-serif text-base my-2'>Handana AI accessible from https://handana.io, one of our main priorities is the privacy of our visitors.<br/>This Privacy Policy document contains types of information that is collected and recorded by Handana AI and how we use it.</p>
