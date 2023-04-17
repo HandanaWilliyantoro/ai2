@@ -7,7 +7,7 @@ const PrivacyPolicy = () => {
         <h2 className='text-lg font-serif my-2'>Privacy policy for Handana AI</h2>
         <p className='font-serif text-base my-2'>Handana AI accessible from https://handana.io, one of our main priorities is the privacy of our visitors.<br/>This Privacy Policy document contains types of information that is collected and recorded by Handana AI and how we use it.</p>
         <p className='font-serif text-base my-2'>If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us.</p>
-        <p className='font-serif text-base my-2'>This Privacy Policy applies only to our online activities and is valid for visitors to our website with regards to the information that they shared and/or collect in xoom internet. This policy is not applicable to any information collected offline or via channels other than this website. Our Privacy Policy was created with the help of the Privacy Policy Generator.</p>
+        <p className='font-serif text-base my-2'>This Privacy Policy applies only to our online activities and is valid for visitors to our website with regards to the information that they shared and/or collect in Handana AI. This policy is not applicable to any information collected offline or via channels other than this website. Our Privacy Policy was created with the help of the Privacy Policy Generator.</p>
         <h2 className='text-lg font-serif my-2 mt-8 font-bold'>Consent</h2>
         <p className='font-serif text-base my-2'>By using our website, you hereby consent to our Privacy Policy and agree to its terms.</p>
         <h2 className='text-lg font-serif my-2 mt-8 font-bold'>Information we collect</h2>
@@ -36,7 +36,7 @@ const PrivacyPolicy = () => {
         <p className='font-serif text-base my-2'>Some of advertisers on our site may use cookies and web beacons. Our advertising partners are listed below. Each of our advertising partners has their own Privacy Policy for their policies on user data. For easier access, we hyperlinked to their Privacy Policies below.</p>
         <p onClick={() => window.open('https://policies.google.com/technologies/ads', '_blank')} className='font-serif cursor-pointer text-base my-2 hover:underline'>Google: https://policies.google.com/technologies/ads</p>
         <h2 className='text-lg font-serif my-2 mt-8 font-bold'>Advertising Partners Privacy Policies</h2>
-        <p className='font-serif text-base my-2'>Note that xoom internet has no access to or control over these cookies that are used by third-party advertisers.</p>
+        <p className='font-serif text-base my-2'>Note that Handana AI has no access to or control over these cookies that are used by third-party advertisers.</p>
         <h2 className='text-lg font-serif my-2 mt-8 font-bold'>CCPA Privacy Rights (Do Not Sell My Personal Information)</h2>
         <p className='font-serif text-base my-2'>Under the CCPA, among other rights, California consumers have the right to:</p>
         <ol>
