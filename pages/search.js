@@ -102,7 +102,7 @@ const search = observer(() => {
     useEffect(() => {
         if(getSearch.response){
             setSearchResult(getSearch.response)
-            setTotalPage(Math.ceil(getSearch.response.response.data.length / 5))
+            setTotalPage(Math.ceil(getSearch.response.response.data.length / 7))
             handleFetchSummarizer(getSearch.response)
             getSearch.reset()
         } else if (getSearch.error) {
@@ -224,7 +224,7 @@ const search = observer(() => {
                     )}
                 </div>
                 <div className="flex-[0.5] w-[50%] p-4 max-md:w-[100%] max-md:pt-0">
-                    {search_result && search_result.response ? search_result.response.data.slice((currPage - 1) * 5, currPage * 5).map(a => (
+                    {search_result && search_result.response ? search_result.response.data.slice((currPage - 1) * 7, currPage * 7).map(a => (
                         <div key={a.url} className="flex flex-col my-2">
                             <p className="text-xs text-green-500 font-sans">{a.domain}</p>
                             <h4 onClick={() => router.push(a.url)} className="cursor-pointer font-sans text-base font-bold hover:underline">{a.title}</h4>

@@ -1,5 +1,3 @@
-import fs from 'fs'
-
 async function encodeBufferAsBase64(buffer) {
   const bytes = new Uint8Array(buffer);
   let binary = '';
@@ -12,7 +10,7 @@ async function encodeBufferAsBase64(buffer) {
 export default async function handler (req, res) {
     try {
 
-        const {prompt} = req.body
+        const {prompt, model} = req.body
 
         const encodedParams = new URLSearchParams();
         encodedParams.append("prompt", prompt);
@@ -21,7 +19,7 @@ export default async function handler (req, res) {
         encodedParams.append("sampler", "euler_a");
         encodedParams.append("upscale", "1");
         encodedParams.append("negative_prompt", "ugly, tiling, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, extra limbs, disfigured, deformed, body out of frame, blurry, bad anatomy, blurred, watermark, grainy, signature, cut off, draft");
-        encodedParams.append("model", "epic_diffusion_1_1");
+        encodedParams.append("model", model || "epic_diffusion_1_1");
         
         const options = {
             method: 'POST',

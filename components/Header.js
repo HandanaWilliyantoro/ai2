@@ -45,7 +45,7 @@ const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
             </div>
             </div>
             <div className='flex-[0.4] flex flex-row items-center justify-end px-0 max-md:hidden'>
-                <img onClick={() => window.open('https://trakteer.id/handana-ai', '_blank')} src="https://cdn.trakteer.id/images/embed/trbtn-red-6.png" alt="Buy Me A Coffee" className='w-[120px] h-[35px] cursor-pointer transition hover:opacity-50' />
+                <img onClick={() => window.open('https://trakteer.id/handana-ai', '_blank')} src="https://cdn.trakteer.id/images/embed/trbtn-red-6.png" alt="Buy Me A Coffee" className='w-[120px] h-[30px] cursor-pointer transition hover:opacity-50' />
                 <IoMdLogOut onClick={logout} color='red' className='cursor-pointer mx-2 mr-0 ml-3 w-5 h-5' />
             </div>
         </div>

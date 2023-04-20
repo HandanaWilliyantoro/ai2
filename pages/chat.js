@@ -148,13 +148,15 @@ const chat = observer(() => {
     }, [history.length])
 
     //#region FETCH CHAT BACKUP ANSWER
-    const handleFetchBackupChat = useCallback(() => {
+    const handleFetchBackupChat = useCallback(async () => {
         const parsedHistory = JSON.parse(JSON.stringify(history))
-        if(parsedHistory.length > 0){
+        if(parsedHistory.length > 1){
+            await parsedHistory.pop()
             const params = [...parsedHistory, {role: 'user', content: input}]
             postChatBackup.execute({history: params})
         } else {
-            const params = [...parsedHistory, {role: 'user', content: {input, persona}}]
+            const findPersona = persona.find(a => a.selected).title
+            const params = [{role: 'user', content: {input, persona: findPersona}}]
             postChatBackup.execute({history: params})
         }
     }, [history, input])
@@ -198,10 +200,10 @@ const chat = observer(() => {
             if(history.length < 1){
                 const query = input.toLowerCase()
                 const findPersona = persona.find(a => a.selected).title
-                postChat.execute({query, persona: findPersona})
+                postChat.execute({query, persona: findPersona, history: params})
             } else {
                 const query = input.toLowerCase()
-                postChat.execute({query, conversationId})
+                postChat.execute({query, conversationId, history: params})
             }
         }
     }, [input, conversationId, persona, history]);
@@ -272,20 +274,20 @@ const chat = observer(() => {
             if(!input) {
                 return
             };
+
             const parsedHistory = JSON.parse(JSON.stringify(history))
             const selectedPersona = persona.find(a => a.selected).title
-            scrollToBottom()
-            if(parsedHistory.length > 0){
+            if(parsedHistory.length > 1){
                 setHistory([...parsedHistory, {role: 'user', content: input}])
                 const params = [...parsedHistory, {role: 'user', content: input}]
                 handleFetchAnswer(params)
             } else {
-                setHistory([...parsedHistory, {role: 'user', content: {input, persona: selectedPersona}}])
+                setHistory([{role: 'user', content: {input, persona: selectedPersona}}])
                 const params = [...parsedHistory, {role: 'user', content: {input, persona: selectedPersona}}]
                 handleFetchAnswer(params)
             }
         }
-    }, [input, history, persona, scrollToBottom]);
+    }, [input, history, persona]);
 
     const onClickArrow = useCallback(() => {
         

@@ -108,6 +108,24 @@ const handler = async (req) => {
     return new Response("No prompt in the request", { status: 400 });
   }
 
+  const searchQuery = history.filter(a => a.role === 'user').map(a => a.content.input ? a.content.input : a.content).toString().replaceAll(", ", " AND ")
+
+  const search = await fetch(`https://real-time-web-search.p.rapidapi.com/search?q=${searchQuery}&limit=5`, {
+      method: 'GET',
+      headers: {
+        'X-RapidAPI-Key': process.env.RAPID_API_KEY,
+        'X-RapidAPI-Host': 'real-time-web-search.p.rapidapi.com',
+      },
+    })
+
+    const engine = await search.json()
+
+    const sources = await engine.data.map((a, i) => `Sources [${i+1}]: ${a.snippet}`)
+
+    console.log(sources, 'ini sourcesnya')
+
+    messages[messages.length - 1].content = `${sources}\n\n${messages[messages.length - 1].content}` 
+
   const payload = {
     model: "gpt-3.5-turbo",
     messages: [
