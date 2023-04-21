@@ -22,7 +22,7 @@ class ChatStore {
                 'Accept-Encoding': 'gzip, deflate, br'
             },
             'body': JSON.stringify(params)
-        }).then(res => res.json())
+        }, 5000).then(res => res.json())
         .then(response => {
             if(response.data){
                 postChat.success({data: response.data.response, conversationId: response.data.conversationId})

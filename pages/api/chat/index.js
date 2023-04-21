@@ -1,3 +1,7 @@
+import { WebBrowser } from "langchain/tools/webbrowser";
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+
 if (!process.env.OPENAI_API_KEY) {
     throw new Error("Missing env var from OpenAI");
 }
@@ -88,25 +92,11 @@ const createPersona = (persona, input) => {
 
 const handler = async (req, res) => {
   try {
-    let {query, conversationId, persona, history} = req.body;
+    let {query, conversationId, persona} = req.body;
 
     if(persona && query){
       query = await createPersona(persona, query)
     }
-
-    const searchQuery = history && history.length > 1 ? history.filter(a => a.role === 'user').map(a => a.content.input ? a.content.input : a.content).toString().replaceAll(",", " AND ") : query
-
-    const search = await fetch(`https://real-time-web-search.p.rapidapi.com/search?q=${searchQuery}&limit=5`, {
-      method: 'GET',
-      headers: {
-        'X-RapidAPI-Key': process.env.RAPID_API_KEY,
-        'X-RapidAPI-Host': 'real-time-web-search.p.rapidapi.com',
-      },
-    })
-
-    const engine = await search.json()
-
-    const sources = await engine.data.map((a, i) => `Sources [${i+1}]: ${a.snippet}`)
 
     const data = await fetch(`https://chatgpt-ai-chat-bot.p.rapidapi.com/ask`, {
       method: 'POST',
@@ -115,12 +105,12 @@ const handler = async (req, res) => {
         'X-RapidAPI-Host': 'chatgpt-ai-chat-bot.p.rapidapi.com',
         'content-type': 'application/json',
       },
-      body: JSON.stringify({query: `Provide a 5-10 sentence rephrased answer to the query based on the sources without citing the sources. \n###\nSOURCES\n\n${sources.toString()}\n###\nQUERY\n${query}\n###\nANSWER`, conversationId, wordLimit: 4096})
+      body: JSON.stringify({query, conversationId, wordLimit: 4096})
     })
 
     const response = await data.json()
 
-    const jsonResponse = await {response: response.response.replace(/\n/g,'\n\n'), conversationId: response.conversationId}
+    const jsonResponse = {response: response.response.replace(/\n/g,'\n\n'), conversationId: response.conversationId}
 
     res.status(200).json({ code: 200, text: 'fetch chat successful', data: jsonResponse })
   } catch(e) {
