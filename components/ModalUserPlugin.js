@@ -10,40 +10,41 @@ const customStyles = {
       bottom: 'auto',
       marginRight: '-50%',
       transform: 'translate(-50%, -50%)',
-      minWidth: '320px',
+      minWidth: '360px',
       padding: '0px'
     },
 };
 
-const ModalPersona = ({
+const ModalUserPlugin = ({
     isOpen,
     onRequestClose,
-    persona,
-    onSelectPersona
+    plugins,
+    onSelectPlugin
 }) => {
     return (
         <Modal ariaHideApp={false} isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
             <div className='flex flex-row items-center justify-between w-full border-b-2 border-b-gray-200 bg-white p-2'>
-                <p className='font-sans text-black font-bold text-sm'>Select Persona</p>
+                <p className='font-sans text-black font-bold text-sm'>Your Plugin</p>
                 <AiOutlineCloseCircle onClick={onRequestClose} className='w-4 h-5 text-black cursor-pointer transition hover:opacity-50' />
             </div>
             <div className='flex flex-col w-full items-start justify-start max-h-[60vh] p-2 overflow-y-scroll'>
-                {persona && persona.map((a, i) => (
+                {plugins && plugins.map((a, i) => (
                     <div key={i} className='flex flex-row items-center justify-start w-full py-2 pr-2'>
-                        <input onClick={() => onSelectPersona(a)} className='cursor-pointer checked:before:bg-white accent-white' type={'checkbox'} checked={a.selected} />
-                        <div className='ml-4 max-w-[300px]'>
-                            <p className='text-sm font-bold font-serif mb-1 text-black'>{a.title}</p>
-                            <p className='text-xs text-gray-500 font-sans my-1'>{a.description}</p>
+                        <img src={a.icon} className='w-12 h-12 object-cover rounded' />
+                        <div className='py-2 px-3 max-w-[300px]'>
+                            <p className='text-sm font-bold font-serif mb-1 text-black'>{a.name}</p>
+                            <p className='text-xs text-gray-500 font-sans my-1'>{a.desc}</p>
                         </div>
+                        <input onClick={() => onSelectPlugin(a)} className='cursor-pointer ml-auto checked:before:bg-white accent-white' type={'checkbox'} checked={a.selected} />
                     </div>
                 ))}
             </div>
             <div className='flex flex-row items-center p-2 justify-between border-t-2'>
-                <p className='text-xs font-serif text-black'>Selected Persona:</p>
-                <p className='text-xs font-serif text-black font-bold'>{persona?.find(a => a.selected)?.title ?? '-'}</p>
+                <p className='text-xs font-serif text-black'>Selected Plugin:</p>
+                <p className='text-xs font-serif text-black font-bold'>{plugins?.find(a => a.selected)?.name ?? '-'}</p>
             </div>
         </Modal>
     )
 }
 
-export default ModalPersona
+export default ModalUserPlugin

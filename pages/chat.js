@@ -1,10 +1,11 @@
 import React, {useState, useCallback, useEffect, useRef} from 'react'
-import {AiOutlineDoubleRight, AiOutlineSync, AiOutlineInfoCircle, AiFillCopy} from 'react-icons/ai'
-import {BsFillSendFill} from 'react-icons/bs'
+import {AiOutlineSync, AiOutlineInfoCircle, AiFillCopy} from 'react-icons/ai'
+import {BsFillSendFill, BsPersonSquare, BsPlugin, BsSun, BsLightning} from 'react-icons/bs'
 import { useRouter } from 'next/router'
 import Persona from '../util/assets/persona.png'
 import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast'
 import { getSession, useSession } from 'next-auth/react'
+import Plugins from '@/util/assets/plugins.json'
 
 // Stores
 import { observer } from 'mobx-react-lite'
@@ -18,7 +19,7 @@ import Header from '@/components/Header'
 import ImageSkeleton from '@/components/ImageSkeleton'
 import ChatSkeleton from '@/components/ChatSkeleton'
 import ModalAuthentication from '@/components/ModalAuthentication'
-import postChatBackup from '@/stores/ChatBackup.store'
+import ModalUserPlugin from '@/components/ModalUserPlugin'
 
 const chat = observer(() => {
     const {status} = useSession()
@@ -127,11 +128,13 @@ const chat = observer(() => {
             selected: false
         }
     ])
+    const [plugins, setPlugins] = useState(Plugins.map(a => ({...a, selected: false})))
     const [answer, setAnswer] = useState('');
     const [search, setSearch] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [isModalPersonaOpened, setIsModalPersonaOpened] = useState(false)
     const [isModalActionOpened, setIsModalActionOpened] = useState(false)
+    const [isModalPluginOpened, setIsModalPluginOpened] = useState(false)
     const [selectedAction, setSelectedAction] = useState('');
     const [conversationId, setConversationId] = useState()
     const [isAuthenticated, setIsAuthenticated] = useState(status === 'authenticated' ? true : undefined)
@@ -147,53 +150,12 @@ const chat = observer(() => {
         scrollToBottom()
     }, [history.length])
 
-    //#region FETCH CHAT BACKUP ANSWER
-    const handleFetchBackupChat = useCallback(async () => {
-        const parsedHistory = JSON.parse(JSON.stringify(history))
-        if(parsedHistory.length > 1){
-            await parsedHistory.pop()
-            const params = [...parsedHistory, {role: 'user', content: input}]
-            postChatBackup.execute({history: params})
-        } else {
-            const findPersona = persona.find(a => a.selected).title
-            const params = [{role: 'user', content: {input, persona: findPersona}}]
-            postChatBackup.execute({history: params})
-        }
-    }, [history, input])
-
-    /* Watcher */
-    useEffect(() => {
-        if(postChatBackup.response){
-            setIsLoading(false)
-            const response = JSON.parse(JSON.stringify(answer))
-            setAnswer(`${response + postChatBackup.response}`)
-            setInput('')
-            postChatBackup.reset()
-        } else if (postChatBackup.error) {
-            setIsLoading(false)
-            showErrorSnackbar(postChatBackup.error);
-            setInput('')
-            postChatBackup.reset();
-        }
-    }, [postChatBackup.response, postChatBackup.error, postChatBackup.reset])
-
-    /* Watcher Finish */
-    useEffect(() => {
-        if(postChatBackup.finished){
-            const parsedHistory = JSON.parse(JSON.stringify(history))
-            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
-            setAnswer('')
-            setInput('')
-        }
-    }, [postChatBackup.finished])
-    //#endregion
-    
     //#region FETCH CHAT ANSWER
     const handleFetchAnswer = useCallback((params) => {
         if(isLoading) return;
         setIsLoading(true);
         const contentChecker = params && params.length > 1 ? params[params.length - 1].content :  params[params.length - 1].content.input
-        if(contentChecker.split(' ')[0] === '!image'){
+        if(contentChecker && contentChecker.split(' ')[0] === '!image'){
             const processedPrompt = contentChecker.replace('!image ', '')
             createArt.execute({prompt: processedPrompt ?? 'dummy'})
         } else {
@@ -228,16 +190,24 @@ const chat = observer(() => {
     useEffect(() => {
         if(postChat.response){
             setIsLoading(false)
-            const parsedHistory = JSON.parse(JSON.stringify(history))
-            setHistory([...parsedHistory, {role: 'assistant', content: postChat.response.data}])
-            setConversationId(postChat.response.conversationId)
+            const response = JSON.parse(JSON.stringify(answer))
+            setAnswer(`${response + postChat.response}`)
             setInput('')
             postChat.reset()
         } else if (postChat.error) {
-            handleFetchBackupChat()
+            showErrorSnackbar('Our chat feature is currently down, please come back later')
             postChat.reset();
         }
     }, [postChat.response, postChat.error, postChat.reset])
+
+    useEffect(() => {
+        if(postChat.finished){
+            const parsedHistory = JSON.parse(JSON.stringify(history))
+            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
+            setAnswer('')
+            setInput('')
+        }
+    }, [postChat.finished])
     //#endregion
 
     //#region HANDLER
@@ -276,7 +246,7 @@ const chat = observer(() => {
             };
 
             const parsedHistory = JSON.parse(JSON.stringify(history))
-            const selectedPersona = persona.find(a => a.selected).title
+            const selectedPersona = persona?.find(a => a.selected)?.title ?? undefined
             if(parsedHistory.length > 1){
                 setHistory([...parsedHistory, {role: 'user', content: input}])
                 const params = [...parsedHistory, {role: 'user', content: input}]
@@ -344,7 +314,7 @@ const chat = observer(() => {
                         </div>
                     }
                 })}
-                {(postChat.loading || postChatBackup.loading) && (
+                {(postChat.loading) && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
                         <ChatSkeleton />
                     </div>
@@ -364,10 +334,28 @@ const chat = observer(() => {
         }
 
         if(history.length === 0 && !answer) {
-            return <div className='flex flex-col bg-white items-center justify-center w-full h-full'>
-                <img className='w-40 h-40 rounded' src={Persona.src} />
-                <p className='font-sans text-black text-base mt-4'>Current AI Persona</p>
-                <p className='font-bold text-black font-serif text-base'>{persona.find(a => a.selected === true).title}</p>
+            return <div className='flex flex-row bg-white items-center justify-center w-full h-full'>
+                <div className='flex flex-col items-center justify-center h-full w-[30%] mx-3 max-md:w-[40%]'>
+                    <BsSun className='w-8 h-8 mb-1' />
+                    <p className='font-bold font-serif text-sm text-black'>Examples</p>
+                    <div className='my-3 border-2 border-gray-300 shadow-lg rounded w-full flex items-center justify-center p-1 px-2 h-20 mx-2'>
+                        <p className='text-center font-serif text-xs text-gray-500'>Write me an essay about technology</p>
+                    </div>
+                    <div className='my-3 border-2 border-gray-300 shadow-lg rounded w-full flex items-center justify-center p-1 px-2 h-20 mx-2'>
+                        <p className='text-center font-serif text-xs text-gray-500'>How to speak with animal</p>
+                    </div>
+                </div>
+                <div className='flex flex-col items-center justify-center h-full w-[30%] mx-3 max-md:w-[40%]'>
+                    <BsLightning className='w-8 h-8 mb-1' />
+                    <p className='font-bold font-serif text-sm text-black'>Capabilities</p>
+                    <div className='my-3 border-2 border-gray-300 shadow-lg rounded w-full flex items-center justify-center p-1 px-2 h-20 mx-2'>
+                        <p className='text-center font-serif text-xs text-gray-500'>Plugins to empower chat capabilities</p>
+                    </div>
+                    
+                    <div className='my-3 border-2 border-gray-300 shadow-lg rounded w-full flex items-center justify-center p-1 px-2 h-20 mx-2'>
+                        <p className='text-center font-serif text-xs text-gray-500'>Persona option customized<br/>based on your need</p>
+                    </div>
+                </div>
             </div>
         }
     }, [persona, answer, history]);
@@ -379,7 +367,7 @@ const chat = observer(() => {
             if(index === i){
                 return {
                     ...element,
-                    selected: true
+                    selected: !element.selected
                 }
             } else {
                 return {
@@ -391,6 +379,26 @@ const chat = observer(() => {
         onClickReset()
         setPersona(newPersona)
     }, [persona, onClickReset]);
+
+    const onSelectPlugin = useCallback(async (a) => {
+        const i = plugins.findIndex(el => el === a);
+        let parsePlugin = await JSON.parse(JSON.stringify(plugins));
+        const newPlugins = await parsePlugin.map((element, index) => {
+            if(index === i){
+                return {
+                    ...element,
+                    selected: !element.selected
+                }
+            } else {
+                return {
+                    ...element,
+                    selected: false
+                }
+            }
+        })
+        onClickReset()
+        setPlugins(newPlugins)
+    }, [plugins]);
 
     const onSelectAction = useCallback((val) => {
         setIsModalActionOpened(true);
@@ -418,6 +426,14 @@ const chat = observer(() => {
     return (
         <div className='max-w-screen-md m-auto h-screen relative border bg-white'>
             {isAuthenticated === false && <ModalAuthentication setIsAuthenticated={setIsAuthenticated} />}
+
+            {/* Modal Plugin */}
+            <ModalUserPlugin
+                isOpen={isModalPluginOpened}
+                onRequestClose={() => setIsModalPluginOpened(!isModalPluginOpened)}
+                plugins={plugins}
+                onSelectPlugin={onSelectPlugin}
+            />
 
             {/* Modal Persona */}
             <ModalPersona
@@ -447,11 +463,14 @@ const chat = observer(() => {
             {/* Footer */}
             <div className='absolute w-full max-w-screen-md bg-white bottom-0 flex flex-col items-start pb-4'>
                 <div className='flex flex-row items-center py-2 w-full'>
-                    <p onClick={() => setIsModalPersonaOpened(!isModalPersonaOpened)} className='font-serif text-xs ml-4 text-black flex flex-row items-center hover:underline cursor-pointer'>See Persona Library <AiOutlineDoubleRight className='w-2 h-2 ml-1' /></p>
+                    <div className='relative mr-2 flex flex-row justify-center items-center'>
+                        <p onClick={() => setIsModalPersonaOpened(!isModalPersonaOpened)} className='font-serif text-xs ml-4 text-black flex flex-row items-center hover:underline cursor-pointer'><BsPersonSquare className='w-4 h-4 mr-1' />Persona</p>
+                        <p onClick={() => setIsModalPluginOpened(!isModalPluginOpened)} className='font-serif text-xs ml-4 text-black flex flex-row items-center hover:underline cursor-pointer'><BsPlugin className='w-4 h-4 mr-1' />Plugin</p>
+                    </div>
                     <div className='group relative ml-auto mr-2 flex justify-center'>
                         <AiOutlineInfoCircle className='text-black' />
                         <span className="absolute bottom-10 w-[250px] scale-0 right-0 rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100">
-                            <p className='font-bold mb-2 text-sm'>Advance Operator</p>
+                            <p className='font-bold mb-2 text-xs'>Advance Operator</p>
                             <p className="font-sans text-xs">Art Generator : use !image operator to generate image (ex: !image an indonesian man)</p>
                         </span>
                     </div>
@@ -462,7 +481,7 @@ const chat = observer(() => {
                 </div>
                 <div className='w-full flex flex-row items-center justify-center'>
                     <input disabled={isLoading} onKeyDown={onClickEnter} value={input} onChange={onChangeInput} placeholder='Write me a tiktok ads copy' className='w-full text-black bg-white mx-2 px-3 py-2 outline-none border-2 rounded font-sans' />
-                    <button onClick={onClickArrow} className='px-4 py-2.5 w-1/6 max-md:w-1/3 bg-black text-white font-serif text-sm font-bold rounded mr-3 border-2 border-black'>{isAuthenticated ? 'Submit' : 'Sign In'}</button>
+                    <button onClick={onClickArrow} className='px-2 py-2.5 w-1/7 max-md:w-1/3 bg-black text-white font-serif text-sm font-bold rounded mr-3 border-1 border-black'>{isAuthenticated ? 'Submit' : 'Sign In'}</button>
                 </div>
             </div>
         </div>
