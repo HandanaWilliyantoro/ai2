@@ -190,24 +190,16 @@ const chat = observer(() => {
     useEffect(() => {
         if(postChat.response){
             setIsLoading(false)
-            const response = JSON.parse(JSON.stringify(answer))
-            setAnswer(`${response + postChat.response}`)
+            const parsedHistory = JSON.parse(JSON.stringify(history))
+            setHistory([...parsedHistory, {role: 'assistant', content: postChat.response}])
             setInput('')
             postChat.reset()
         } else if (postChat.error) {
+            setIsLoading(false)
             showErrorSnackbar('Our chat feature is currently down, please come back later')
             postChat.reset();
         }
     }, [postChat.response, postChat.error, postChat.reset])
-
-    useEffect(() => {
-        if(postChat.finished){
-            const parsedHistory = JSON.parse(JSON.stringify(history))
-            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
-            setAnswer('')
-            setInput('')
-        }
-    }, [postChat.finished])
     //#endregion
 
     //#region HANDLER
@@ -302,7 +294,7 @@ const chat = observer(() => {
                         </div>
                     } else if (a.role === 'assistant') {
                         return <div key={i} className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
-                            {a.content && a.content.includes('base64') ? (
+                            {a && a.content && a.content.includes('base64') ? (
                                 <img className='w-[275px] h-[275px] cursor-pointer object-center rounded transition hover:opacity-50' src={a.content} alt='generated ai image' />
                             ) : (
                                 <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
