@@ -2,9 +2,11 @@ import React, {useState, useCallback, useEffect, useRef} from 'react'
 import {AiOutlineSync, AiOutlineInfoCircle, AiFillCopy} from 'react-icons/ai'
 import {BsFillSendFill, BsPersonSquare, BsPlugin, BsSun, BsLightning} from 'react-icons/bs'
 import { useRouter } from 'next/router'
-import Persona from '../util/assets/persona.png'
 import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast'
 import { getSession, useSession } from 'next-auth/react'
+import ReactLoading from 'react-loading';
+
+// Data
 import Plugins from '@/util/assets/plugins.json'
 
 // Stores
@@ -162,10 +164,12 @@ const chat = observer(() => {
             if(history.length < 1){
                 const query = input.toLowerCase()
                 const findPersona = persona.find(a => a.selected).title
-                postChat.execute({query, persona: findPersona, history: params})
+                const pluginUrl = plugins?.find(a => a.selected)?.url ?? ''
+                postChat.execute({query, persona: findPersona, history: params, pluginUrl})
             } else {
                 const query = input.toLowerCase()
-                postChat.execute({query, conversationId, history: params})
+                const pluginUrl = plugins.find(a => a.selected).url
+                postChat.execute({query, conversationId, history: params, pluginUrl})
             }
         }
     }, [input, conversationId, persona, history]);
@@ -297,7 +301,10 @@ const chat = observer(() => {
                             {a && a.content && a.content.includes('base64') ? (
                                 <img className='w-[275px] h-[275px] cursor-pointer object-center rounded transition hover:opacity-50' src={a.content} alt='generated ai image' />
                             ) : (
-                                <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
+                                <div>
+                                    {plugins && plugins.find(a => a.selected)?.name ? <p className='text-xs py-2 px-3 rounded bg-green-200 text-green-500 font-sans font-bold w-[fit-content] mb-2'>Plugin: {plugins.find(a => a.selected).name}</p> : undefined}
+                                    <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
+                                </div>
                             )}
                             <div className='flex flex-row items-center justify-start mt-4'>
                                 <p onClick={() => onSelectAction(a.content)} className='font-sans text-black text-xs font-bold flex flex-row items-center mr-4 transition cursor-pointer hover:opacity-50'><BsFillSendFill className='mr-1' /> Send</p>
@@ -308,6 +315,7 @@ const chat = observer(() => {
                 })}
                 {(postChat.loading) && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
+                        {plugins && plugins.find(a => a.selected)?.name ? <p className='text-xs flex flex-row items-center justify-center py-2 px-3 rounded bg-green-200 text-green-500 font-sans font-bold w-[fit-content] mb-4'>Plugin: {plugins.find(a => a.selected).name} <ReactLoading className='ml-2 flex items-center' type='spin' color={'#939393'} height={'auto'} width={15} /></p> : undefined}
                         <ChatSkeleton />
                     </div>
                 )}

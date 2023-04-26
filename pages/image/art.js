@@ -22,6 +22,9 @@ const Art = observer(() => {
     const [isAuthenticated, setIsAuthenticated] = useState(status === 'authenticated' ? true : undefined)
     const [model, setModel] = useState("epic_diffusion_1_1")
     const [modelOptions, setModelOptions] = useState([])
+    const [negative_prompt, setNegativePrompt] = useState()
+    const [width, setWidth] = useState(1024)
+    const [height, setHeight] = useState(1024)
 
     const router = useRouter();
 
@@ -56,7 +59,7 @@ const Art = observer(() => {
             return;
         }
 
-        createArt.execute({prompt, model})
+        createArt.execute({prompt, model, negative_prompt, width, height})
     }, [prompt, model]);
 
     /* Watcher */
@@ -88,6 +91,20 @@ const Art = observer(() => {
             window.removeEventListener('storage', checkUserData)
         }
     }, [])
+
+    const onChangeWidth = useCallback((e) => {
+        if(Number(e.target.value) < 0){
+            return;
+        }
+        setWidth(Number(e.target.value))
+    }, []);
+
+    const onChangeHeight = useCallback((e) => {
+        if(Number(e.target.value) < 0){
+            return;
+        }
+        setHeight(Number(e.target.value))
+    }, []);
     //#endregion
 
     return (
@@ -106,7 +123,19 @@ const Art = observer(() => {
                         <label className='text-xs text-black font-serif mb-1'>Prompt</label>
                         <input value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Ex: an astronaut riding a horse on mars" className='rounded bg-white text-black border-2 p-1 pl-2 py-2 w-full font-serif text-xs outline-none'  />
                     </div>
-                    <div className='flex-col flex items-start justify-start ml-4 my-2 w-3/4'>
+                    <div className='flex-col flex items-start mx-4 my-3 w-3/4'>
+                        <label className='text-xs text-black font-serif mb-1'>Negative Prompt</label>
+                        <input value={negative_prompt} onChange={e => setNegativePrompt(e.target.value)} placeholder="Ex: ugly, tiling, poorly drawn hands" className='rounded bg-white text-black border-2 p-1 pl-2 py-2 w-full font-serif text-xs outline-none'  />
+                    </div>
+                    <div className='flex-col flex items-start mx-4 my-3 w-3/4'>
+                        <label className='text-xs text-black font-serif mb-1'>Width (320 - 1024)</label>
+                        <input type='number' value={width} onChange={onChangeWidth} placeholder="Ex: an astronaut riding a horse on mars" className='rounded bg-white text-black border-2 p-1 pl-2 py-2 w-full font-serif text-xs outline-none'  />
+                    </div>
+                    <div className='flex-col flex items-start mx-4 my-3 w-3/4'>
+                        <label className='text-xs text-black font-serif mb-1'>Height (320 - 1024)</label>
+                        <input type='number' value={height} onChange={onChangeHeight} placeholder="Ex: an astronaut riding a horse on mars" className='rounded bg-white text-black border-2 p-1 pl-2 py-2 w-full font-serif text-xs outline-none'  />
+                    </div>
+                    <div className='flex-col flex items-start justify-start mb-2 ml-4 w-3/4'>
                         <label className='text-xs text-black font-serif mb-1'>Model</label>
                         <select value={model} onChange={e => setModel(e.target.value)} placeholder="Ex: Epic Diffusion" className='rounded border-2 bg-white text-black p-1 pr-4 w-full py-2 font-serif text-xs outline-none'>
                             {modelOptions && modelOptions.length > 0 && modelOptions.map(a => (
