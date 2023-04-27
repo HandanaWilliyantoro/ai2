@@ -41,10 +41,10 @@ export default async function handler (req, res) {
       });
 
       const data = await chat.call([
-        new SystemChatMessage(`You are a helpful assistant named Handana AI that accurately answers the user's queries based on the previous answer. translate the answer to indonesia language.
+        new SystemChatMessage(`You are a helpful assistant named Handana AI that accurately answers the user's queries based on the previous answer..
           ${history && history.length >= 3 ? `${history[history.length - 2].content}, ANSWER: ${result.output}` : undefined}
         `),
-        new HumanChatMessage(query)
+        new AIChatMessage(result.output)
       ]);
 
       if(data && data.text){
@@ -54,7 +54,7 @@ export default async function handler (req, res) {
       }
     } else {
       const data = await chat.call([
-          new SystemChatMessage(`You are a helpful assistant named Handana AI that accurately answers the user's queries based on the previous answer. translate the answer to indonesia language.
+          new SystemChatMessage(`You are a helpful assistant named Handana AI that accurately answers the user's queries based on the previous answer..
             ${history && history.length >= 3 ? history[history.length - 2].content : undefined}
           `),
           new HumanChatMessage(query)
