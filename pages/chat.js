@@ -158,8 +158,7 @@ const chat = observer(() => {
         setIsLoading(true);
         const contentChecker = params && params.length > 1 ? params[params.length - 1].content :  params[params.length - 1].content.input
         if(contentChecker && contentChecker.includes('!image')){
-            const processedPrompt = contentChecker && contentChecker.includes('!image') ? contentChecker.replace('!image ', '') : ''
-            createArt.execute({prompt: processedPrompt ?? 'dummy'})
+            createArt.execute({prompt: contentChecker ?? 'dummy'})
         } else {
             if(history.length < 1){
                 const query = input.toLowerCase()
