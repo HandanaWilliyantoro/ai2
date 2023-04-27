@@ -157,8 +157,8 @@ const chat = observer(() => {
         if(isLoading) return;
         setIsLoading(true);
         const contentChecker = params && params.length > 1 ? params[params.length - 1].content :  params[params.length - 1].content.input
-        if(contentChecker && contentChecker.split(' ')[0] === '!image'){
-            const processedPrompt = contentChecker.replace('!image ', '')
+        if(contentChecker && contentChecker.includes('!image')){
+            const processedPrompt = contentChecker && contentChecker.includes('!image') ? contentChecker.replace('!image ', '') : ''
             createArt.execute({prompt: processedPrompt ?? 'dummy'})
         } else {
             if(history.length < 1){
