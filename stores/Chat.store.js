@@ -1,5 +1,4 @@
 import {makeAutoObservable} from "mobx"
-import getProfile from "./Profile.store";
 
 class ChatStore {
     response = "";
@@ -22,29 +21,41 @@ class ChatStore {
                 'Accept-Encoding': 'gzip, deflate, br'
             },
             'body': JSON.stringify(params)
-        }).then(res => res.json())
-        .then(response => {
-            if(response.data){
-                postChat.success(response.data)
-            } else {
-                postChat.failed(response.text)
-            }
+        }).then(res => {
+            const reader = res.body.getReader();
+
+            const read = () => {
+            // read the data
+            reader.read().then(async ({ done, value }) => {
+                const decoder = new TextDecoder();
+                if (done) {
+                    postChat.finished = true;
+                    return;
+                }
+                if(decoder.decode(value) === 'initiate | stop'){
+                    console.log('initiate | stop')
+                    return;
+                } else {
+                    const decoded = decoder.decode(value);
+                    postChat.success(decoded)
+                }
+                read();
+            });
+            };
+            read();
         })
         .catch(e => postChat.failed(e))
     }
 
     success(data, premium){
-        getProfile.premium = premium;
         postChat.response = data
         postChat.error = undefined
         postChat.loading = false
-        postChat.finished = true;
     }
 
     failed(data){
         postChat.error = data;
         postChat.loading = false;
-        postChat.finished = true;
         postChat.response = "";
     }
 

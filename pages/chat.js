@@ -157,7 +157,7 @@ const chat = observer(({session}) => {
         if(isLoading) return;
         setIsLoading(true);
         const contentChecker = params && params.length > 1 ? params[params.length - 1].content :  params[params.length - 1].content.input
-        if(contentChecker && contentChecker.split(' ')[0] === '!image'){
+        if(contentChecker && contentChecker.includes(' ') && contentChecker.split(' ')[0] === '!image'){
             const processedPrompt = contentChecker.replace('!image ', '')
             createArt.execute({prompt: processedPrompt ?? 'dummy'})
         } else {
@@ -168,7 +168,7 @@ const chat = observer(({session}) => {
                 postChat.execute({query, persona: findPersona, history: params, pluginUrl})
             } else {
                 const query = input.toLowerCase()
-                const pluginUrl = plugins.find(a => a.selected).url
+                const pluginUrl = plugins?.find(a => a.selected)?.url ?? ''
                 postChat.execute({query, conversationId, history: params, pluginUrl})
             }
         }
@@ -194,8 +194,8 @@ const chat = observer(({session}) => {
     useEffect(() => {
         if(postChat.response){
             setIsLoading(false)
-            const parsedHistory = JSON.parse(JSON.stringify(history))
-            setHistory([...parsedHistory, {role: 'assistant', content: postChat.response}])
+            const response = JSON.parse(JSON.stringify(answer))
+            setAnswer(`${response + postChat.response}`)
             setInput('')
             postChat.reset()
         } else if (postChat.error) {
@@ -204,6 +204,16 @@ const chat = observer(({session}) => {
             postChat.reset();
         }
     }, [postChat.response, postChat.error, postChat.reset])
+
+    /* Watcher Finish */
+    useEffect(() => {
+        if(postChat.finished){
+            const parsedHistory = JSON.parse(JSON.stringify(history))
+            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
+            setAnswer('')
+            setInput('')
+        }
+    }, [postChat.finished])
     //#endregion
 
     //#region HANDLER

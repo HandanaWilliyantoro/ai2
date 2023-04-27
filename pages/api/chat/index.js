@@ -1,73 +1,131 @@
+import { NextResponse } from "next/server";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import { HumanChatMessage, SystemChatMessage, AIChatMessage } from "langchain/schema";
-import { initializeAgentExecutorWithOptions } from "langchain/agents";
+import { LLMChain } from "langchain/chains";
+import { CallbackManager } from "langchain/callbacks";
 import {
-  RequestsGetTool,
-  RequestsPostTool,
-  AIPluginTool,
-} from "langchain/tools";
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    SystemMessagePromptTemplate,
+} from "langchain/prompts";
+import {AIPluginTool, RequestsGetTool, RequestsPostTool} from 'langchain/tools'
+import { initializeAgentExecutorWithOptions } from "langchain/agents";
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error("Missing env var from OpenAI");
-}
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-export default async function handler (req, res) {
-  try {
-    const { query, history, pluginUrl } = req.body;
-    
-    const chat = new ChatOpenAI({ 
-      modelName: "gpt-3.5-turbo",
-      temperature: 0.7,
-      topP: 1,
-      frequencyPenalty: 0,
-      presencePenalty: 0,
-      maxTokens: 500,
-    })
-
-    if(pluginUrl){
-      const tools = [
-        await AIPluginTool.fromPluginUrl(
-          pluginUrl
-        ),
-      ];
-      const agent = await initializeAgentExecutorWithOptions(
-        tools,
-        chat,
-        { agentType: "chat-conversational-react-description", verbose: true }
-      );
-    
-      const result = await agent.call({
-        input: query,
-      });
-
-      const data = await chat.call([
-        new SystemChatMessage(`You are a helpful assistant named Handana AI that accurately answers the user's queries based on the previous answer. translate the answer to indonesia language.
-          ${history && history.length >= 3 ? `${history[history.length - 2].content}, ANSWER: ${result.output}` : undefined}
-        `),
-        new HumanChatMessage(query)
-      ]);
-
-      if(data && data.text){
-        res.status(200).json({text: 'Fetch answer success', code: 200, data: data.text})
-      } else {
-        res.status(404).json({text: 'Failed to fetch answer', code: 404})
-      }
-    } else {
-      const data = await chat.call([
-          new SystemChatMessage(`You are a helpful assistant named Handana AI that accurately answers the user's queries based on the previous answer. translate the answer to indonesia language.
-            ${history && history.length >= 3 ? history[history.length - 2].content : undefined}
-          `),
-          new HumanChatMessage(query)
-      ]);
-    
-      if(data.text){
-        res.status(200).json({data: data.text, code: 200, text: "Fetch chat success"})
-      } else {
-        res.status(404).json({text: 'Failed to fetch answer', code: 401})
-      }
-    }
-  } catch(e) {
-    console.log(e)
-    res.status(500).json({text: 'Internal server error', code: 500, error: e})
-  }
+export const config = {
+    api: {
+      bodyParser: false,
+    },
+    runtime: "edge",
 };
+
+export default async function handler(req, res) {
+    const body = await req.json()
+
+    try {
+        if (!OPENAI_API_KEY) {
+            throw new Error("OPENAI_API_KEY is not defined.");
+        }
+
+        const encoder = new TextEncoder();
+        const stream = new TransformStream();
+        const writer = stream.writable.getWriter();
+
+        const llm = new ChatOpenAI({
+            openAIApiKey: OPENAI_API_KEY,
+            temperature: 0.9,
+            streaming: true,
+            modelName: "gpt-3.5-turbo",
+            temperature: 0.7,
+            topP: 1,
+            frequencyPenalty: 0,
+            presencePenalty: 0,
+            maxTokens: 500,
+            streaming: true,
+            callbackManager: CallbackManager.fromHandlers({
+                handleLLMNewToken: async (token) => {
+                    await writer.ready;
+                    await writer.write(encoder.encode(`${token}`));
+                },
+                handleLLMEnd: async () => {
+                    await writer.ready;
+                    await writer.close();
+                },
+                handleLLMError: async (e) => {
+                    await writer.ready;
+                    await writer.abort(e);
+                },
+            }),
+        });
+
+        if(body.pluginUrl){
+          const tools = [
+            new RequestsGetTool(),
+            new RequestsPostTool(),
+            await AIPluginTool.fromPluginUrl(
+              body.pluginUrl
+            ),
+          ];
+          const agent = await initializeAgentExecutorWithOptions(
+            tools,
+            new ChatOpenAI({ temperature: 0 }),
+            { agentType: "chat-conversational-react-description", verbose: true }
+          );
+        
+          const result = await agent.call({
+            input: `${body.history && body.history.length >= 3 ? `${body.history[body.history.length - 2].content}, QUESTION: ${body.query}` : undefined}`,
+          });
+
+          const chatPrompt = ChatPromptTemplate.fromPromptMessages([
+            SystemMessagePromptTemplate.fromTemplate(
+              `You are a helpful assistant named Handana AI that accurately answers the user's queries based on the previous answer. translate the answer to indonesia language.
+              ${body.history && body.history.length >= 3 ? `${body.history[body.history.length - 2].content}, ANSWER: ${result.output}` : undefined}
+              `
+            ),
+            HumanMessagePromptTemplate.fromTemplate("{input}"),
+        ]);
+
+        const chain = new LLMChain({
+            prompt: chatPrompt,
+            llm: llm,
+        });
+
+        chain.call({input: body.query}).catch(console.error)
+        } else {
+          const chatPrompt = ChatPromptTemplate.fromPromptMessages([
+              SystemMessagePromptTemplate.fromTemplate(
+                  `You are a helpful assistant named Handana AI that accurately answers the user's queries based on the previous answer. translate the answer to indonesia language.
+                  ${body.history && body.history.length >= 3 ? body.history[body.history.length - 2].content : undefined}
+                  `
+              ),
+              HumanMessagePromptTemplate.fromTemplate("{input}"),
+          ]);
+          const chain = new LLMChain({
+              prompt: chatPrompt,
+              llm: llm,
+          });
+
+          chain
+              .call({input: body.query})
+              .catch(console.error);
+        }
+
+        return new NextResponse(stream.readable, {
+            headers: {
+                "Content-Type": "text/event-stream",
+                "Cache-Control": "no-cache",
+            },
+        });
+    } catch (error) {
+        console.log(error)
+        return new Response(
+            JSON.stringify(
+                { error: error.message },
+                {
+                    status: 500,
+                    headers: { "Content-Type": "application/json" },
+                }
+            )
+        );
+    }
+}
