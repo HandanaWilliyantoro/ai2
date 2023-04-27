@@ -157,8 +157,9 @@ const chat = observer(() => {
         if(isLoading) return;
         setIsLoading(true);
         const contentChecker = params && params.length > 1 ? params[params.length - 1].content :  params[params.length - 1].content.input
-        if(contentChecker && contentChecker.includes('!image')){
-            createArt.execute({prompt: contentChecker ?? 'dummy'})
+        if(contentChecker && contentChecker.split(' ')[0] === '!image'){
+            const processedPrompt = contentChecker.replace('!image ', '')
+            createArt.execute({prompt: processedPrompt ?? 'dummy'})
         } else {
             if(history.length < 1){
                 const query = input.toLowerCase()
@@ -167,7 +168,7 @@ const chat = observer(() => {
                 postChat.execute({query, persona: findPersona, history: params, pluginUrl})
             } else {
                 const query = input.toLowerCase()
-                const pluginUrl = plugins?.find(a => a.selected)?.url ?? ''
+                const pluginUrl = plugins.find(a => a.selected).url
                 postChat.execute({query, conversationId, history: params, pluginUrl})
             }
         }
@@ -302,7 +303,7 @@ const chat = observer(() => {
                             ) : (
                                 <div>
                                     {plugins && plugins.find(a => a.selected)?.name ? <p className='text-xs py-2 px-3 rounded bg-green-200 text-green-500 font-sans font-bold w-[fit-content] mb-2'>Plugin: {plugins.find(a => a.selected).name}</p> : undefined}
-                                    <p className='font-serif text-sm text-black'>{a.content}</p>
+                                    <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
                                 </div>
                             )}
                             <div className='flex flex-row items-center justify-start mt-4'>
@@ -326,7 +327,7 @@ const chat = observer(() => {
                 )}
                 {answer && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full'>
-                        <p className='font-serif text-sm text-black'>{answer}</p>
+                            <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
                     </div>
                 )}
             </div>
