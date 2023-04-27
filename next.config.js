@@ -4,6 +4,17 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production"
   },
+  headers: () => [
+    {
+      source: '/chat*',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'no-store',
+        },
+      ],
+    },
+  ],
 }
 
 module.exports = nextConfig
