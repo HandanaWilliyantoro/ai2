@@ -14,7 +14,7 @@ import Header from '@/components/Header'
 import ModalAuthentication from '@/components/ModalAuthentication'
 import getModels from '@/stores/FetchModels.store'
 
-const Art = observer(() => {
+const Art = observer(({session}) => {
     const {status} = useSession()
 
     const [prompt, setPrompt] = useState('Woman Elf');
@@ -77,20 +77,13 @@ const Art = observer(() => {
     //#region HANDLER
     useEffect(() => {
         handleFetchModels()
-        function checkUserData() {
-            const item = localStorage.getItem('token')
-        
-            if(item){
-                setIsAuthenticated(true)
-            }
+        const item = localStorage.getItem('token')
+        if(item || session){
+            setIsAuthenticated(true)
+        } else {
+            setIsAuthenticated(false)
         }
-    
-        window.addEventListener('storage', checkUserData)
-    
-        return () => {
-            window.removeEventListener('storage', checkUserData)
-        }
-    }, [])
+    }, [isAuthenticated])
 
     const onChangeWidth = useCallback((e) => {
         if(Number(e.target.value) < 0){
@@ -139,7 +132,7 @@ const Art = observer(() => {
                         <label className='text-xs text-black font-serif mb-1'>Model</label>
                         <select value={model} onChange={e => setModel(e.target.value)} placeholder="Ex: Epic Diffusion" className='rounded border-2 bg-white text-black p-1 pr-4 w-full py-2 font-serif text-xs outline-none'>
                             {modelOptions && modelOptions.length > 0 && modelOptions.map(a => (
-                                <option value={a.id}>{a.name}</option>
+                                <option key={a.id} value={a.id}>{a.name}</option>
                             ))}
                         </select>
                     </div>

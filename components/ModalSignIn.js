@@ -39,7 +39,6 @@ const ModalSignIn = observer(({
     useEffect(() => {
         if(status == 'authenticated'){
             formAuthenticate(data.user, data.accessToken)
-            showSuccessSnackbar('You have successfully logged in')
             setModalType(undefined)
             setIsAuthenticated(true)
         }

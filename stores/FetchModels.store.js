@@ -24,7 +24,6 @@ class FetchModelStore {
         .then(res => res.json())
         .then(response => {
             if(response.data){
-                console.log(response.data, 'ini response data')
                 getModels.success(response.data)
             } else {
                 getModels.failed(response.text)

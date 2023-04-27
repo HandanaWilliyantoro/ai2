@@ -23,7 +23,7 @@ import ChatSkeleton from '@/components/ChatSkeleton'
 import ModalAuthentication from '@/components/ModalAuthentication'
 import ModalUserPlugin from '@/components/ModalUserPlugin'
 
-const chat = observer(() => {
+const chat = observer(({session}) => {
     const {status} = useSession()
 
     const [history, setHistory] = useState([]);
@@ -407,18 +407,11 @@ const chat = observer(() => {
 
     useEffect(() => {
         onClickReset()
-        function checkUserData() {
-            const item = localStorage.getItem('token')
-        
-            if(item){
-                setIsAuthenticated(true)
-            }
-        }
-    
-        window.addEventListener('storage', checkUserData)
-    
-        return () => {
-            window.removeEventListener('storage', checkUserData)
+        const item = localStorage.getItem('token')
+        if(item || session){
+            setIsAuthenticated(true)
+        } else {
+            setIsAuthenticated(false)
         }
     }, [isAuthenticated])
     //#endregion
@@ -481,7 +474,7 @@ const chat = observer(() => {
                 </div>
                 <div className='w-full flex flex-row items-center justify-center'>
                     <input disabled={isLoading} onKeyDown={onClickEnter} value={input} onChange={onChangeInput} placeholder='Write me a tiktok ads copy' className='w-full text-black bg-white mx-2 px-3 py-2 outline-none border-2 rounded font-sans' />
-                    <button onClick={onClickArrow} className='px-2 py-2.5 w-1/7 max-md:w-1/3 bg-black text-white font-serif text-sm font-bold rounded mr-3 border-1 border-black'>{isAuthenticated ? 'Submit' : 'Sign In'}</button>
+                    <button onClick={onClickArrow} className='px-2 py-2.5 w-1/6 max-md:w-1/3 bg-black text-white font-serif text-sm font-bold rounded mr-3 border-1 border-black'>{isAuthenticated ? 'Submit' : 'Sign In'}</button>
                 </div>
             </div>
         </div>

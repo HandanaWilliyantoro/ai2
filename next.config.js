@@ -6,7 +6,7 @@ const nextConfig = {
   },
   headers: () => [
     {
-      source: '/chat*',
+      source: '/chat',
       headers: [
         {
           key: 'Cache-Control',

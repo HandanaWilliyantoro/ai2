@@ -24,7 +24,6 @@ class FetchDonationStore {
         .then(res => res.json())
         .then(response => {
             if(response.data){
-                console.log(response.data, 'ini response data')
                 getDonations.success(response.data)
             } else {
                 getDonations.failed(response.text)
