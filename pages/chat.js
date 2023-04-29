@@ -157,6 +157,7 @@ const chat = observer(({session}) => {
         if(isLoading) return;
         setIsLoading(true);
         const contentChecker = params && params.length > 1 ? params[params.length - 1].content :  params[params.length - 1].content.input
+        console.log(contentChecker, params, params.length, 'ini contentchecker sama params')
         if(contentChecker && contentChecker.includes(' ') && contentChecker.split(' ')[0] === '!image'){
             const processedPrompt = contentChecker.replace('!image ', '')
             createArt.execute({prompt: processedPrompt ?? 'dummy'})
@@ -193,13 +194,11 @@ const chat = observer(({session}) => {
     /* Watcher Text */
     useEffect(() => {
         if(postChat.response){
-            setIsLoading(false)
             const response = JSON.parse(JSON.stringify(answer))
             setAnswer(`${response + postChat.response}`)
             setInput('')
             postChat.reset()
         } else if (postChat.error) {
-            setIsLoading(false)
             showErrorSnackbar('Our chat feature is currently down, please come back later')
             postChat.reset();
         }
@@ -210,8 +209,10 @@ const chat = observer(({session}) => {
         if(postChat.finished){
             const parsedHistory = JSON.parse(JSON.stringify(history))
             setHistory([...parsedHistory, {role: 'assistant', content: answer}])
+            setIsLoading(false)
             setAnswer('')
             setInput('')
+            postChat.reset()
         }
     }, [postChat.finished])
     //#endregion
@@ -468,7 +469,6 @@ const chat = observer(({session}) => {
                 <div className='flex flex-row items-center py-2 w-full'>
                     <div className='relative mr-2 flex flex-row justify-center items-center'>
                         <p onClick={() => setIsModalPersonaOpened(!isModalPersonaOpened)} className='font-serif text-xs ml-4 text-black flex flex-row items-center hover:underline cursor-pointer'><BsPersonSquare className='w-4 h-4 mr-1' />Persona</p>
-                        <p onClick={() => setIsModalPluginOpened(!isModalPluginOpened)} className='font-serif text-xs ml-4 text-black flex flex-row items-center hover:underline cursor-pointer'><BsPlugin className='w-4 h-4 mr-1' />Plugin</p>
                     </div>
                     <div className='group relative ml-auto mr-2 flex justify-center'>
                         <AiOutlineInfoCircle className='text-black' />
