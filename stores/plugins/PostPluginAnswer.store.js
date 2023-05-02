@@ -12,7 +12,7 @@ class PluginAnswerStore {
 
     async execute(params){
         postPluginAnswer.loading = true
-        fetch(`/api/chat`, {
+        fetch(`/api/chat/plugins`, {
             'method': "POST",
             'headers': {
                 'Content-Type': 'application/json',
