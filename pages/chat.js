@@ -13,6 +13,7 @@ import Plugins from '@/util/assets/plugins.json'
 import { observer } from 'mobx-react-lite'
 import postChat from '@/stores/Chat.store'
 import createArt from '@/stores/Art.store'
+import getPluginIntents from '@/stores/plugins/GetPluginIntent.store'
 
 // Components
 import ModalPersona from '@/components/ModalPersona'
@@ -22,6 +23,8 @@ import ImageSkeleton from '@/components/ImageSkeleton'
 import ChatSkeleton from '@/components/ChatSkeleton'
 import ModalAuthentication from '@/components/ModalAuthentication'
 import ModalUserPlugin from '@/components/ModalUserPlugin'
+import getPluginOperation from '@/stores/plugins/GetPluginOperation.store'
+import postPluginAnswer from '@/stores/plugins/PostPluginAnswer.store'
 
 const chat = observer(({session}) => {
     const {status} = useSession()
@@ -140,6 +143,8 @@ const chat = observer(({session}) => {
     const [selectedAction, setSelectedAction] = useState('');
     const [conversationId, setConversationId] = useState()
     const [isAuthenticated, setIsAuthenticated] = useState(status === 'authenticated' ? true : undefined)
+    const [pluginIntents, setPluginIntents] = useState()
+    const [isPluginChatLoading, setIsPluginChatLoading] = useState(false)
 
     const divRef = useRef(null);
     const router = useRouter();
@@ -152,28 +157,191 @@ const chat = observer(({session}) => {
         scrollToBottom()
     }, [history.length])
 
+    //#region FETCH CHAT ANSWER PLUGIN
+    const pluginChatHandler = useCallback(async (query, selectedPlugins) => {
+        setIsPluginChatLoading(true);
+        const actions = await selectedPlugins.map(p => `${p.manifest.name_for_model}: "${p.manifest.description_for_model}"`);
+        const userQuery = `
+        You are an assistant bot designed to deduce the intent of a given text. Treat the provided objective as your goal and adhere to the instructions.
+
+        User query: "${query}"
+        Your objective: As an assistant bot is to help the machine comprehend human intentions based on user input and available tools.
+        Your goal is to identify the best action to directly address the user's inquiry. 
+        In your subsequent steps, you will utilize the chosen action. You may select multiple actions and list them in a meaningful order. 
+        Prioritize actions that directly relate to the user's query over general ones. 
+        Ensure that the generated thought is highly specific and explicit to best match the user's expectations. 
+        Construct the result in a manner that an online open-API would most likely expect. 
+        You can repeat and chain actions, even if they are the same, one after the another.
+        
+        Output exactly with this format, avoid any other text as this will be parsed by a machine: 
+        <action name, single word>: <your thought as a bot about how to use this action in your next steps (use verbs as: search, query, calculate, store, etc.), concisely up to 10 words, use only data extraction without any calculations>.
+        
+        Available Actions: 
+        N/A: no suitable action, just perform simple GPT completion.
+        - ${actions.join('\n - ')}.
+        `
+
+        getPluginIntents.execute({query: userQuery, selectedPlugins})
+    }, []);
+
+    /* Handle plugin intents */
+    const handleIntents = useCallback(async (intents) => {
+        if(intents[0].action != 'N/A'){
+            const chosenPlugin = Plugins.find(a => a.manifest.name_for_model === intents[0].action)
+
+            const data = await fetch(chosenPlugin.manifest.api.url, {method: 'GET'});
+            
+            const openApiDefinition = await data.text()
+
+            const userQuery = `
+            You are an assistant bot designed to extract and generate suitable actions based on the given text and chat history. Treat the provided objective as your goal and adhere to the instructions. To assist you in connecting to the internet, we have included excerpts from the web, which you can utilize to respond to user inquiries.
+
+            User query: \n"${input}".
+            Plugin description: \n"${chosenPlugin.manifest.description_for_model}".
+            Usage thought: \n"${intents[0].thought}".
+            OpenAPI definition: \n"${openApiDefinition}".
+            Your objective: As an assistant bot, your purpose is to help the machine comprehend human intentions based on user input and the available open-API definition file. Respond only with the URL, method, and parameters that best align with the user's query. Ensure that any placeholders are replaced with relevant data according to the given query, thought, and context. The outputted thought should be highly specific and explicit to best match the user's expectations. If there is only one endpoint available, select it.
+            
+            Output exactly with this format, avoid any other text as this will be parsed by a machine: 
+            URL: <url + parameters, respecting plugin settings>
+            METHOD: <method (GET/POST/etc)>
+            BODY: <body in case of POST>
+            [END]`
+
+            getPluginOperation.execute({query: userQuery})
+        } else {
+            postPluginAnswer.execute({query: input, history})
+            setIsPluginChatLoading(false)
+            setIsLoading(false)
+        }
+    }, [input, Plugins, history])
+
+    /* Handle plugin operations */
+    const handleOperations = useCallback(async (res) => {
+        try {
+            const lines = res.split(/\n+/);
+            const url = lines[0].split(/\s*URL\s*:\s*/)?.[1];
+            const method = lines[1]?.split(/\s*METHOD\s*:\s*/)?.[1];
+            const body = lines[2]?.split(/\s*BODY\s*:\s*/)?.[1];
+    
+            let responseOperation;
+    
+            if(url && method){
+                switch(method){
+                    case "GET":
+                        responseOperation = await fetch(url, {method, headers: {
+                            'access-control-allow-origin': '*',
+                            'Content-Type': 'application/json',
+                            'Connection': 'keep-alive',
+                            'Accept': '*/*',
+                            'Accept-Encoding': 'gzip, deflate, br'
+                        }})
+                        break;
+                    case "POST":
+                        responseOperation = await fetch(url, {method, headers: {
+                            'Content-Type': 'application/json',
+                            'Connection': 'keep-alive',
+                            'Accept': '*/*',
+                            'Accept-Encoding': 'gzip, deflate, br'
+                        }, body})
+                        break;
+                }
+            }
+    
+            const response = await responseOperation.text();
+    
+            const userQuery = `
+                User query: \n"${input}".
+                Thoughts: \n"${pluginIntents.map(x => x.thought).join('.')}."
+                Context from the web: \n"${response ? JSON.stringify(response) : ''}".
+            `
+    
+            postPluginAnswer.execute({query: userQuery, history})
+            setIsPluginChatLoading(false)
+            setIsLoading(false)
+        } catch(e) {
+            console.log(e)
+            showErrorSnackbar('Failed to fetch plugin answer')
+            setIsPluginChatLoading(false)
+            setIsLoading(false)
+        }
+    }, [input, history, pluginIntents]);
+
+    /* Watcher plugin chat feature */
+    useEffect(() => {
+        if(postPluginAnswer.response){
+            const response = JSON.parse(JSON.stringify(answer))
+            setAnswer(`${response + postPluginAnswer.response}`)
+            setInput('')
+            postPluginAnswer.reset()
+        } else if (postPluginAnswer.error){
+            showErrorSnackbar('failed to fetch plugin chat answer')
+            setIsPluginChatLoading(false)
+            postPluginAnswer.reset()
+        }
+    }, [postPluginAnswer.response, postPluginAnswer.error, postPluginAnswer.reset])
+
+    /* Watcher if plugin has finished */
+    useEffect(() => {
+        if(postPluginAnswer.finished){
+            const parsedHistory = JSON.parse(JSON.stringify(history))
+            setIsPluginChatLoading(false)
+            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
+            setAnswer('')
+            setInput('')
+            postPluginAnswer.reset()
+        }
+    }, [postPluginAnswer.finished])
+
+    useEffect(() => {
+        if(getPluginOperation.response){
+            handleOperations(getPluginOperation.response)
+            getPluginOperation.reset();
+        } else if (getPluginOperation.error) {
+            showErrorSnackbar('Failed to fetch plugin answer')
+            setIsPluginChatLoading(false)
+            getPluginOperation.reset();
+        }
+    }, [getPluginOperation.response, getPluginOperation.error, getPluginOperation.reset])
+
+    useEffect(() => {
+        if(getPluginIntents.response){
+            handleIntents(getPluginIntents.response.result)
+            setPluginIntents(getPluginIntents.response.result)
+            getPluginIntents.reset()
+        } else if (getPluginIntents.error) {
+            showErrorSnackbar('Failed to fetch plugin intents')
+            setIsPluginChatLoading(false)
+            getPluginIntents.reset()
+        }
+    }, [getPluginIntents.response, getPluginIntents.error, getPluginIntents.reset])
+    //#endregion
+
     //#region FETCH CHAT ANSWER
     const handleFetchAnswer = useCallback((params) => {
         if(isLoading) return;
         setIsLoading(true);
         const contentChecker = params && params.length > 1 ? params[params.length - 1].content :  params[params.length - 1].content.input
-        console.log(contentChecker, params, params.length, 'ini contentchecker sama params')
         if(contentChecker && contentChecker.includes(' ') && contentChecker.split(' ')[0] === '!image'){
             const processedPrompt = contentChecker.replace('!image ', '')
             createArt.execute({prompt: processedPrompt ?? 'dummy'})
         } else {
-            if(history.length < 1){
+            const selectedPlugins = plugins.filter(a => a.selected);
+            if(selectedPlugins && selectedPlugins.length > 0){
                 const query = input.toLowerCase()
-                const findPersona = persona.find(a => a.selected).title
-                const pluginUrl = plugins?.find(a => a.selected)?.url ?? ''
-                postChat.execute({query, persona: findPersona, history: params, pluginUrl})
+                return pluginChatHandler(query, selectedPlugins)
             } else {
-                const query = input.toLowerCase()
-                const pluginUrl = plugins?.find(a => a.selected)?.url ?? ''
-                postChat.execute({query, conversationId, history: params, pluginUrl})
+                if(history.length < 1){
+                    const query = input.toLowerCase()
+                    const findPersona = persona.find(a => a.selected).title
+                    postChat.execute({query, persona: findPersona, history: params})
+                } else {
+                    const query = input.toLowerCase()
+                    postChat.execute({query, history: params})
+                }
             }
         }
-    }, [input, conversationId, persona, history]);
+    }, [input, persona, history]);
 
     /* Watcher Image */
     useEffect(() => {
@@ -221,6 +389,8 @@ const chat = observer(({session}) => {
     const onClickReset = useCallback(() => {
         setHistory([]);
         setAnswer('')
+        setIsLoading(false);
+        setIsPluginChatLoading(false)
     }, []);
 
     const onSubmitHandler = useCallback(() => {
@@ -324,6 +494,12 @@ const chat = observer(({session}) => {
                         </div>
                     }
                 })}
+                {isPluginChatLoading && (
+                    <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
+                        {plugins && plugins.find(a => a.selected)?.name ? <p className='text-xs flex flex-row items-center justify-center py-2 px-3 rounded bg-green-200 text-green-500 font-sans font-bold w-[fit-content] mb-4'>Plugin: {plugins.find(a => a.selected).name} <ReactLoading className='ml-2 flex items-center' type='spin' color={'#939393'} height={'auto'} width={15} /></p> : undefined}
+                        <ChatSkeleton />
+                    </div>
+                )}
                 {(postChat.loading) && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
                         {plugins && plugins.find(a => a.selected)?.name ? <p className='text-xs flex flex-row items-center justify-center py-2 px-3 rounded bg-green-200 text-green-500 font-sans font-bold w-[fit-content] mb-4'>Plugin: {plugins.find(a => a.selected).name} <ReactLoading className='ml-2 flex items-center' type='spin' color={'#939393'} height={'auto'} width={15} /></p> : undefined}
@@ -469,6 +645,8 @@ const chat = observer(({session}) => {
                 <div className='flex flex-row items-center py-2 w-full'>
                     <div className='relative mr-2 flex flex-row justify-center items-center'>
                         <p onClick={() => setIsModalPersonaOpened(!isModalPersonaOpened)} className='font-serif text-xs ml-4 text-black flex flex-row items-center hover:underline cursor-pointer'><BsPersonSquare className='w-4 h-4 mr-1' />Persona</p>
+                        <p onClick={() => setIsModalPluginOpened(!isModalPluginOpened)} className='font-serif text-xs ml-4 text-black flex flex-row items-center hover:underline cursor-pointer'><BsPlugin className='w-4 h-4 mr-1' />Plugin</p>
+
                     </div>
                     <div className='group relative ml-auto mr-2 flex justify-center'>
                         <AiOutlineInfoCircle className='text-black' />

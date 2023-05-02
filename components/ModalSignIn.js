@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { emailRegExp } from '@/util/regex';
 import { showSuccessSnackbar, showErrorSnackbar } from '@/util/toast';
 import { authenticate as formAuthenticate } from '@/util/auth';
-import {useSession, signIn as socialSignIn, signOut} from "next-auth/react";
+import {useSession, signIn as socialSignIn} from "next-auth/react";
 import { SiGoogle } from 'react-icons/si';
 
 import signIn from '@/stores/SignIn.store';
@@ -26,7 +26,6 @@ const customStyles = {
 const ModalSignIn = observer(({
     isOpen,
     onRequestClose,
-    loading,
     setModalType,
     setIsAuthenticated,
     isAuthenticated

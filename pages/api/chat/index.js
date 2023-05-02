@@ -7,8 +7,6 @@ import {
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 } from "langchain/prompts";
-import {AIPluginTool, RequestsGetTool, RequestsPostTool} from 'langchain/tools'
-import { initializeAgentExecutorWithOptions } from "langchain/agents";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -101,20 +99,35 @@ const createPersona = (persona, input) => {
       default:
         return input
     }
-  }
+}
+
+async function getSearchResult (query) {
+    const data = await fetch(`https://real-time-web-search.p.rapidapi.com/search?q=${query}&limit=10`, {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': process.env.RAPID_API_KEY,
+            'X-RapidAPI-Host': 'real-time-web-search.p.rapidapi.com',
+        },
+    })
+
+    const engine = await data.json()
+
+    const searchResult = await engine.data.slice(0,1)
+
+    return searchResult[0].snippet
+}
 
 export default async function handler(req, res) {
     const body = await req.json()
 
-    let query;
-
-    if(body.persona && body.query){
-        query = await createPersona(body.persona, body.query)
-    }
-
     try {
         if (!OPENAI_API_KEY) {
             throw new Error("OPENAI_API_KEY is not defined.");
+        }
+
+        let query = body.query
+        if(body.query && body.persona){
+            query = await createPersona(body.persona, body.query)
         }
 
         const encoder = new TextEncoder();
@@ -130,7 +143,7 @@ export default async function handler(req, res) {
             topP: 1,
             frequencyPenalty: 0,
             presencePenalty: 0,
-            maxTokens: 500,
+            maxTokens: 750,
             streaming: true,
             callbackManager: CallbackManager.fromHandlers({
                 handleLLMNewToken: async (token) => {
@@ -148,10 +161,18 @@ export default async function handler(req, res) {
             }),
         });
 
-        
+        if(body.history && body.history.length > 1){
+            body.history.pop()
+        }
+
+        const result = await getSearchResult(query)
+
         const chatPrompt = ChatPromptTemplate.fromPromptMessages([
             SystemMessagePromptTemplate.fromTemplate(
-                `You are an AI assistant named Handana AI that answers the user's queries based on the previous conversation.
+                `You are a helpful assistant named Handana AI that accurately answers the user's queries based on the previous conversation and answer based on given SOURCE if it's relevant. don't answer anything about the given source provided.
+
+                SOURCE:
+                ${result}
                 
                 PREVIOUS CONVERSATION:
                 ${body.history && body.history.length >= 3 ? body.history.map(a => a.role === 'user' ? `USER: ${a.content.input ? a.content.input : a.content}\n` : `ASSISTANT: ${a.content}\n`).toString() : `USER: ${body.history[0].content.input}`}
@@ -159,6 +180,7 @@ export default async function handler(req, res) {
             ),
             HumanMessagePromptTemplate.fromTemplate("{input}"),
         ]);
+
         const chain = new LLMChain({
             prompt: chatPrompt,
             llm: llm,

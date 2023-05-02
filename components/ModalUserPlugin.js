@@ -24,7 +24,7 @@ const ModalUserPlugin = ({
     return (
         <Modal ariaHideApp={false} isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
             <div className='flex flex-row items-center justify-between w-full border-b-2 border-b-gray-200 bg-white p-2'>
-                <p className='font-sans text-black font-bold text-sm'>Plugin Mode <span className='py-0.5 ml-0.5 text-xs text-blue-600 font-sans bg-blue-200 px-2 rounded'>Beta</span></p>
+                <p className='font-sans text-black font-bold text-sm'>Plugin Mode <span className='py-0.5 ml-0.5 text-xs text-blue-600 font-sans bg-blue-200 px-2 rounded'>Alpha</span></p>
                 <AiOutlineCloseCircle onClick={onRequestClose} className='w-4 h-5 text-black cursor-pointer transition hover:opacity-50' />
             </div>
             <div className='flex flex-col w-full items-start justify-start max-h-[60vh] p-2 overflow-y-scroll'>
