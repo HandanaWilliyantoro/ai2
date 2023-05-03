@@ -296,6 +296,8 @@ const chat = observer(({session}) => {
     useEffect(() => {
         if(getPluginOperation.response){
             handleOperations(getPluginOperation.response)
+            const response = JSON.parse(JSON.stringify(answer))
+            setAnswer(`${response + '>> Getting data on plugin success!'}\n\n`)
             getPluginOperation.reset();
         } else if (getPluginOperation.error) {
             showErrorSnackbar('Failed to fetch plugin answer')
@@ -307,6 +309,8 @@ const chat = observer(({session}) => {
     useEffect(() => {
         if(getPluginIntents.response){
             handleIntents(getPluginIntents.response.result)
+            const response = JSON.parse(JSON.stringify(answer))
+            setAnswer(`>> ${response + getPluginIntents.response.result[0].thought}\n\n`)
             setPluginIntents(getPluginIntents.response.result)
             getPluginIntents.reset()
         } else if (getPluginIntents.error) {
@@ -494,9 +498,15 @@ const chat = observer(({session}) => {
                         </div>
                     }
                 })}
+                {answer && !isPluginChatLoading && (
+                    <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full'>
+                            <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
+                    </div>
+                )}
                 {isPluginChatLoading && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
                         {plugins && plugins.find(a => a.selected)?.name ? <p className='text-xs flex flex-row items-center justify-center py-2 px-3 rounded bg-green-200 text-green-500 font-sans font-bold w-[fit-content] mb-4'>Plugin: {plugins.find(a => a.selected).name} <ReactLoading className='ml-2 flex items-center' type='spin' color={'#939393'} height={'auto'} width={15} /></p> : undefined}
+                        {answer && <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />}
                         <ChatSkeleton />
                     </div>
                 )}
@@ -510,11 +520,6 @@ const chat = observer(({session}) => {
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
                         <ImageSkeleton />
                         <p className="mt-1 font-sans text-sm font-bold text-black">Generating Art..</p>
-                    </div>
-                )}
-                {answer && (
-                    <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full'>
-                            <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
                     </div>
                 )}
             </div>
