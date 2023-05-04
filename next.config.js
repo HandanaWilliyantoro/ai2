@@ -14,6 +14,23 @@ const nextConfig = {
         },
       ],
     },
+    {
+      source: '/chat/plugins/evaluate',
+      headers: [
+        {
+          key: 'Access-Control-Allow-Origin',
+          value: '*',
+        },
+        {
+          key: 'Access-Control-Allow-Methods',
+          value: 'GET, PUT, PATCH, POST, DELETE',
+        },
+        {
+          key: 'Access-Control-Allow-Headers',
+          value: '*',
+        },
+      ],
+    },
   ],
   webpack(config) {
     config.experiments = {

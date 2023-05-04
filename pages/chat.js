@@ -189,7 +189,15 @@ const chat = observer(({session}) => {
         if(intents[0].action != 'N/A'){
             const chosenPlugin = Plugins.find(a => a.manifest.name_for_model === intents[0].action)
 
-            const data = await fetch(chosenPlugin.manifest.api.url, {method: 'GET'});
+            console.log(chosenPlugin, 'ini chosen plugin')
+
+            const data = await fetch(`/api/chat/plugins/evaluate?url=${chosenPlugin.manifest.api.url}`, {method: 'GET', headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json',
+                'Connection': 'keep-alive',
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, br'
+            }});
             
             const openApiDefinition = await data.text()
 
@@ -223,14 +231,16 @@ const chat = observer(({session}) => {
             const url = lines[0].split(/\s*URL\s*:\s*/)?.[1];
             const method = lines[1]?.split(/\s*METHOD\s*:\s*/)?.[1];
             const body = lines[2]?.split(/\s*BODY\s*:\s*/)?.[1];
+
+            console.log(body, 'ini body')
     
             let responseOperation;
     
             if(url && method){
                 switch(method){
                     case "GET":
-                        responseOperation = await fetch(url, {method, headers: {
-                            'access-control-allow-origin': '*',
+                        responseOperation = await fetch(`/api/chat/plugins/evaluate?url=${url}`, {method, headers: {
+                            'Access-Control-Allow-Origin': '*',
                             'Content-Type': 'application/json',
                             'Connection': 'keep-alive',
                             'Accept': '*/*',
@@ -238,7 +248,7 @@ const chat = observer(({session}) => {
                         }})
                         break;
                     case "POST":
-                        responseOperation = await fetch(url, {method, headers: {
+                        responseOperation = await fetch(`/api/chat/plugins/evaluate?url=${url}`, {method, headers: {
                             'Content-Type': 'application/json',
                             'Connection': 'keep-alive',
                             'Accept': '*/*',
@@ -247,15 +257,15 @@ const chat = observer(({session}) => {
                         break;
                 }
             }
-    
-            const response = await responseOperation.text();
-    
+
+            const response = await responseOperation.json();
+
             const userQuery = `
                 User query: \n"${input}".
                 Thoughts: \n"${pluginIntents.map(x => x.thought).join('.')}."
                 Context from the web: \n"${response ? JSON.stringify(response) : ''}".
             `
-    
+
             postPluginAnswer.execute({query: userQuery, history})
             setIsPluginChatLoading(false)
             setIsLoading(false)
@@ -265,7 +275,7 @@ const chat = observer(({session}) => {
             setIsPluginChatLoading(false)
             setIsLoading(false)
         }
-    }, [input, history, pluginIntents]);
+    }, [input, history, pluginIntents, answer]);
 
     /* Watcher plugin chat feature */
     useEffect(() => {
@@ -297,7 +307,7 @@ const chat = observer(({session}) => {
         if(getPluginOperation.response){
             handleOperations(getPluginOperation.response)
             const response = JSON.parse(JSON.stringify(answer))
-            setAnswer(`${response + '>> Getting data on plugin success!'}\n\n`)
+            setAnswer(`${response + '> Fetching data from plugin'}\n\n`)
             getPluginOperation.reset();
         } else if (getPluginOperation.error) {
             showErrorSnackbar('Failed to fetch plugin answer')
@@ -310,7 +320,7 @@ const chat = observer(({session}) => {
         if(getPluginIntents.response){
             handleIntents(getPluginIntents.response.result)
             const response = JSON.parse(JSON.stringify(answer))
-            setAnswer(`>> ${response + getPluginIntents.response.result[0].thought}\n\n`)
+            setAnswer(`> ${response + getPluginIntents.response.result[0].thought}\n\n`)
             setPluginIntents(getPluginIntents.response.result)
             getPluginIntents.reset()
         } else if (getPluginIntents.error) {
