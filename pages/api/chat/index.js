@@ -112,9 +112,9 @@ async function getSearchResult (query) {
 
     const engine = await data.json()
 
-    const searchResult = await engine.data.slice(0,1)
+    const searchResult = await engine.data
 
-    return searchResult[0].snippet
+    return searchResult.map(a => a.snippet).toString()
 }
 
 export default async function handler(req, res) {
@@ -161,21 +161,17 @@ export default async function handler(req, res) {
             }),
         });
 
-        if(body.history && body.history.length > 1){
-            body.history.pop()
-        }
-
-        const result = await getSearchResult(query)
+        const searchResult = await getSearchResult(query)
 
         const chatPrompt = ChatPromptTemplate.fromPromptMessages([
             SystemMessagePromptTemplate.fromTemplate(
                 `You are a helpful assistant named Handana AI that accurately answers the user's queries based on the previous conversation and answer based on given SOURCE if it's relevant. don't answer anything about the given source provided.
-
+                
                 SOURCE:
-                ${result}
+                ${searchResult.replace(/\{/g, '(').replace(/}/g, ')')}
                 
                 PREVIOUS CONVERSATION:
-                ${body.history && body.history.length >= 3 ? body.history.map(a => a.role === 'user' ? `USER: ${a.content.input ? a.content.input : a.content}\n` : `ASSISTANT: ${a.content}\n`).toString() : `USER: ${body.history[0].content.input}`}
+                ${body.history && body.history.length >= 3 ? body.history.map(a => a.role === 'user' ? `USER: ${a.content.input ? a.content.input.replace(/\{/g, '[').replace(/}/g, ']') : a.content}\n` : `ASSISTANT: ${a.content.replace(/\{/g, '[').replace(/}/g, ']Z')}\n`).toString() : `USER: ${body.history[0].content.input}`}
                 `
             ),
             HumanMessagePromptTemplate.fromTemplate("{input}"),

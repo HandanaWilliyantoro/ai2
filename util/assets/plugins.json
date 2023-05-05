@@ -1,6 +1,6 @@
 [
     {
-      "id": 3,
+      "id": 1,
       "name": "Klarna Shopping",
       "url": "https://www.klarna.com/.well-known/ai-plugin.json",
       "desc": "Search and compare prices from thousands of online shops",
@@ -28,7 +28,7 @@
       }
     },
     {
-      "id": 9,
+      "id": 2,
       "name": "Speak",
       "url": "https://api.speak.com/.well-known/ai-plugin.json",
       "desc": "Learn how to say anything in another language with Speak, your AI-powered language tutor",
@@ -55,7 +55,7 @@
       }
     },
     {
-      "id": 10,
+      "id": 3,
       "name": "Milo Family AI",
       "url": "https://www.joinmilo.com/.well-known/ai-plugin.json",
       "desc": "Curating the wisdom of village to give parents ideas that turn any 20 minutes from meh to magic",
@@ -79,6 +79,31 @@
         "logo_url": "https://www.joinmilo.com/milo-blink.png",
         "contact_email": "hello@joinmilo.com",
         "legal_info_url": "https://www.joinmilo.com/terms"
+      }
+    },
+    {
+      "id": 4,
+      "name": "Transcribe",
+      "url": "https://www.transvribe.com/.well-known/ai-plugin.json",
+      "desc": "Plugin that allows you to ask any YouTube video a question.",
+      "icon": "https://www.transvribe.com/assets/sq-logo-100.jpg",
+      "manifest": {
+        "schema_version": "v1",
+        "name_for_human": "Transcribe",
+        "name_for_model": "Transcribe",
+        "description_for_human": "Plugin that allows you to ask any YouTube video a question..",
+        "description_for_model": "Plugin that answers questions based on content in a YouTube video.",
+        "auth": {
+            "type": "none"
+        },
+        "api": {
+            "type": "openapi",
+            "url": "https://www.transvribe.com/ai-plugin/openapi.yaml",
+            "is_user_authenticated": false
+        },
+        "logo_url": "https://www.transvribe.com/assets/sq-logo-100.jpg",
+        "contact_email": "zahid@transvribe.com",
+        "legal_info_url": "htts://www.transvribe.com"
       }
     }
 ]
