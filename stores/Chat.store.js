@@ -12,13 +12,15 @@ class ChatStore {
 
     async execute(params){
         postChat.loading = true
+        const token = localStorage.getItem('token')
         fetch(`/api/chat`, {
             'method': "POST",
             'headers': {
                 'Content-Type': 'application/json',
                 'Connection': 'keep-alive',
                 'Accept': '*/*',
-                'Accept-Encoding': 'gzip, deflate, br'
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Authorization': token
             },
             'body': JSON.stringify(params)
         }).then(res => {

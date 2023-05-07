@@ -1,9 +1,9 @@
-import {verify} from 'jsonwebtoken'
+import { jwtVerify } from "jose";
 
 const secretKey = process.env.SECRET_JWT_KEY
 
-const verifyToken = (payload) => {
-    return verify(payload, secretKey)
+const verifyToken = async (token) => {
+    return await jwtVerify(token, new TextEncoder().encode(secretKey)).payload;
 }
 
 export default async function handler (req, res) {

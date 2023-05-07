@@ -2,7 +2,7 @@ import dbConnect from "@/util/mongo";
 import User from "@/models/User";
 import {Types} from 'mongoose'
 import {hashSync} from 'bcrypt'
-import {sign} from 'jsonwebtoken'
+import { SignJWT } from "jose";
 
 const secretKey = process.env.SECRET_JWT_KEY
 
@@ -11,7 +11,12 @@ const hashPassword = (plainPassword) => {
 }
 
 const createToken = (payload) => {
-    return sign(payload, secretKey)
+    return new SignJWT({...payload})
+    .setProtectedHeader({alg: 'HS256', typ: 'JWT'})
+    .setExpirationTime(exp)
+    .setIssuedAt(iat)
+    .setNotBefore(iat)
+    .sign(new TextEncoder().encode(secretKey));
 }
 
 export default async function handler (req, res) {

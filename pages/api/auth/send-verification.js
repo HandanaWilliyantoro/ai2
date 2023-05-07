@@ -1,11 +1,19 @@
 import nodemailer from 'nodemailer'
 import {google} from 'googleapis'
-const { sign } = require("jsonwebtoken")
+import { SignJWT } from 'jose'
 
 const secretKey = process.env.SECRET_JWT_KEY
 
 const createToken = (payload) => {
-    return sign(payload, secretKey)
+    const iat = Math.floor(Date.now() / 1000);
+    const exp = iat + 60* 60; // one hour
+
+    return new SignJWT({...payload})
+        .setProtectedHeader({alg: 'HS256', typ: 'JWT'})
+        .setExpirationTime(exp)
+        .setIssuedAt(iat)
+        .setNotBefore(iat)
+        .sign(new TextEncoder().encode(secretKey));
 }
 
 const OAuth2 = google.auth.OAuth2;

@@ -7,6 +7,13 @@ import {
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 } from "langchain/prompts";
+import { jwtVerify } from "jose";
+
+const secretKey = process.env.SECRET_JWT_KEY
+
+const verifyToken = async (token) => {
+    return jwtVerify(token, new TextEncoder().encode(secretKey));
+}
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -112,13 +119,16 @@ async function getSearchResult (query) {
 
     const engine = await data.json()
 
-    const searchResult = await engine.data
+    const searchResult = await engine.data.slice(0, 2)
 
     return searchResult.map(a => a.snippet).toString()
 }
 
 export default async function handler(req, res) {
-    const body = await req.json()
+    const body = await req.json();
+    const token = await req.headers.get('authorization');
+
+    const {payload: {premium}} = await verifyToken(token)
 
     try {
         if (!OPENAI_API_KEY) {
@@ -135,15 +145,10 @@ export default async function handler(req, res) {
         const writer = stream.writable.getWriter();
 
         const llm = new ChatOpenAI({
-            openAIApiKey: OPENAI_API_KEY,
-            temperature: 0.9,
-            streaming: true,
             modelName: "gpt-3.5-turbo",
-            temperature: 0.7,
-            topP: 1,
-            frequencyPenalty: 0,
-            presencePenalty: 0,
-            maxTokens: 750,
+            openAIApiKey: OPENAI_API_KEY,
+            temperature: premium ? 0.7 : 0.8,
+            maxTokens: premium ? 1900 : 750,
             streaming: true,
             callbackManager: CallbackManager.fromHandlers({
                 handleLLMNewToken: async (token) => {
