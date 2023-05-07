@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
     const engine = await data.json()
 
-    const sources = await engine.data.slice(0, 5)
+    const sources = await engine.data.slice(0, 10)
 
     const parsedSources = await sources.map((a, i) => `Sources [${i+1}]: ${a.snippet}`)
 
