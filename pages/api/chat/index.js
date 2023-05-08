@@ -138,8 +138,8 @@ export default async function handler(req, res) {
         const llm = new ChatOpenAI({
             modelName: "gpt-3.5-turbo",
             openAIApiKey: OPENAI_API_KEY,
-            temperature: premium ? 0.7 : 0.8,
-            maxTokens: premium ? 1900 : 750,
+            temperature: 0.7,
+            maxTokens: 1000,
             streaming: true,
             callbackManager: CallbackManager.fromHandlers({
                 handleLLMNewToken: async (token) => {
