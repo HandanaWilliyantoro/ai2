@@ -1,13 +1,3 @@
-import { jwtVerify } from "jose";
-import dbConnect from "@/util/mongo";
-import User from "@/models/User";
-
-const secretKey = process.env.SECRET_JWT_KEY
-
-const verifyToken = async (token) => {
-    return jwtVerify(token, new TextEncoder().encode(secretKey));
-}
-
 async function encodeBufferAsBase64(buffer) {
   const bytes = new Uint8Array(buffer);
   let binary = '';

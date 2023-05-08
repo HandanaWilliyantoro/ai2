@@ -10,15 +10,17 @@ class FetchModelStore {
         makeAutoObservable(this)
     }
 
-    async execute(){
+    async execute(session){
         getModels.loading = true
+        const token = localStorage.getItem('token')
         fetch(`/api/art/model`, {
             'method': "GET",
             'headers': {
                 'Content-Type': 'application/json',
                 'Connection': 'keep-alive',
                 'Accept': '*/*',
-                'Accept-Encoding': 'gzip, deflate, br'
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Authorization': session?.accessToken ? session?.accessToken : token
             },
         })
         .then(res => res.json())

@@ -30,8 +30,9 @@ const Art = observer(({session}) => {
 
     //#region FETCH MODELS
     const handleFetchModels = useCallback(() => {
-        getModels.execute()
-    }, []);
+        const token = localStorage.getItem('token')
+        getModels.execute({accessToken: session?.accessToken ?? token})
+    }, [session, session.accessToken]);
 
     /* Watcher */
     useEffect(() => {
@@ -39,7 +40,8 @@ const Art = observer(({session}) => {
             setModelOptions(getModels.response)
             getModels.reset()
         } else if (getModels.error) {
-            showErrorSnackbar('Failed to fetch ai generator models')
+            console.log(getModels.error, 'ini get models error')
+            showErrorSnackbar(getModels.error)
             getModels.reset()
         }
     }, [getModels.response, getModels.error, getModels.reset])
@@ -108,7 +110,7 @@ const Art = observer(({session}) => {
             <Header />
             <div className='flex flex-row items-center justify-between mx-4'>
                 <p onClick={() => router.push('/image/search')} className='font-serif cursor-pointer text-sm transition hover:opacity-50 text-black flex items-center'><RxArrowLeft className='mr-1 w-4 h-4' />Search Image</p>
-                <p className='font-serif mt-2 text-lg text-gray-400 font-bold ml-4 py-2 max-md:text-sm'>Image / Art Generator</p>
+                <p className='font-serif mt-2 text-sm text-gray-400 font-bold ml-4 py-2 max-md:text-sm'>Image / Art Generator</p>
             </div>
             <div className='min-h-[calc(100vh-135px)] flex flex-row items-start justify-start w-full mt-4 max-md:mt-2 pb-8 max-md:pb-4 max-md:min-h-[calc(100vh-190px)] max-md:flex-col'>
                 <div className='flex-[0.5] flex flex-col items-start justify-start min-h-[calc(100vh-135px)] max-md:min-h-[auto] max-md:max-h-[400px] w-full border-black'>
@@ -129,14 +131,17 @@ const Art = observer(({session}) => {
                         <input type='number' value={height} onChange={onChangeHeight} placeholder="Ex: an astronaut riding a horse on mars" className='rounded bg-white text-black border-2 p-1 pl-2 py-2 w-full font-serif text-xs outline-none'  />
                     </div>
                     <div className='flex-col flex items-start justify-start mb-2 ml-4 w-3/4'>
-                        <label className='text-xs text-black font-serif mb-1'>Model</label>
+                        <label className='text-xs text-black font-serif mb-1'>Model ({modelOptions.length})</label>
                         <select value={model} onChange={e => setModel(e.target.value)} placeholder="Ex: Epic Diffusion" className='rounded border-2 bg-white text-black p-1 pr-4 w-full py-2 font-serif text-xs outline-none'>
                             {modelOptions && modelOptions.length > 0 && modelOptions.map(a => (
                                 <option key={a.id} value={a.id}>{a.name}</option>
                             ))}
                         </select>
                     </div>
-                    <button disabled={createArt.loading} onClick={handleFetchImage} className='font-serif text-xs ml-4 w-20 bg-black text-white outline-none py-2 rounded transition mt-2 border border-black hover:text-black hover:bg-white'>{!isAuthenticated ? 'Sign In' : (createArt.loading ? "Loading.." : "Submit")}</button>
+                    <div className='flex flex-row items-start justify-start mt-2 ml-4 w-3/4'>
+                        <button disabled={createArt.loading} onClick={handleFetchImage} className='font-serif w-full text-xs bg-black text-white outline-none py-2 rounded transition border border-black hover:text-black hover:bg-white'>{!isAuthenticated ? 'Sign In' : (createArt.loading ? "Loading.." : "Submit")}</button>
+                        <button className='font-serif text-transparent animate-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 w-full ml-2 bg-black text-white text-xs py-2 rounded outline-none'>Unlock 50+ models</button>
+                    </div>
                 </div>
                 <div className='flex-[0.5] max-md:w-full flex flex-col min-h-[calc(100vh-180px)] max-md:mt-4 max-md:min-h-[auto] max-md:py-4 items-start justify-start px-2'>
                     {createArt.loading ? (
