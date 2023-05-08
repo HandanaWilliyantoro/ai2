@@ -1,3 +1,13 @@
+import { jwtVerify } from "jose";
+import dbConnect from "@/util/mongo";
+import User from "@/models/User";
+
+const secretKey = process.env.SECRET_JWT_KEY
+
+const verifyToken = async (token) => {
+    return jwtVerify(token, new TextEncoder().encode(secretKey));
+}
+
 async function encodeBufferAsBase64(buffer) {
   const bytes = new Uint8Array(buffer);
   let binary = '';
@@ -9,7 +19,6 @@ async function encodeBufferAsBase64(buffer) {
 
 export default async function handler (req, res) {
     try {
-
         const {prompt, model} = req.body
 
         const encodedParams = new URLSearchParams();
@@ -43,6 +52,7 @@ export default async function handler (req, res) {
         }
 
     } catch(e) {
+        console.log(e)
         res.status(500).json({
             text: 'internal server error',
             code: 500,

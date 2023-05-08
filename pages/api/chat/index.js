@@ -7,13 +7,6 @@ import {
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 } from "langchain/prompts";
-import { jwtVerify } from "jose";
-
-const secretKey = process.env.SECRET_JWT_KEY
-
-const verifyToken = async (token) => {
-    return jwtVerify(token, new TextEncoder().encode(secretKey));
-}
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -127,8 +120,6 @@ async function getSearchResult (query) {
 export default async function handler(req, res) {
     const body = await req.json();
     const token = await req.headers.get('authorization');
-
-    const {payload: {premium}} = await verifyToken(token)
 
     try {
         if (!OPENAI_API_KEY) {

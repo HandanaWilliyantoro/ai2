@@ -141,7 +141,6 @@ const chat = observer(({session}) => {
     const [isModalActionOpened, setIsModalActionOpened] = useState(false)
     const [isModalPluginOpened, setIsModalPluginOpened] = useState(false)
     const [selectedAction, setSelectedAction] = useState('');
-    const [conversationId, setConversationId] = useState()
     const [isAuthenticated, setIsAuthenticated] = useState(status === 'authenticated' ? true : undefined)
     const [pluginIntents, setPluginIntents] = useState()
     const [isPluginChatLoading, setIsPluginChatLoading] = useState(false)

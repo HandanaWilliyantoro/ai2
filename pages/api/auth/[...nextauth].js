@@ -21,7 +21,7 @@ const createToken = (payload) => {
         .setExpirationTime(exp)
         .setIssuedAt(iat)
         .setNotBefore(iat)
-        .sign(new TextEncoder().encode(secret));
+        .sign(new TextEncoder().encode(secretKey));
 }
 
 export const authOptions = {

@@ -11,10 +11,12 @@ class ArtStore {
 
     async execute(params){
         createArt.loading = true
+        const token = localStorage.getItem('token')
         fetch(`/api/art`, {
             'method': "POST",
             'headers': {
                 'Content-Type': 'application/json',
+                'Authorization': token
             },
             'body': JSON.stringify(params)
         })
