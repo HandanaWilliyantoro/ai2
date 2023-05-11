@@ -28,6 +28,7 @@ const basicPlanModel = async () => {
 
 export default async function handler (req, res) {
     try {
+
         await dbConnect();
 
         const {authorization} = req.headers;

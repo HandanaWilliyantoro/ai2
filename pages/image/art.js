@@ -5,6 +5,8 @@ import { observer } from 'mobx-react-lite'
 import { getSession, useSession } from 'next-auth/react'
 
 import createArt from '@/stores/Art.store'
+import getModels from '@/stores/FetchModels.store'
+import getAllModels from '@/stores/FetchAllModels.store'
 
 // Components
 import {RxArrowLeft} from 'react-icons/rx'
@@ -12,7 +14,7 @@ import { showErrorSnackbar } from '@/util/toast'
 import Loading from '@/components/Loading'
 import Header from '@/components/Header'
 import ModalAuthentication from '@/components/ModalAuthentication'
-import getModels from '@/stores/FetchModels.store'
+import ModalPremiumArt from '@/components/ModalPremiumArt'
 
 const Art = observer(({session}) => {
     const {status} = useSession()
@@ -20,19 +22,21 @@ const Art = observer(({session}) => {
     const [prompt, setPrompt] = useState('Woman Elf');
     const [image, setImage] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(status === 'authenticated' ? true : undefined)
+    const [isPremiumArtOpened, setIsPremiumArtOpened] = useState(false)
     const [model, setModel] = useState("epic_diffusion_1_1")
     const [modelOptions, setModelOptions] = useState([])
     const [negative_prompt, setNegativePrompt] = useState()
     const [width, setWidth] = useState(1024)
     const [height, setHeight] = useState(1024)
+    const [premiumModelOptions, setPremiumModelOptions] = useState([])
 
     const router = useRouter();
 
     //#region FETCH MODELS
-    const handleFetchModels = useCallback(() => {
+    const handleFetchModels = useCallback((all) => {
         const token = localStorage.getItem('token')
-        getModels.execute({accessToken: session?.accessToken ?? token})
-    }, [session, session.accessToken]);
+        getModels.execute({accessToken: session?.accessToken ? session?.accessToken : token, all})
+    }, [session]);
 
     /* Watcher */
     useEffect(() => {
@@ -45,6 +49,24 @@ const Art = observer(({session}) => {
             getModels.reset()
         }
     }, [getModels.response, getModels.error, getModels.reset])
+    //#endregion
+
+    //#region FETCH ALL MODELS
+    const handleFetchAllModels = useCallback(() => {
+        const token = localStorage.getItem('token')
+        getAllModels.execute({accessToken: session?.accessToken ? session?.accessToken : token})
+    }, [session]);
+
+    /* Watcher */
+    useEffect(() => {
+        if(getAllModels.response){
+            setPremiumModelOptions(getAllModels.response)
+            getAllModels.reset()
+        } else if (getAllModels.error) {
+            showErrorSnackbar(getAllModels.error)
+            getAllModels.reset()
+        }
+    }, [getAllModels.response, getAllModels.error, getAllModels.reset])
     //#endregion
 
     //#region FETCH IMAGE
@@ -100,12 +122,24 @@ const Art = observer(({session}) => {
         }
         setHeight(Number(e.target.value))
     }, []);
+
+    const handleOpenModalPremium = useCallback(() => {
+        setIsPremiumArtOpened(true)
+        handleFetchAllModels()
+    }, [])
     //#endregion
 
     return (
         <div className='max-w-screen-lg mx-auto border-x-2 overflow-y-scroll bg-white h-screen relative max-md:flex max-md:flex-col'>
             {/* Modal Authentication */}
             {isAuthenticated === false && <ModalAuthentication setIsAuthenticated={setIsAuthenticated} />}
+
+            {/* Modal premium art */}
+            <ModalPremiumArt 
+                isOpen={isPremiumArtOpened} 
+                onRequestClose={() => setIsPremiumArtOpened(false)} 
+                options={premiumModelOptions}
+            />
 
             <Header />
             <div className='flex flex-row items-center justify-between mx-4'>
@@ -140,7 +174,7 @@ const Art = observer(({session}) => {
                     </div>
                     <div className='flex flex-row items-start justify-start mt-2 ml-4 w-3/4'>
                         <button disabled={createArt.loading} onClick={handleFetchImage} className='font-serif w-full text-xs bg-black text-white outline-none py-2 rounded transition border border-black hover:text-black hover:bg-white'>{!isAuthenticated ? 'Sign In' : (createArt.loading ? "Loading.." : "Submit")}</button>
-                        <button className='font-serif text-transparent animate-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 w-full ml-2 bg-black text-white text-xs py-2 rounded outline-none'>Unlock 50+ models</button>
+                        <button onClick={handleOpenModalPremium} className='font-serif text-transparent animate-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 w-full ml-2 bg-black text-white text-xs py-2 rounded outline-none transition hover:opacity-50'>Go Extra</button>
                     </div>
                 </div>
                 <div className='flex-[0.5] max-md:w-full flex flex-col min-h-[calc(100vh-180px)] max-md:mt-4 max-md:min-h-[auto] max-md:py-4 items-start justify-start px-2'>

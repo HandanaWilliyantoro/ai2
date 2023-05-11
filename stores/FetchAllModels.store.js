@@ -1,6 +1,6 @@
 import {makeAutoObservable} from "mobx"
 
-class FetchModelStore {
+class FetchAllModelStore {
     response = "";
     error = undefined;
     loading = false;
@@ -11,9 +11,9 @@ class FetchModelStore {
     }
 
     async execute({session}){
-        getModels.loading = true
+        getAllModels.loading = true
         const token = localStorage.getItem('token')
-        fetch(`/api/art/model`, {
+        fetch(`/api/art/model/all`, {
             'method': "GET",
             'headers': {
                 'Content-Type': 'application/json',
@@ -26,34 +26,34 @@ class FetchModelStore {
         .then(res => res.json())
         .then(response => {
             if(response.data){
-                getModels.success(response.data)
+                getAllModels.success(response.data)
             } else {
-                getModels.failed(response.text)
+                getAllModels.failed(response.text)
             }
         })
-        .catch(e => getModels.failed(e))
+        .catch(e => getAllModels.failed(e))
     }
 
     success(data){
-        getModels.response = data
-        getModels.error = undefined
-        getModels.loading = false
+        getAllModels.response = data
+        getAllModels.error = undefined
+        getAllModels.loading = false
     }
 
     failed(data){
-        getModels.error = data;
-        getModels.loading = false;
-        getModels.response = "";
+        getAllModels.error = data;
+        getAllModels.loading = false;
+        getAllModels.response = "";
     }
 
     reset() {
-        getModels.response = "";
-        getModels.loading = false;
-        getModels.error = undefined
-        getModels.finished = false;
+        getAllModels.response = "";
+        getAllModels.loading = false;
+        getAllModels.error = undefined
+        getAllModels.finished = false;
     }
 }
 
-const getModels = new FetchModelStore()
+const getAllModels = new FetchAllModelStore()
 
-export default getModels
+export default getAllModels
