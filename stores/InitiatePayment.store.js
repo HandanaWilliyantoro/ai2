@@ -1,6 +1,6 @@
 import {makeAutoObservable} from "mobx"
 
-class DonateStore {
+class InitiatePaymentStore {
     response = undefined;
     error = undefined;
     loading = false;
@@ -10,62 +10,63 @@ class DonateStore {
     }
 
     execute(payload){
-        donate.loading = true
-        fetch(`/api/donate`, {
+        initiatePayment.loading = true
+        fetch(`/api/payment/generate-token`, {
             'method': "POST",
             'headers': {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Authorization': payload.accessToken
             },
-            'body': JSON.stringify(payload)
+            'body': JSON.stringify({gross_amount: payload.gross_amount})
         })
         .then(res => res.json())
         .then(response => {
             const {code, data} = response;
             if(code === 200){
-                window.snap.pay(data.token, {
+                window.snap.pay(data, {
                     onSuccess: function(result){
                       /* You may add your own implementation here */
-                      donate.success(response)
+                      initiatePayment.success(response)
                     },
                     onPending: function(result){
                       /* You may add your own implementation here */
-                      donate.failed("Payment Pending")
+                      initiatePayment.failed("Payment Pending")
                     },
                     onError: function(result){
                       /* You may add your own implementation here */
-                      donate.failed("Payment Error")
+                      initiatePayment.failed("Payment Error")
                     },
                     onClose: function(){
                       /* You may add your own implementation here */
-                      donate.failed("Payment Pending")
+                      initiatePayment.failed("Payment Pending")
                     }
                   })
             } else {
-                donate.failed("Paymend Midtrans Error")
+                initiatePayment.failed("Paymend Midtrans Error")
             }
         })
     }
 
     success(data){
-        donate.response = data
-        donate.error = undefined
-        donate.loading = false
+        initiatePayment.response = data
+        initiatePayment.error = undefined
+        initiatePayment.loading = false
     }
 
     failed(data){
-        donate.error = data;
-        donate.loading = false;
-        donate.response = undefined;
+        initiatePayment.error = data;
+        initiatePayment.loading = false;
+        initiatePayment.response = undefined;
     }
 
     reset() {
-        donate.response = undefined;
-        donate.loading = false;
-        donate.error = undefined
+        initiatePayment.response = undefined;
+        initiatePayment.loading = false;
+        initiatePayment.error = undefined
     }
 }
 
-const donate = new DonateStore()
+const initiatePayment = new InitiatePaymentStore()
 
-export default donate
+export default initiatePayment

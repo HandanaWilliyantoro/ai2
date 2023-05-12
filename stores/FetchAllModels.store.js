@@ -10,7 +10,7 @@ class FetchAllModelStore {
         makeAutoObservable(this)
     }
 
-    async execute({session}){
+    async execute({accessToken}){
         getAllModels.loading = true
         const token = localStorage.getItem('token')
         fetch(`/api/art/model/all`, {
@@ -20,7 +20,7 @@ class FetchAllModelStore {
                 'Connection': 'keep-alive',
                 'Accept': '*/*',
                 'Accept-Encoding': 'gzip, deflate, br',
-                'Authorization': session?.accessToken ? session?.accessToken : token
+                'Authorization': accessToken ? accessToken : token
             },
         })
         .then(res => res.json())

@@ -15,6 +15,7 @@ import Loading from '@/components/Loading'
 import Header from '@/components/Header'
 import ModalAuthentication from '@/components/ModalAuthentication'
 import ModalPremiumArt from '@/components/ModalPremiumArt'
+import initiatePayment from '@/stores/InitiatePayment.store'
 
 const Art = observer(({session}) => {
     const {status} = useSession()
@@ -35,7 +36,9 @@ const Art = observer(({session}) => {
     //#region FETCH MODELS
     const handleFetchModels = useCallback((all) => {
         const token = localStorage.getItem('token')
-        getModels.execute({accessToken: session?.accessToken ? session?.accessToken : token, all})
+        if(session?.accessToken || token){
+            getModels.execute({accessToken: session?.accessToken ? session?.accessToken : token, all})
+        }
     }, [session]);
 
     /* Watcher */
@@ -54,7 +57,9 @@ const Art = observer(({session}) => {
     //#region FETCH ALL MODELS
     const handleFetchAllModels = useCallback(() => {
         const token = localStorage.getItem('token')
-        getAllModels.execute({accessToken: session?.accessToken ? session?.accessToken : token})
+        if(session?.accessToken || token){
+            getAllModels.execute({accessToken: session?.accessToken ? session?.accessToken : token})
+        }
     }, [session]);
 
     /* Watcher */
@@ -98,16 +103,38 @@ const Art = observer(({session}) => {
     }, [createArt.reset, createArt.response, createArt.error, isAuthenticated])
     //#endregion
 
+    //#region INITIATE PAYMENT
+    const handleInitiatePayment = useCallback(() => {
+        const token = localStorage.getItem('token');
+        if(session.accessToken || token){
+            initiatePayment.execute({gross_amount: 50000, accessToken: session?.accessToken || token})
+        }
+    }, []);
+
+    /* Watcher */
+    useEffect(() => {
+        if(initiatePayment.response){
+            console.log('initiate payment success');
+            initiatePayment.reset();
+        } else if (initiatePayment.error) {
+            showErrorSnackbar(initiatePayment.error)
+            initiatePayment.reset();
+        }
+    }, [initiatePayment.response, initiatePayment.error, initiatePayment.reset])
+
+    //#endregion
+
     //#region HANDLER
     useEffect(() => {
-        handleFetchModels()
         const item = localStorage.getItem('token')
-        if(item || session){
+        console.log(session?.accessToken)
+        if(item || session?.accessToken){
+            handleFetchModels()
             setIsAuthenticated(true)
         } else {
             setIsAuthenticated(false)
         }
-    }, [isAuthenticated])
+    }, [isAuthenticated, session?.accessToken])
 
     const onChangeWidth = useCallback((e) => {
         if(Number(e.target.value) < 0){
@@ -127,6 +154,10 @@ const Art = observer(({session}) => {
         setIsPremiumArtOpened(true)
         handleFetchAllModels()
     }, [])
+
+    const onClickUnlockPremium = useCallback(() => {
+        handleInitiatePayment()
+    }, []);
     //#endregion
 
     return (
@@ -139,12 +170,12 @@ const Art = observer(({session}) => {
                 isOpen={isPremiumArtOpened} 
                 onRequestClose={() => setIsPremiumArtOpened(false)} 
                 options={premiumModelOptions}
+                onClickUnlockPremium={onClickUnlockPremium}
             />
 
             <Header />
             <div className='flex flex-row items-center justify-between mx-4'>
-                <p onClick={() => router.push('/image/search')} className='font-serif cursor-pointer text-sm transition hover:opacity-50 text-black flex items-center'><RxArrowLeft className='mr-1 w-4 h-4' />Search Image</p>
-                <p className='font-serif mt-2 text-sm text-gray-400 font-bold ml-4 py-2 max-md:text-sm'>Image / Art Generator</p>
+                <p onClick={() => router.back()} className='font-serif cursor-pointer text-sm transition hover:opacity-50 mt-2 py-2 text-black flex items-center font-bold'><RxArrowLeft className='mr-2 w-5 h-5' />AI ART GENERATOR</p>
             </div>
             <div className='min-h-[calc(100vh-135px)] flex flex-row items-start justify-start w-full mt-4 max-md:mt-2 pb-8 max-md:pb-4 max-md:min-h-[calc(100vh-190px)] max-md:flex-col'>
                 <div className='flex-[0.5] flex flex-col items-start justify-start min-h-[calc(100vh-135px)] max-md:min-h-[auto] max-md:max-h-[400px] w-full border-black'>

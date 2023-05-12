@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Logo from "@/components/Logo";
 import Search from "@/components/Search";
 import Tagline from "@/components/Tagline";
-import {RxChatBubble, RxPencil2, RxImage} from 'react-icons/rx'
+import {RxChatBubble, RxPencil2, RxMagnifyingGlass, RxMagicWand} from 'react-icons/rx'
 
 export default function ImageHome() {
 
@@ -23,6 +23,10 @@ export default function ImageHome() {
     router.push(`/image/search?q=${search}`)
   }, [search, router.push])
 
+  const navigate = useCallback((url) => {
+    router.push(url)
+  }, [router.push]);
+
   return (
     <div className="min-w-screen min-h-screen bg-white flex flex-col items-center justify-center px-5 py-5">
         <div className="w-full md:w-auto mx-auto rounded-xl bg-gray-100 shadow-lg p-8 text-gray-800 relative overflow-hidden resize-x min-w-40 max-w-3xl flex flex-col items-center justify-center">
@@ -39,6 +43,12 @@ export default function ImageHome() {
               <div className="h-2 bg-blue-500 flex-1"></div>
               <div className="h-2 bg-green-500 flex-1"></div>
               <div className="h-2 bg-pink-500 flex-1"></div>
+          </div>
+          <div className="flex flex-row items-center justify-center py-4">
+            <p onClick={() => navigate('/')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-2 transition hover:opacity-50"><RxMagnifyingGlass className='w-4 h-4 mr-1' />Search</p>
+            <p onClick={() => navigate('/chat')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-2 transition hover:opacity-50"><RxChatBubble className='w-4 h-4 mr-1' />Chat</p>
+            <p onClick={() => navigate('/write')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-2 transition hover:opacity-50"><RxPencil2 className='w-4 h-4 mr-1' />Write</p>
+            <p onClick={() => navigate('/image/art')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-2 transition hover:opacity-50"><RxMagicWand className='w-4 h-4 mr-1' />Art</p>
           </div>
         </div>
     </div>

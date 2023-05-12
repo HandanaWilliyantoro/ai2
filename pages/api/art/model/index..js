@@ -5,7 +5,13 @@ import { jwtVerify } from "jose";
 const secretKey = process.env.SECRET_JWT_KEY
 
 const verifyToken = async (token) => {
-    return jwtVerify(token, new TextEncoder().encode(secretKey));
+    try {
+        console.log(token, 'ini tokennya ya')
+        return jwtVerify(token, new TextEncoder().encode(secretKey));
+    } catch(e) {
+        return "Please sign in to continue"
+    }
+
 }
 
 const basicPlanModel = async () => {
