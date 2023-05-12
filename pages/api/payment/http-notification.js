@@ -4,6 +4,8 @@ export default async function handler (req, res) {
         const body = req.body
         const headers = req.headers
 
+        console.log(body, headers, 'ni body dan headers')
+
         res.status(200).json({body, headers, text: 'http notification'})
     } catch(e) {
         console.log(e)
