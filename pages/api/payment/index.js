@@ -2,7 +2,7 @@ import midtransClient from "midtrans-client";
 
 // Create Core API instance
 let core = new midtransClient.CoreApi({
-    isProduction : process.env.MIDTRANS_PRODUCTION_ENV,
+    isProduction : process.env.MIDTRANS_PRODUCTION_ENV === "true" ? true : false,
     serverKey : process.env.MIDTRANS_SERVER_KEY,
     clientKey : process.env.MIDTRANS_CLIENT_KEY
 });

@@ -2,9 +2,10 @@ import midtransClient from "midtrans-client"
 import { jwtVerify } from "jose";
 import {Types} from 'mongoose'
 
+console.log(process.env.MIDTRANS_PRODUCTION_ENV === "true" ? true : false, 'ini midtrans prod env')
+
 const verifyToken = async (token) => {
     try {
-        console.log(token, 'ini tokennya ya')
         return jwtVerify(token, new TextEncoder().encode(secretKey));
     } catch(e) {
         return "Please sign in to continue"
@@ -13,7 +14,7 @@ const verifyToken = async (token) => {
 
 let snap = new midtransClient.Snap({
     // Set to true if you want Production Environment (accept real transaction).
-    isProduction : false,
+    isProduction : process.env.MIDTRANS_PRODUCTION_ENV === "true" ? true : false,
     serverKey : process.env.MIDTRANS_SERVER_KEY
 });
 
