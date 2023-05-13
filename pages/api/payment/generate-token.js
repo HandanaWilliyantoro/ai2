@@ -1,8 +1,8 @@
 import midtransClient from "midtrans-client"
 import { jwtVerify } from "jose";
 import {Types} from 'mongoose'
-
-console.log(process.env.MIDTRANS_PRODUCTION_ENV === "true" ? true : false, 'ini midtrans prod env')
+import ArtSubscription from "@/models/ArtSubscription";
+import dbConnect from "@/util/mongo";
 
 const verifyToken = async (token) => {
     try {
@@ -20,6 +20,9 @@ let snap = new midtransClient.Snap({
 
 export default async function handler(req, res) {
     try {
+
+        await dbConnect()
+
         const {gross_amount} = req.body;
         const {authorization} = req.headers;
 
@@ -48,7 +51,13 @@ export default async function handler(req, res) {
         const response = await snap.createTransaction(parameter)
 
         if(response && response.token){
-            res.status(200).json({text: 'Get token success', code: 200, data: response.token});
+            const subscription = await new ArtSubscription({order_id, user_email: user.email, amount: gross_amount, channel_response_message: 'INITIATE', currency: 'IDR'})
+            await subscription.save()
+            if(subscription){
+                res.status(200).json({text: 'Get token success', code: 200, data: response.token});
+            } else {
+                res.status(404).json({text: 'Failed to create art subscription', code: 404})
+            }
         } else {
             throw new Error('Failed to get transaction token')
         }
