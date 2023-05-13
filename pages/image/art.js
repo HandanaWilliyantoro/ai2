@@ -117,7 +117,7 @@ const Art = observer(({session}) => {
             console.log('initiate payment success');
             initiatePayment.reset();
         } else if (initiatePayment.error) {
-            showErrorSnackbar(initiatePayment.error)
+            console.log(initiatePayment.error)
             initiatePayment.reset();
         }
     }, [initiatePayment.response, initiatePayment.error, initiatePayment.reset])
