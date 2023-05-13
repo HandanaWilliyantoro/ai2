@@ -40,7 +40,7 @@ class InitiatePaymentStore {
                     onClose: function(){
                       /* You may add your own implementation here */
                       initiatePayment.failed("Payment Pending")
-                    }
+                    },
                   })
             } else {
                 initiatePayment.failed("Paymend Midtrans Error")

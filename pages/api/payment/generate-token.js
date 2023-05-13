@@ -35,7 +35,8 @@ export default async function handler(req, res) {
         let parameter = {
             "transaction_details": {
                 order_id,
-                gross_amount
+                gross_amount,
+                "currency": "IDR"
             },
             "credit_card":{
                 "secure" : true,

@@ -35,7 +35,7 @@ const ModalPremiumArt = ({
                         <p className='text-black flex flex-row font-serif text-xs items-center justify-start mt-3'><AiOutlineCheckCircle className='text-green-600 mr-1' />Priority access to new features</p>
                         <p className='text-black flex flex-row font-serif text-xs items-center justify-start mt-3'><AiOutlineCheckCircle className='text-green-600 mr-1' />Unlock over 50+ art generator model</p>
                         <select placeholder='See all models' className='text-black text-xs w-full border-gray-400 rounded border-2 bg-white outline-none py-2 mt-2'>
-                            {options && options.length > 0 && options.map(a => <option value={a.id}>{a.name}</option>)}
+                            {options && options.length > 0 && options.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                         </select>
                     </div>
                     <p className='text-black font-bold font-sans text-sm ml-auto mb-1.5 mt-8'>IDR 50.000 / mo</p>
