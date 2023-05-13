@@ -16,11 +16,12 @@ export default async function handler (req, res) {
 
         const {gross_amount, order_id, saved_token_id, currency, payment_type, channel_response_message, status_code, saved_token_id_expired_at} = req.body;
 
-        if(status_code !== '200'){
+        if(status_code !== '200' && channel_response_message !== 'Approved'){
             throw new Error('Failed to handle http notification transaction');
         }
 
         const subscription = await ArtSubscription.findOne({order_id});
+
         const buyer = await User.findOne({email: subscription.user_email});
 
         if(saved_token_id && saved_token_id_expired_at){
@@ -37,7 +38,6 @@ export default async function handler (req, res) {
                 "interval": 1,
                 "interval_unit": "month",
                 "max_interval": 12,
-                "start_time": new Date()
             },
             "metadata": {
                 "description": "Recurring payment for subscription art generator"
@@ -65,6 +65,6 @@ export default async function handler (req, res) {
 
     } catch(e) {
         console.log(e)
-        res.status(500).json({text: e.message, code: 500})
+        res.status(500).json({text: 'internal server error', code: 500, error: e.message})
     }
 }
