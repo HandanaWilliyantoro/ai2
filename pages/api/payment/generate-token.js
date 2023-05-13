@@ -4,12 +4,10 @@ import {Types} from 'mongoose'
 import ArtSubscription from "@/models/ArtSubscription";
 import dbConnect from "@/util/mongo";
 
+const secretKey = process.env.SECRET_JWT_KEY
+
 const verifyToken = async (token) => {
-    try {
-        return jwtVerify(token, new TextEncoder().encode(secretKey));
-    } catch(e) {
-        return "Please sign in to continue"
-    }
+    return jwtVerify(token, new TextEncoder().encode(secretKey));
 }
 
 let snap = new midtransClient.Snap({
@@ -32,7 +30,7 @@ export default async function handler(req, res) {
             throw new Error('You are not authorized to do this!')
         }
 
-        const user = await verifyToken(authorization)
+        const {payload: user} = await verifyToken(authorization)
 
         let parameter = {
             "transaction_details": {
@@ -47,7 +45,7 @@ export default async function handler(req, res) {
                 "email": user.email,
             }
         };
-        
+
         const response = await snap.createTransaction(parameter)
 
         if(response && response.token){

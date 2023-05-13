@@ -3,14 +3,14 @@ import { jwtVerify } from "jose";
 const secretKey = process.env.SECRET_JWT_KEY
 
 const verifyToken = async (token) => {
-    return await jwtVerify(token, new TextEncoder().encode(secretKey)).payload;
+    return await jwtVerify(token, new TextEncoder().encode(secretKey));
 }
 
 export default async function handler (req, res) {
     try {
         const {secret, confirmationCode} = req.body;
         const token = await verifyToken(secret)
-        if(token.confirmationCode === confirmationCode){
+        if(token.payload.confirmationCode === confirmationCode){
             res.status(200).json({
                 text: 'Email verified!',
                 code: 200
