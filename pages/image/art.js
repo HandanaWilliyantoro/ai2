@@ -109,7 +109,7 @@ const Art = observer(({session}) => {
         if(session.accessToken || token){
             initiatePayment.execute({gross_amount: 50000, accessToken: session?.accessToken || token})
         }
-    }, []);
+    }, [session, session?.accessToken]);
 
     /* Watcher */
     useEffect(() => {
@@ -153,11 +153,11 @@ const Art = observer(({session}) => {
     const handleOpenModalPremium = useCallback(() => {
         setIsPremiumArtOpened(true)
         handleFetchAllModels()
-    }, [])
+    }, [setIsPremiumArtOpened, handleFetchAllModels])
 
     const onClickUnlockPremium = useCallback(() => {
         handleInitiatePayment()
-    }, []);
+    }, [handleInitiatePayment]);
     //#endregion
 
     return (
