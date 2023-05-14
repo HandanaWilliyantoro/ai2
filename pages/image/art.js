@@ -7,6 +7,7 @@ import { getSession, useSession } from 'next-auth/react'
 import createArt from '@/stores/Art.store'
 import getModels from '@/stores/FetchModels.store'
 import getAllModels from '@/stores/FetchAllModels.store'
+import getProfile from '@/stores/Profile.store'
 
 // Components
 import {RxArrowLeft} from 'react-icons/rx'
@@ -30,8 +31,31 @@ const Art = observer(({session}) => {
     const [width, setWidth] = useState(1024)
     const [height, setHeight] = useState(1024)
     const [premiumModelOptions, setPremiumModelOptions] = useState([])
+    const [user, setUser] = useState({})
 
     const router = useRouter();
+
+    //#region FETCH USER PROFILE
+    const handleFetchUser = useCallback(() => {
+        const token = localStorage.getItem('token');
+        if(session.accessToken || token){
+            getProfile.execute({accessToken: session?.accessToken || token})
+        }
+    }, [session, session?.accessToken]);
+
+    /* Watcher */
+    useEffect(() => {
+        if(getProfile.response){
+            setUser(getProfile.response);
+            localStorage.setItem('user', JSON.stringify(getProfile.response))
+            getProfile.reset()
+        } else if (getProfile.error) {
+            console.log(getProfile.error)
+            showErrorSnackbar("Failed to fetch profile")
+            getProfile.reset()
+        }
+    }, [getProfile.response, getProfile.error, getProfile.reset])
+    //#endregion
 
     //#region FETCH MODELS
     const handleFetchModels = useCallback((all) => {
@@ -115,6 +139,7 @@ const Art = observer(({session}) => {
     useEffect(() => {
         if(initiatePayment.response){
             console.log('initiate payment success');
+            handleFetchUser()
             initiatePayment.reset();
         } else if (initiatePayment.error) {
             console.log(initiatePayment.error)
@@ -129,6 +154,7 @@ const Art = observer(({session}) => {
         const item = localStorage.getItem('token')
         if(item || session?.accessToken){
             handleFetchModels()
+            handleFetchUser()
             setIsAuthenticated(true)
         } else {
             setIsAuthenticated(false)
@@ -174,27 +200,27 @@ const Art = observer(({session}) => {
 
             <Header />
             <div className='flex flex-row items-center justify-between mx-4'>
-                <p onClick={() => router.back()} className='font-serif cursor-pointer text-sm transition hover:opacity-50 mt-2 py-2 text-black flex items-center font-bold'><RxArrowLeft className='mr-2 w-5 h-5' />AI ART GENERATOR</p>
+                <p onClick={() => router.back()} className='font-serif cursor-pointer text-sm transition hover:opacity-50 mt-2 py-2 text-black flex items-center font-bold'><RxArrowLeft className='mr-2 w-5 h-5' />AI ART GENERATOR{user.premium ? <span className='py-0.7 px-2 text-[10px] font-serif text-transparent animate-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white rounded ml-2'>Extra Mode</span> : <span className='py-0.7 px-2 text-[10px] bg-black text-white rounded ml-2'>Free Mode</span>}</p>
             </div>
-            <div className='min-h-[calc(100vh-135px)] flex flex-row items-start justify-start w-full mt-4 max-md:mt-2 pb-8 max-md:pb-4 max-md:min-h-[calc(100vh-190px)] max-md:flex-col'>
-                <div className='flex-[0.5] flex flex-col items-start justify-start min-h-[calc(100vh-135px)] max-md:min-h-[auto] max-md:max-h-[400px] w-full border-black'>
-                    <div className='flex-col flex items-start mx-4 mb-2 w-3/4'>
+            <div className='flex flex-row items-start justify-start w-full my-4 max-md:mt-2 max-md:pb-4 max-md:min-h-[calc(100vh-190px)] max-md:flex-col'>
+                <div className='flex-[0.5] flex flex-col items-start justify-start min-h-[calc(100vh-135px)] px-4 max-md:min-h-[auto] max-md:max-h-[400px] w-full border-black'>
+                    <div className='flex-col flex items-start mx-0 mb-2.5 w-full'>
                         <label className='text-xs text-black font-serif mb-1'>Prompt</label>
                         <input value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Ex: an astronaut riding a horse on mars" className='rounded bg-white text-black border-2 p-1 pl-2 py-2 w-full font-serif text-xs outline-none'  />
                     </div>
-                    <div className='flex-col flex items-start mx-4 my-3 w-3/4'>
+                    <div className='flex-col flex items-start mx-0 mb-2.5 w-full'>
                         <label className='text-xs text-black font-serif mb-1'>Negative Prompt</label>
                         <input value={negative_prompt} onChange={e => setNegativePrompt(e.target.value)} placeholder="Ex: ugly, tiling, poorly drawn hands" className='rounded bg-white text-black border-2 p-1 pl-2 py-2 w-full font-serif text-xs outline-none'  />
                     </div>
-                    <div className='flex-col flex items-start mx-4 my-3 w-3/4'>
+                    <div className='flex-col flex items-start mx-0 mb-2.5 w-full'>
                         <label className='text-xs text-black font-serif mb-1'>Width (320 - 1024)</label>
                         <input type='number' value={width} onChange={onChangeWidth} placeholder="Ex: an astronaut riding a horse on mars" className='rounded bg-white text-black border-2 p-1 pl-2 py-2 w-full font-serif text-xs outline-none'  />
                     </div>
-                    <div className='flex-col flex items-start mx-4 my-3 w-3/4'>
+                    <div className='flex-col flex items-start mx-0 mb-2.5 w-full'>
                         <label className='text-xs text-black font-serif mb-1'>Height (320 - 1024)</label>
                         <input type='number' value={height} onChange={onChangeHeight} placeholder="Ex: an astronaut riding a horse on mars" className='rounded bg-white text-black border-2 p-1 pl-2 py-2 w-full font-serif text-xs outline-none'  />
                     </div>
-                    <div className='flex-col flex items-start justify-start mb-2 ml-4 w-3/4'>
+                    <div className='flex-col flex items-start justify-start mb-2.5 w-full'>
                         <label className='text-xs text-black font-serif mb-1'>Model ({modelOptions.length})</label>
                         <select value={model} onChange={e => setModel(e.target.value)} placeholder="Ex: Epic Diffusion" className='rounded border-2 bg-white text-black p-1 pr-4 w-full py-2 font-serif text-xs outline-none'>
                             {modelOptions && modelOptions.length > 0 && modelOptions.map(a => (
@@ -202,12 +228,14 @@ const Art = observer(({session}) => {
                             ))}
                         </select>
                     </div>
-                    <div className='flex flex-row items-start justify-start mt-2 ml-4 w-3/4'>
-                        <button disabled={createArt.loading} onClick={handleFetchImage} className='font-serif w-full text-xs bg-black text-white outline-none py-2 rounded transition border border-black hover:text-black hover:bg-white'>{!isAuthenticated ? 'Sign In' : (createArt.loading ? "Loading.." : "Submit")}</button>
-                        <button onClick={handleOpenModalPremium} className='font-serif text-transparent animate-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 w-full ml-2 bg-black text-white text-xs py-2 rounded outline-none transition hover:opacity-50'>Go Extra</button>
+                    <div className='flex flex-row items-start justify-start mt-2 w-full'>
+                        <button disabled={createArt.loading} onClick={handleFetchImage} className='font-serif mb-2 w-full text-xs bg-black text-white outline-none py-2 rounded transition border border-black hover:text-black hover:bg-white'>{!isAuthenticated ? 'Sign In' : (createArt.loading ? "Loading.." : `Generate"`)}</button>
+                        {!user.premium && (
+                            <button onClick={handleOpenModalPremium} className='font-serif text-transparent animate-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 w-full ml-2 bg-black text-white text-xs py-2 rounded outline-none transition hover:opacity-50'>Go Extra</button>
+                        )}
                     </div>
                 </div>
-                <div className='flex-[0.5] max-md:w-full flex flex-col min-h-[calc(100vh-180px)] max-md:mt-4 max-md:min-h-[auto] max-md:py-4 items-start justify-start px-2'>
+                <div className='flex-[0.5] max-md:w-full flex flex-col max-md:mt-4 max-md:min-h-[auto] max-md:py-4 items-start justify-start px-2'>
                     {createArt.loading ? (
                         <div className='m-auto block max-md:w-full'>
                             <Loading text={`Generating Art for "${prompt}"`} />

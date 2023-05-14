@@ -4,27 +4,25 @@ class GetProfileStore {
     response = undefined;
     error = undefined;
     loading = false;
-    premium = false;
     
     constructor(){
         makeAutoObservable(this)
     }
 
-    execute(params){
+    execute({accessToken}){
         getProfile.loading = true
-        const token = localStorage.getItem('token')
-        fetch(`/user/me`, {
+        fetch(`/api/me`, {
             'method': "GET",
             'headers': {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': accessToken
             },
         })
         .then(res => res.json())
         .then(response => {
             if(response.code && response.code === 200){
-                getProfile.success(response.data, response.premium)
+                getProfile.success(response.data)
             } else {
                 getProfile.failed(response.text)
             }
@@ -32,8 +30,7 @@ class GetProfileStore {
         .catch(e => getProfile.failed(e))
     }
 
-    success(data, premium){
-        getProfile.premium = premium
+    success(data){
         getProfile.response = data
         getProfile.error = undefined
         getProfile.loading = false

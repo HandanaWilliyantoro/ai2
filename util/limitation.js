@@ -1,7 +1,7 @@
 const limitation = async (premium) => {
     if(premium){
-        await localStorage.removeItem('limit')
-        await localStorage.removeItem('session')
+        localStorage.removeItem('limit')
+        localStorage.removeItem('session')
         return {code: 200, text: 'Continue'}
     } else {
         const token = localStorage.getItem('token');
@@ -19,11 +19,11 @@ const limitation = async (premium) => {
                     await localStorage.setItem('limit', newLimit);
                     return {code: 200, text: 'Continue'}
                 } else {
-                    return {code: 404, text: 'Handana AI is at capacity right now, we kindly ask that you return later'}
+                    return {code: 404, text: 'At capacity'}
                 }
             }
         } else {
-            return {text: 'You are not authorized to do this', code: 401}
+            return {text: 'Sign in to continue', code: 401}
         }
     }
 }

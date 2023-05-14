@@ -10,7 +10,6 @@ const verifyToken = async (token) => {
     } catch(e) {
         return "Please sign in to continue"
     }
-
 }
 
 const basicPlanModel = async () => {

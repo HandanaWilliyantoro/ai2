@@ -1,4 +1,5 @@
 import {makeAutoObservable} from "mobx"
+import limitation from "@/util/limitation";
 
 class ArtStore {
     response = undefined;
