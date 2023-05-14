@@ -26,7 +26,7 @@ const ModalPremiumArt = ({
         <Modal isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
             <div className='text-black flex flex-row items-center justify-center w-full max-md:w-full max-md:flex-col max-md:h-auto'>
                 <div className='text-black flex flex-col items-start w-full justify-start p-4'>
-                    <p className='text-black font-bold font-serif text-left text-base'>Experience art like never before with our unlimited AI-powered art generator.</p>
+                    <p className='text-black font-bold font-serif text-left text-base'>Unlock exclusive access to over 50+ art generator models.</p>
                     <p className='text-black font-serif text-left text-xs mt-2 leading-5'>
                         Our AI-powered art generator allows you to create stunning and unique artworks with over <br/><span className='text-black font-bold'>50+ available models</span> in a matter of seconds. 
                     </p>

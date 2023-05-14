@@ -18,7 +18,6 @@ const createToken = (payload) => {
 
     return new SignJWT({...payload})
         .setProtectedHeader({alg: 'HS256', typ: 'JWT'})
-        .setExpirationTime(exp)
         .setIssuedAt(iat)
         .setNotBefore(iat)
         .sign(new TextEncoder().encode(secretKey));

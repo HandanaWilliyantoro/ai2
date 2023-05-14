@@ -127,7 +127,6 @@ const Art = observer(({session}) => {
     //#region HANDLER
     useEffect(() => {
         const item = localStorage.getItem('token')
-        console.log(session?.accessToken)
         if(item || session?.accessToken){
             handleFetchModels()
             setIsAuthenticated(true)
