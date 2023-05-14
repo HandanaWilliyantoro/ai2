@@ -112,7 +112,7 @@ const Art = observer(({session}) => {
             return;
         }
 
-        createArt.execute({prompt, model, negative_prompt, width, height})
+        createArt.execute({prompt, model, negative_prompt, width, height, premium: user.premium})
     }, [prompt, model]);
 
     /* Watcher */
@@ -121,6 +121,9 @@ const Art = observer(({session}) => {
             setImage(createArt.response)
             createArt.reset()
         } else if (createArt.error) {
+            if(createArt.error === "We're at maximum capacity at this moment"){
+                handleOpenModalPremium()
+            }
             showErrorSnackbar(createArt.error)
             createArt.reset()
         }

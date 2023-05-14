@@ -13,27 +13,33 @@ class ArtStore {
     async execute(params){
         createArt.loading = true
         const token = localStorage.getItem('token')
-        fetch(`/api/art`, {
-            'method': "POST",
-            'headers': {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            },
-            'body': JSON.stringify(params)
-        })
-        .then(res => res.json())
-        .then((response) => {
-            if(response.data){
-                createArt.success(response.data)
-            } else {
-                console.log(response)
-                createArt.failed(response.text)
-            }
-        })
-        .catch(error => {
-            console.log(error.e)
-            createArt.failed('internal server error')
-        })
+        const limitedAccess = await limitation(params.premium)
+        if(limitedAccess.code === 200){
+            delete params.premium
+            fetch(`/api/art`, {
+                'method': "POST",
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                'body': JSON.stringify(params)
+            })
+            .then(res => res.json())
+            .then((response) => {
+                if(response.data){
+                    createArt.success(response.data)
+                } else {
+                    console.log(response)
+                    createArt.failed(response.text)
+                }
+            })
+            .catch(error => {
+                console.log(error.e)
+                createArt.failed('internal server error')
+            })
+        } else {
+            createArt.failed("We're at maximum capacity at this moment")
+        }
     }
     
     success(data){
