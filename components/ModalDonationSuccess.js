@@ -21,7 +21,7 @@ const ModalDonationSuccess = ({
     onRequestClose
 }) => {
   return (
-    <Modal isOpen={isOpen} closeTimeoutMS={5000} style={customStyles}>
+    <Modal ariaHideApp={false} isOpen={isOpen} closeTimeoutMS={5000} style={customStyles}>
       <div className='flex flex-col items-center justify-center w-full p-4'>
         <img className='w-[150px] h-[150px] object-contain' src={Grateful.src} alt='feeling grateful' />
         <p className='text-sm text-gray-600 font-serif text-center w-full mt-2'>Thank you for your generous contribution!</p>

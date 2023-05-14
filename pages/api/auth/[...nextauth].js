@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
+import CredentialsProvider from "next-auth/providers/credentials";
 import dbConnect from '@/util/mongo';
 import User from '@/models/User';
 import {Types} from 'mongoose'
@@ -18,6 +19,7 @@ const createToken = (payload) => {
 
     return new SignJWT({...payload})
         .setProtectedHeader({alg: 'HS256', typ: 'JWT'})
+        .setExpirationTime(exp)
         .setIssuedAt(iat)
         .setNotBefore(iat)
         .sign(new TextEncoder().encode(secretKey));
@@ -29,6 +31,24 @@ export const authOptions = {
    clientId: process.env.GOOGLE_AUTH_ID,
    clientSecret: process.env.GOOGLE_AUTH_SECRET,
   }),
+  CredentialsProvider({
+    // The name to display on the sign in form (e.g. 'Sign in with...')
+    name: 'Credentials',
+    // The credentials is used to generate a suitable form on the sign in page.
+    // You can specify whatever fields you are expecting to be submitted.
+    // e.g. domain, username, password, 2FA token, etc.
+    // You can pass any HTML attribute to the <input> tag through the object.
+    credentials: {
+      email: { label: "email", type: "text", placeholder: "jsmith" },
+      password: { label: "password", type: "password" }
+    },
+    async authorize(credentials, req) {
+      if (credentials) {
+        return credentials
+      }
+      return null
+    }
+  })
  ],
  secret: secretKey,
  session: {
@@ -38,6 +58,8 @@ export const authOptions = {
     async signIn({ user }) {
         try {
             await dbConnect()
+
+            console.log('masuk pa eko')
 
             if(user.email){
                 const checkUser = await User.findOne({email: user.email})

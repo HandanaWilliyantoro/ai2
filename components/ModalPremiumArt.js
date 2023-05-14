@@ -23,7 +23,7 @@ const ModalPremiumArt = ({
     onClickUnlockPremium
 }) => {
     return (
-        <Modal isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
+        <Modal ariaHideApp={false} isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
             <div className='text-black flex flex-row items-center justify-center w-full max-md:w-full max-md:flex-col max-md:h-auto'>
                 <div className='text-black flex flex-col items-start w-full justify-start p-4'>
                     <p className='text-black font-bold font-serif text-left text-base'>Unlock exclusive access to over 50+ art generator models.</p>

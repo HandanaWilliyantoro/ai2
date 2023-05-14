@@ -79,7 +79,7 @@ const ModalVerifyCode = observer(({
   //#endregion
 
   return (
-    <Modal isOpen={isOpen} onRequestClose={onRequestClose} ariaHideApp={false} style={customStyles}>
+    <Modal ariaHideApp={false} isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
         <div className='flex flex-col items-start justify-center p-4 py-1'>
             <div className='flex flex-row items-center justify-between py-2 w-full'>
                 <BiArrowBack onClick={() => setModalType('sign-up')} width={45} height={45} className='cursor-pointer' />

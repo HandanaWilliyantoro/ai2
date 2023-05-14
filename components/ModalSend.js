@@ -145,7 +145,7 @@ const ModalSend = ({
     //#endregion
 
     return (
-        <Modal isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
+        <Modal ariaHideApp={false} isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
             <div className='flex flex-col items-start justify-start w-full'>
                 <div className='border-b-2 w-full flex flex-row items-center justify-between'>
                     <p className='text-sm text-black font-bold p-2 ml-1'>Send Panel</p>

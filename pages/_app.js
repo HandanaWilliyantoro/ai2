@@ -9,8 +9,13 @@ const App = ({ Component, pageProps }) => {
 
   useEffect(() => {
     const session = pageProps.session;
+    
+    console.log(session, 'ini session')
+
     if(session){
       localStorage.setItem('token', session.accessToken)
+    } else {
+      localStorage.clear()
     }
   }, [pageProps.session])
 

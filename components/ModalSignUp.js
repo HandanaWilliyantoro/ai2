@@ -100,7 +100,7 @@ const ModalSignUp = observer(({
     });
 
     return (
-        <Modal isOpen={isOpen} onRequestClose={onRequestClose} ariaHideApp={false} style={customStyles}>
+        <Modal ariaHideApp={false} isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
             <div className='flex flex-col items-start w-full justify-center p-4 bg-white'>
                 <h4 className='font-sans text-lg w-full text-center font-bold text-black'>Sign Up to Continue</h4>
                 <p className='text-xs font-serif text-gray-400 mt-1 w-full text-center'>Discover The Power of AI + Search Engine with Handana</p>

@@ -64,6 +64,7 @@ const ModalSignIn = observer(({
     useEffect(() => {
         if(signIn.response){
             showSuccessSnackbar('Sign in successfull')
+            socialSignIn("credentials", {email: formik.values.email, password: formik.values.password})
             setIsAuthenticated(true)
             formAuthenticate(signIn.response.user, signIn.response.token);
             setModalType(undefined)
