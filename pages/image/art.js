@@ -38,7 +38,7 @@ const Art = observer(({session}) => {
     //#region FETCH USER PROFILE
     const handleFetchUser = useCallback(() => {
         const token = localStorage.getItem('token');
-        if(session.accessToken || token){
+        if((session && session.accessToken) || token){
             getProfile.execute({accessToken: session?.accessToken || token})
         }
     }, [session, session?.accessToken]);
@@ -99,7 +99,9 @@ const Art = observer(({session}) => {
     //#endregion
 
     //#region FETCH IMAGE
-    const handleFetchImage = useCallback(async () => {
+    const handleFetchImage = useCallback(async (e) => {
+        e.preventDefault()
+
         if(!prompt && isAuthenticated){
             showErrorSnackbar('Prompt field is required')
             return;
@@ -113,7 +115,7 @@ const Art = observer(({session}) => {
         }
 
         createArt.execute({prompt, model, negative_prompt, width, height, premium: user.premium})
-    }, [prompt, model]);
+    }, [prompt, model, isAuthenticated, negative_prompt, width, height, user.premium, createArt.loading]);
 
     /* Watcher */
     useEffect(() => {
@@ -133,7 +135,7 @@ const Art = observer(({session}) => {
     //#region INITIATE PAYMENT
     const handleInitiatePayment = useCallback(() => {
         const token = localStorage.getItem('token');
-        if(session.accessToken || token){
+        if((session && session.accessToken) || token){
             initiatePayment.execute({gross_amount: 50000, accessToken: session?.accessToken || token})
         }
     }, [session, session?.accessToken]);
