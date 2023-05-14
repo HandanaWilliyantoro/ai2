@@ -229,7 +229,7 @@ const Art = observer(({session}) => {
                         </select>
                     </div>
                     <div className='flex flex-row items-start justify-start mt-2 w-full'>
-                        <button disabled={createArt.loading} onClick={handleFetchImage} className='font-serif mb-2 w-full text-xs bg-black text-white outline-none py-2 rounded transition border border-black hover:text-black hover:bg-white'>{!isAuthenticated ? 'Sign In' : (createArt.loading ? "Loading.." : `Generate"`)}</button>
+                        <button disabled={createArt.loading} onClick={handleFetchImage} className='font-serif mb-2 w-full text-xs bg-black text-white outline-none py-2 rounded transition border border-black hover:text-black hover:bg-white'>{!isAuthenticated ? 'Sign In' : (createArt.loading ? "Loading.." : `Generate`)}</button>
                         {!user.premium && (
                             <button onClick={handleOpenModalPremium} className='font-serif text-transparent animate-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 w-full ml-2 bg-black text-white text-xs py-2 rounded outline-none transition hover:opacity-50'>Go Extra</button>
                         )}
