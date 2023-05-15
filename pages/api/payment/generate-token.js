@@ -1,8 +1,20 @@
 import midtransClient from "midtrans-client"
-import { jwtVerify, SignJWT } from "jose";
+import { jwtVerify } from "jose";
 import {Types} from 'mongoose'
 import ArtSubscription from "@/models/ArtSubscription";
 import dbConnect from "@/util/mongo";
+
+const secretKey = process.env.SECRET_JWT_KEY
+
+
+const verifyToken = async (token) => {
+    try {
+        return jwtVerify(token, new TextEncoder().encode(secretKey));
+    } catch(e) {
+        console.log(e.message)
+        return "Please sign in to continue"
+    }
+}
 
 let snap = new midtransClient.Snap({
     // Set to true if you want Production Environment (accept real transaction).
@@ -15,7 +27,7 @@ export default async function handler(req, res) {
 
         await dbConnect()
 
-        const {gross_amount, email} = req.body;
+        const {gross_amount} = req.body;
         const {authorization} = req.headers;
 
         const order_id = new Types.ObjectId()
@@ -25,6 +37,8 @@ export default async function handler(req, res) {
         }
 
         const {payload: user} = await verifyToken(authorization)
+
+        console.log(user, 'ini user')
 
         let parameter = {
             "transaction_details": {
@@ -37,14 +51,14 @@ export default async function handler(req, res) {
                 "save_card": true
             },
             "customer_details": {
-                "email": email,
+                "email": user.email,
             }
         };
 
         const response = await snap.createTransaction(parameter)
 
         if(response && response.token){
-            const subscription = await new ArtSubscription({order_id, user_email: email, amount: gross_amount, channel_response_message: 'INITIATE', currency: 'IDR'})
+            const subscription = await new ArtSubscription({order_id, user_email: user.email, amount: gross_amount, channel_response_message: 'INITIATE', currency: 'IDR'})
             await subscription.save()
             if(subscription){
                 res.status(200).json({text: 'Get token success', code: 200, data: response.token});
