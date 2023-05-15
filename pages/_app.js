@@ -20,8 +20,6 @@ const App = ({ Component, pageProps }) => {
     const exp = iat + (60 * 300); // five hour;
     const parsedExpiry = JSON.parse(expiry);
 
-    console.log(exp, iat)
-
     if(iat >= (parsedExpiry - 900) && parsedExpiry){
       handleRelog()
       return

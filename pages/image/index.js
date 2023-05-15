@@ -48,7 +48,7 @@ export default function ImageHome() {
             <p onClick={() => navigate('/')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-2 transition hover:opacity-50"><RxMagnifyingGlass className='w-4 h-4 mr-1' />Search</p>
             <p onClick={() => navigate('/chat')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-2 transition hover:opacity-50"><RxChatBubble className='w-4 h-4 mr-1' />Chat</p>
             <p onClick={() => navigate('/write')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-2 transition hover:opacity-50"><RxPencil2 className='w-4 h-4 mr-1' />Write</p>
-            <p onClick={() => navigate('/image/art')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-2 transition hover:opacity-50"><RxMagicWand className='w-4 h-4 mr-1' />Art</p>
+            <p onClick={() => navigate('/art')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-2 transition hover:opacity-50"><RxMagicWand className='w-4 h-4 mr-1' />Art</p>
           </div>
         </div>
     </div>

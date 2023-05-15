@@ -100,7 +100,7 @@ const Search = observer(() => {
                     <input checked={commercial} onClick={checkCommercial} className="rounded-full text-white cursor-pointer" name='commercial-use' type={'checkbox'} />
                     <label for='commercial-use' className="ml-1 font-serif text-xs text-black">Royalty Free</label>
                 </div>
-                <button onClick={() => router.push('/image/art')} className='p-2 text-white border bg-black font-serif text-xs rounded transition hover:bg-white hover:border-black hover:text-black'>Generate AI Art</button>
+                <button onClick={() => router.push('/art')} className='p-2 text-white border bg-black font-serif text-xs rounded transition hover:bg-white hover:border-black hover:text-black'>Generate AI Art</button>
             </div>
             {images.length > 0 && !findImage.loading ? (
                 <div className='w-full flex flex-row flex-wrap items-start pb-4'>

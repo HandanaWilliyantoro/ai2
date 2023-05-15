@@ -45,7 +45,7 @@ export default function Home() {
             <p onClick={() => navigate('/chat')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-3 transition hover:opacity-50"><RxChatBubble className='w-4 h-4 mr-1' />Chat</p>
             <p onClick={() => navigate('/image')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-3 transition hover:opacity-50"><RxImage className='w-4 h-4 mr-1' />Image</p>
             <p onClick={() => navigate('/write')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-3 transition hover:opacity-50"><RxPencil2 className='w-4 h-4 mr-1' />Write</p>
-            <p onClick={() => navigate('/image/art')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-3 transition hover:opacity-50"><RxMagicWand className='w-4 h-4 mr-1' />Art</p>
+            <p onClick={() => navigate('/art')} className="flex flex-row text-sm font-bold cursor-pointer font-sans mx-3 transition hover:opacity-50"><RxMagicWand className='w-4 h-4 mr-1' />Art</p>
           </div>
         </div>
     </div>

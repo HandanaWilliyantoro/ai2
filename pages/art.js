@@ -23,6 +23,7 @@ const Art = observer(({session}) => {
 
     const [prompt, setPrompt] = useState('Woman Elf');
     const [image, setImage] = useState('');
+    const [search, setSearch] = useState('')
     const [isAuthenticated, setIsAuthenticated] = useState(status === 'authenticated' ? true : undefined)
     const [isPremiumArtOpened, setIsPremiumArtOpened] = useState(false)
     const [model, setModel] = useState("epic_diffusion_1_1")
@@ -188,6 +189,18 @@ const Art = observer(({session}) => {
     const onClickUnlockPremium = useCallback(() => {
         handleInitiatePayment()
     }, [handleInitiatePayment]);
+
+    const onSubmitHandlerKeydown = useCallback((e) => {
+        if(e.key === 'Enter'){
+          e.preventDefault()
+          router.push(`/search?q=${search}`)
+        }
+      }, [search, router.push])
+    
+      const onSubmitHandler = useCallback((e) => {
+        e.preventDefault()
+        router.push(`/search?q=${search}`)
+      }, [search, router.push])
     //#endregion
 
     return (
@@ -203,7 +216,7 @@ const Art = observer(({session}) => {
                 onClickUnlockPremium={onClickUnlockPremium}
             />
 
-            <Header />
+            <Header onSubmitHandler={onSubmitHandler} onSubmitHandlerKeyDown={onSubmitHandlerKeydown} value={search} setValue={setSearch} />
             <div className='flex flex-row items-center justify-between mx-4'>
                 <p onClick={() => router.back()} className='font-serif cursor-pointer text-sm transition hover:opacity-50 mt-2 py-2 text-black flex items-center font-bold'><RxArrowLeft className='mr-2 w-5 h-5' />AI ART GENERATOR{user.premium ? <span className='py-0.7 px-2 text-[10px] font-serif text-transparent animate-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white rounded ml-2'>Extra Mode</span> : <span className='py-0.7 px-2 text-[10px] bg-black text-white rounded ml-2'>Free Mode</span>}</p>
             </div>
