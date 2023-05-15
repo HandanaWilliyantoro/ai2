@@ -20,7 +20,7 @@ const ModalAuthentication = ({setIsAuthenticated}) => {
             default:
                 return;
         }
-    }, [secret, userData]);
+    }, [secret, userData, modalType]);
 
     return renderBody(modalType)
 }

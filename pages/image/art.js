@@ -157,14 +157,14 @@ const Art = observer(({session}) => {
     //#region HANDLER
     useEffect(() => {
         const item = localStorage.getItem('token')
-        if(item || session?.accessToken){
+        if(item){
             handleFetchModels()
             handleFetchUser()
             setIsAuthenticated(true)
         } else {
             setIsAuthenticated(false)
         }
-    }, [isAuthenticated, session?.accessToken])
+    }, [isAuthenticated])
 
     const onChangeWidth = useCallback((e) => {
         if(Number(e.target.value) < 0){
@@ -193,7 +193,7 @@ const Art = observer(({session}) => {
     return (
         <div className='max-w-screen-lg mx-auto border-x-2 overflow-y-scroll bg-white h-screen relative max-md:flex max-md:flex-col'>
             {/* Modal Authentication */}
-            {isAuthenticated === false && <ModalAuthentication setIsAuthenticated={setIsAuthenticated} />}
+            {!isAuthenticated && <ModalAuthentication setIsAuthenticated={setIsAuthenticated} />}
 
             {/* Modal premium art */}
             <ModalPremiumArt 

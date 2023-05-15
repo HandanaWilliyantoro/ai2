@@ -36,7 +36,8 @@ const ModalSignIn = observer(({
     //#region GOOGLE SIGN IN
     /* Execute */
     useEffect(() => {
-        if(status == 'authenticated'){
+        const expiry = localStorage.getItem('expiry')
+        if(status == 'authenticated' && expiry){
             formAuthenticate(data.user, data.accessToken)
             setModalType(undefined)
             setIsAuthenticated(true)

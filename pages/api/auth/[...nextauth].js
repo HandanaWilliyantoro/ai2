@@ -15,8 +15,7 @@ const hashPassword = (plainPassword) => {
 
 const createToken = (payload) => {
     const iat = Math.floor(Date.now() / 1000);
-    const exp = iat + 60* 60; // one hour
-
+    const exp = iat + 60* 300; // five hour
     return new SignJWT({...payload})
         .setProtectedHeader({alg: 'HS256', typ: 'JWT'})
         .setExpirationTime(exp)
@@ -58,9 +57,6 @@ export const authOptions = {
     async signIn({ user }) {
         try {
             await dbConnect()
-
-            console.log('masuk pa eko')
-
             if(user.email){
                 const checkUser = await User.findOne({email: user.email})
         

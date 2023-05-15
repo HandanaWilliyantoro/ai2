@@ -6,7 +6,7 @@ const secretKey = process.env.SECRET_JWT_KEY
 
 const createToken = (payload) => {
     const iat = Math.floor(Date.now() / 1000);
-    const exp = iat + 60* 60; // one hour
+    const exp = iat + 60 * 300; // five hour
 
     return new SignJWT({...payload})
         .setProtectedHeader({alg: 'HS256', typ: 'JWT'})

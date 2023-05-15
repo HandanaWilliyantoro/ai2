@@ -10,13 +10,13 @@ const limitation = async (premium) => {
             const sessionDate = localStorage.getItem('art-session');
             const currentLimit = localStorage.getItem('art-limit');
             if (Number(currentLimit) > 0) {
-                await localStorage.setItem('art-limit', Number(currentLimit) - 1)
+                localStorage.setItem('art-limit', Number(currentLimit) - 1)
                 return {code: 200, text: 'Continue'}
             } else {
                 if(Number(currentDate) >= Number(sessionDate) ){
                     const newLimit = Math.ceil(Math.random() * 5);
-                    await localStorage.setItem('art-session', currentDate + 1800000)
-                    await localStorage.setItem('art-limit', newLimit);
+                    localStorage.setItem('art-session', currentDate + 1800000)
+                    localStorage.setItem('art-limit', newLimit);
                     return {code: 200, text: 'Continue'}
                 } else {
                     return {code: 404, text: 'At capacity'}

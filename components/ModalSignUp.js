@@ -69,7 +69,8 @@ const ModalSignUp = observer(({
 
     /* Watcher */
     useEffect(() => {
-        if(data && status === 'authenticated'){
+        const expiry = localStorage.getItem('expiry')
+        if(data && status === 'authenticated' && expiry){
             setIsAuthenticated(true)
             formAuthenticate(data.user, data.accessToken)
             setModalType(undefined)
