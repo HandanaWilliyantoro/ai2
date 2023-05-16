@@ -144,9 +144,8 @@ const Art = observer(({session}) => {
     /* Watcher */
     useEffect(() => {
         if(initiatePayment.response){
-            console.log('initiate payment success');
-            handleFetchUser()
             initiatePayment.reset();
+            window.location.reload()
         } else if (initiatePayment.error) {
             console.log(initiatePayment.error)
             initiatePayment.reset();

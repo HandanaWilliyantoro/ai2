@@ -38,8 +38,6 @@ export default async function handler(req, res) {
 
         const {payload: user} = await verifyToken(authorization)
 
-        console.log(user, 'ini user')
-
         let parameter = {
             "transaction_details": {
                 order_id,
