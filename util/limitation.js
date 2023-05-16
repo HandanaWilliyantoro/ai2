@@ -14,7 +14,7 @@ const limitation = async (premium) => {
                 return {code: 200, text: 'Continue'}
             } else {
                 if(Number(currentDate) >= Number(sessionDate) ){
-                    const newLimit = Math.ceil(Math.random() * 5);
+                    const newLimit = Math.floor(Math.random() * 6) + 10;
                     localStorage.setItem('art-session', currentDate + 1800000)
                     localStorage.setItem('art-limit', newLimit);
                     return {code: 200, text: 'Continue'}
