@@ -28,6 +28,12 @@ export default async function handler (req, res) {
 
         const data = await User.findOne({email});
 
+        const iat = Math.floor(Date.now() / 1000);
+
+        if(data.planExpiry && (iat >= data.planExpiry) && data.premium){
+            await User.findByIdAndUpdate({_id: data._id}, {premium: false})
+        }
+
         if(data){
             res.status(200).json({text: "Fetch profile success", code: 200, data})
         } else {

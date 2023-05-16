@@ -41,7 +41,7 @@ const UserSchema = new mongoose.Schema(
     },
     planExpiry: {
         type: Number,
-        required: false
+        required: false,
     }
   },
   { timestamps: true }

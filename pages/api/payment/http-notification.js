@@ -57,7 +57,8 @@ export default async function handler (req, res) {
                 transaction_name: 'Art Generator Subscription',
                 channel_response_message
             })
-            await User.findByIdAndUpdate({_id: buyer._id}, {premium: true})
+            const iat = Math.floor(Date.now() / 1000);
+            await User.findByIdAndUpdate({_id: buyer._id}, {premium: true, planExpiry: iat + 2630000})
             res.status(200).json({text: 'Subscription successful', code: 200})
         } else {
             res.status(404).json({text: "failed to create subscription", code: 404})
