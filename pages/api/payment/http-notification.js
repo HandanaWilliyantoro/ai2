@@ -14,9 +14,9 @@ export default async function handler (req, res) {
 
         await dbConnect()
 
-        const {order_id, saved_token_id, payment_type, channel_response_message, saved_token_id_expired_at} = req.body;
+        const {order_id, saved_token_id, payment_type, channel_response_message, saved_token_id_expired_at, transaction_status} = req.body;
 
-        if(!order_id){
+        if(transaction_status !== 'capture' && transaction_status !== 'settlement'){
             throw new Error('Failed to handle http notification transaction');
         }
 
