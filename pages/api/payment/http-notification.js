@@ -3,7 +3,7 @@ import midtransClient from 'midtrans-client'
 import dbConnect from '@/util/mongo';
 import ArtSubscription from '@/models/ArtSubscription';
 
-let core = new midtransClient.CoreApi({
+let snap = new midtransClient.Snap({
     isProduction: process.env.MIDTRANS_PRODUCTION_ENV === "true" ? true : false,
     serverKey : process.env.MIDTRANS_SERVER_KEY,
     clientKey : process.env.MIDTRANS_CLIENT_KEY
@@ -14,9 +14,9 @@ export default async function handler (req, res) {
 
         await dbConnect()
 
-        const {gross_amount, order_id, saved_token_id, currency, payment_type, channel_response_message, status_code, saved_token_id_expired_at} = req.body;
+        const {order_id, saved_token_id, payment_type, channel_response_message, saved_token_id_expired_at} = req.body;
 
-        if(status_code !== '200' && channel_response_message !== 'Approved'){
+        if(!order_id){
             throw new Error('Failed to handle http notification transaction');
         }
 
@@ -28,28 +28,7 @@ export default async function handler (req, res) {
             await User.findByIdAndUpdate({_id: buyer._id}, {saved_token_id, saved_token_id_expired_at})
         }
 
-        let parameter = {
-            "name": "Art Generator Subscription",
-            "amount": gross_amount,
-            "currency": currency,
-            "payment_type": payment_type,
-            "token": saved_token_id || buyer.saved_token_id,
-            "schedule": {
-                "interval": 1,
-                "interval_unit": "month",
-                "max_interval": 12,
-            },
-            "metadata": {
-                "description": "Recurring payment for subscription art generator"
-            },
-            "customer_details": {
-                "email": buyer.email,
-            }
-        };
-        
-        const subscriptionRes = await core.createSubscription(parameter);
-
-        if(subscriptionRes){
+        if(buyer && subscription){
             await ArtSubscription.findByIdAndUpdate({_id: subscription._id}, {
                 payment_type, 
                 saved_token_id: saved_token_id || buyer.saved_token_id, 
@@ -59,13 +38,13 @@ export default async function handler (req, res) {
             })
             const iat = Math.floor(Date.now() / 1000);
             await User.findByIdAndUpdate({_id: buyer._id}, {premium: true, planExpiry: iat + 2630000})
-            res.status(200).json({text: 'Subscription successful', code: 200})
+            res.status(200).json({text: 'Transaction successful', code: 200})
         } else {
             res.status(404).json({text: "failed to create subscription", code: 404})
         }
 
     } catch(e) {
-        console.log(e)
+        console.log(e.message)
         res.status(500).json({text: 'internal server error', code: 500, error: e.message})
     }
 }
