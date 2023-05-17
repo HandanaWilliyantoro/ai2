@@ -14,11 +14,7 @@ export default async function handler (req, res) {
 
         await dbConnect()
 
-        const {order_id, saved_token_id, payment_type, channel_response_message, saved_token_id_expired_at, transaction_status} = req.body;
-
-        if(transaction_status !== 'capture' && transaction_status !== 'settlement'){
-            throw new Error('Failed to handle http notification transaction');
-        }
+        const {order_id, saved_token_id, payment_type, channel_response_message, saved_token_id_expired_at, transaction_status, status_code} = req.body;
 
         const subscription = await ArtSubscription.findOne({order_id});
 
@@ -37,8 +33,10 @@ export default async function handler (req, res) {
                 channel_response_message
             })
             const iat = Math.floor(Date.now() / 1000);
-            await User.findByIdAndUpdate({_id: buyer._id}, {premium: true, planExpiry: iat + 2630000})
-            res.status(200).json({text: 'Transaction successful', code: 200})
+            if(transaction_status === 'capture' || transaction_status === 'settlement'){
+                await User.findByIdAndUpdate({_id: buyer._id}, {premium: true, planExpiry: iat + 2630000})
+            }
+            res.status(200).json({text: `Transaction ${transaction_status} with payment type: ${payment_type}`, code: status_code, status: transaction_status})
         } else {
             res.status(404).json({text: "failed to create subscription", code: 404})
         }
