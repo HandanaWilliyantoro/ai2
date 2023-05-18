@@ -40,6 +40,15 @@ const nextConfig = {
 
     return config;
   },
+  async redirects() {
+    return [
+      {
+        source: '/image/art',
+        destination: '/art',
+        permanent: true,
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig

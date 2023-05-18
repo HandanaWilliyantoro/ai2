@@ -1,11 +1,9 @@
 import User from '@/models/User';
-import midtransClient from 'midtrans-client'
 import dbConnect from '@/util/mongo';
 import ArtSubscription from '@/models/ArtSubscription';
 
 export default async function handler (req, res) {
     try {
-
         await dbConnect()
 
         const {order_id, saved_token_id, payment_type, channel_response_message, saved_token_id_expired_at, transaction_status, status_code} = req.body;
