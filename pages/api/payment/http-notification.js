@@ -3,12 +3,6 @@ import midtransClient from 'midtrans-client'
 import dbConnect from '@/util/mongo';
 import ArtSubscription from '@/models/ArtSubscription';
 
-let snap = new midtransClient.Snap({
-    isProduction: process.env.MIDTRANS_PRODUCTION_ENV === "true" ? true : false,
-    serverKey : process.env.MIDTRANS_SERVER_KEY,
-    clientKey : process.env.MIDTRANS_CLIENT_KEY
-});
-
 export default async function handler (req, res) {
     try {
 
