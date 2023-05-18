@@ -1,17 +1,9 @@
 import User from '@/models/User';
-import midtransClient from 'midtrans-client'
 import dbConnect from '@/util/mongo';
 import ArtSubscription from '@/models/ArtSubscription';
 
-let snap = new midtransClient.Snap({
-    isProduction: process.env.MIDTRANS_PRODUCTION_ENV === "true" ? true : false,
-    serverKey : process.env.MIDTRANS_SERVER_KEY,
-    clientKey : process.env.MIDTRANS_CLIENT_KEY
-});
-
 export default async function handler (req, res) {
     try {
-
         await dbConnect()
 
         const {order_id, saved_token_id, payment_type, channel_response_message, saved_token_id_expired_at, transaction_status, status_code} = req.body;
