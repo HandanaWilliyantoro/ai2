@@ -85,9 +85,13 @@ const createPersona = (persona, input) => {
 
 export default async function handler(req, res) {
     try {
-    const {conversationId, query, history} = await req.body;
+    const {conversationId, query, persona} = await req.body;
 
-    const source = await getSearchResult(query);
+    let q = query;
+
+    if(query && persona){
+        q = await createPersona(persona, query)
+    }
 
     const data = await fetch(`https://chatgpt-ai-chat-bot.p.rapidapi.com/ask`, {
         method: 'POST',
@@ -96,12 +100,12 @@ export default async function handler(req, res) {
             'X-RapidAPI-Host': 'chatgpt-ai-chat-bot.p.rapidapi.com',
             'content-type': 'application/json',
         },
-        body: JSON.stringify({query: `You are a helpful assistant named Handana AI that accurately answers the user's question based on the given SOURCE if the SOURCE is relevant. don't answer anything about the given source provided. SOURCE: ${source}. QUESTION: ${query}?`, wordLimit: 4096, conversationId})
+        body: JSON.stringify({query: `You are a helpful assistant named Handana AI that accurately answers the user's question. QUESTION: ${q}?`, wordLimit: 4096, conversationId})
     })
     const completion = await data.json();
 
     if(completion && completion.response){
-        res.status(200).json({text: 'fetch chat operation success', code: 200, data: completion.response})
+        res.status(200).json({text: 'fetch chat operation success', code: 200, data: completion.response, conversationId: completion.conversationId})
     } else {
         res.status(404).json({text: 'failed to fetch chat operation', code: 404})
     }

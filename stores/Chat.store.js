@@ -26,7 +26,7 @@ class ChatStore {
         }).then(res => res.json())
         .then(response => {
             if(response.data){
-                postChat.success({data: response.data, conversationId: response.data.conversationId})
+                postChat.success({data: response.data, conversationId: response.conversationId})
             } else {
                 postChat.failed(response.text)
             }

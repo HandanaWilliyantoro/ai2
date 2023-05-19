@@ -189,8 +189,6 @@ const chat = observer(({session}) => {
         if(intents[0].action != 'N/A'){
             const chosenPlugin = Plugins.find(a => a.manifest.name_for_model === intents[0].action)
 
-            console.log(chosenPlugin, 'ini chosen plugin')
-
             const data = await fetch(`/api/chat/plugins/evaluate?url=${chosenPlugin.manifest.api.url}`, {method: 'GET', headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json',
@@ -232,8 +230,6 @@ const chat = observer(({session}) => {
             const method = lines[1]?.split(/\s*METHOD\s*:\s*/)?.[1];
             const body = lines[2]?.split(/\s*BODY\s*:\s*/)?.[1];
 
-            console.log(body, 'ini body')
-    
             let responseOperation;
     
             if(url && method){
@@ -345,7 +341,9 @@ const chat = observer(({session}) => {
                 const query = input.toLowerCase()
                 return pluginChatHandler(query, selectedPlugins)
             } else {
+                console.log('masuk')
                 if(history.length < 1){
+                    console.log('masuk atas')
                     const query = input.toLowerCase()
                     const findPersona = persona.find(a => a.selected).title
                     postChat.execute({query, persona: findPersona, history: params})
@@ -377,7 +375,6 @@ const chat = observer(({session}) => {
     useEffect(() => {
         if(postChat.response){
             const parsedHistory = JSON.parse(JSON.stringify(history))
-            console.log(postChat.response, 'ini postchat response')
             setHistory([...parsedHistory, {role: 'assistant', content: postChat.response.data}])
             setConversationId(postChat.response.conversationId)
             setInput('')

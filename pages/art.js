@@ -73,7 +73,6 @@ const Art = observer(({session}) => {
             setModelOptions(getModels.response)
             getModels.reset()
         } else if (getModels.error) {
-            console.log(getModels.error, 'ini get models error')
             showErrorSnackbar(getModels.error)
             getModels.reset()
         }
