@@ -23,28 +23,13 @@ class ChatStore {
                 'Authorization': token
             },
             'body': JSON.stringify(params)
-        }).then(res => {
-            const reader = res.body.getReader();
-
-            const read = () => {
-            // read the data
-            reader.read().then(async ({ done, value }) => {
-                const decoder = new TextDecoder();
-                if (done) {
-                    postChat.finished = true;
-                    return;
-                }
-                if(decoder.decode(value) === 'initiate | stop'){
-                    console.log('initiate | stop')
-                    return;
-                } else {
-                    const decoded = decoder.decode(value);
-                    postChat.success(decoded)
-                }
-                read();
-            });
-            };
-            read();
+        }).then(res => res.json())
+        .then(response => {
+            if(response.data){
+                postChat.success({data: response.data, conversationId: response.data.conversationId})
+            } else {
+                postChat.failed(response.text)
+            }
         })
         .catch(e => postChat.failed(e))
     }

@@ -16,6 +16,8 @@ import {
       method: "POST",
       body: JSON.stringify(payload),
     });
+
+    console.log(res.json(), 'ni open ai response')
   
     const stream = new ReadableStream({
       async start(controller) {
@@ -50,8 +52,5 @@ import {
         }
       },
     });
-
-    console.log(stream, 'ini stream')
-  
     return stream;
   }

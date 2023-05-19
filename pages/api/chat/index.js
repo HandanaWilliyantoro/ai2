@@ -1,21 +1,3 @@
-import { NextResponse } from "next/server";
-import { ChatOpenAI } from "langchain/chat_models/openai";
-import { LLMChain } from "langchain/chains";
-import { CallbackManager } from "langchain/callbacks";
-import {
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
-} from "langchain/prompts";
-
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-
-export const config = {
-    api: {
-      bodyParser: false,
-    },
-    runtime: "edge",
-};
 
 const createPersona = (persona, input) => {
     switch(persona){
@@ -101,103 +83,31 @@ const createPersona = (persona, input) => {
     }
 }
 
-async function getSearchResult (query) {
-    const data = await fetch(`https://real-time-web-search.p.rapidapi.com/search?q=${query}&limit=10`, {
-        method: 'GET',
+export default async function handler(req, res) {
+    try {
+    const {conversationId, query, history} = await req.body;
+
+    const source = await getSearchResult(query);
+
+    const data = await fetch(`https://chatgpt-ai-chat-bot.p.rapidapi.com/ask`, {
+        method: 'POST',
         headers: {
             'X-RapidAPI-Key': process.env.RAPID_API_KEY,
-            'X-RapidAPI-Host': 'real-time-web-search.p.rapidapi.com',
+            'X-RapidAPI-Host': 'chatgpt-ai-chat-bot.p.rapidapi.com',
+            'content-type': 'application/json',
         },
+        body: JSON.stringify({query: `You are a helpful assistant named Handana AI that accurately answers the user's question based on the given SOURCE if the SOURCE is relevant. don't answer anything about the given source provided. SOURCE: ${source}. QUESTION: ${query}?`, wordLimit: 4096, conversationId})
     })
+    const completion = await data.json();
 
-    const engine = await data.json()
+    if(completion && completion.response){
+        res.status(200).json({text: 'fetch chat operation success', code: 200, data: completion.response})
+    } else {
+        res.status(404).json({text: 'failed to fetch chat operation', code: 404})
+    }
 
-    const searchResult = await engine.data.slice(0, 2)
-
-    return searchResult.map(a => a.snippet).toString()
-}
-
-export default async function handler(req, res) {
-    const body = await req.json();
-    const token = await req.headers.get('authorization');
-
-    try {
-        if (!OPENAI_API_KEY) {
-            throw new Error("OPENAI_API_KEY is not defined.");
-        }
-
-        let query = body.query
-        if(body.query && body.persona){
-            query = await createPersona(body.persona, body.query)
-        }
-
-        const encoder = new TextEncoder();
-        const stream = new TransformStream();
-        const writer = stream.writable.getWriter();
-
-        const llm = new ChatOpenAI({
-            modelName: "gpt-3.5-turbo",
-            openAIApiKey: OPENAI_API_KEY,
-            temperature: 0.7,
-            maxTokens: 1000,
-            streaming: true,
-            callbackManager: CallbackManager.fromHandlers({
-                handleLLMNewToken: async (token) => {
-                    await writer.ready;
-                    await writer.write(encoder.encode(`${token}`));
-                },
-                handleLLMEnd: async () => {
-                    await writer.ready;
-                    await writer.close();
-                },
-                handleLLMError: async (e) => {
-                    await writer.ready;
-                    await writer.abort(e);
-                },
-            }),
-        });
-
-        const searchResult = await getSearchResult(query)
-
-        const chatPrompt = ChatPromptTemplate.fromPromptMessages([
-            SystemMessagePromptTemplate.fromTemplate(
-                `You are a helpful assistant named Handana AI that accurately answers the user's queries based on the previous conversation and answer based on given SOURCE if it's relevant. don't answer anything about the given source provided.
-                
-                SOURCE:
-                ${searchResult.replace(/\{/g, '(').replace(/}/g, ')')}
-                
-                PREVIOUS CONVERSATION:
-                ${body.history && body.history.length >= 3 ? body.history.map(a => a.role === 'user' ? `USER: ${a.content.input ? a.content.input.replace(/\{/g, '[').replace(/}/g, ']') : a.content}\n` : `ASSISTANT: ${a.content.replace(/\{/g, '[').replace(/}/g, ']Z')}\n`).toString() : `USER: ${body.history[0].content.input}`}
-                `
-            ),
-            HumanMessagePromptTemplate.fromTemplate("{input}"),
-        ]);
-
-        const chain = new LLMChain({
-            prompt: chatPrompt,
-            llm: llm,
-        });
-
-        chain
-            .call({input: query})
-            .catch(console.error);
-
-        return new NextResponse(stream.readable, {
-            headers: {
-                "Content-Type": "text/event-stream",
-                "Cache-Control": "no-cache",
-            },
-        });
-    } catch (error) {
-        console.log(error)
-        return new Response(
-            JSON.stringify(
-                { error: error.message },
-                {
-                    status: 500,
-                    headers: { "Content-Type": "application/json" },
-                }
-            )
-        );
+    } catch(e) {
+        console.log(e)
+        res.status(500).json({text: 'Internal server error', code: 500, error: e.message})
     }
 }

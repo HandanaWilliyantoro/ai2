@@ -135,7 +135,8 @@ const chat = observer(({session}) => {
     ])
     const [plugins, setPlugins] = useState(Plugins.map(a => ({...a, selected: false})))
     const [answer, setAnswer] = useState('');
-    const [search, setSearch] = useState('')
+    const [search, setSearch] = useState('');
+    const [conversationId, setConversationId] = useState('');
     const [isLoading, setIsLoading] = useState(false)
     const [isModalPersonaOpened, setIsModalPersonaOpened] = useState(false)
     const [isModalActionOpened, setIsModalActionOpened] = useState(false)
@@ -350,11 +351,11 @@ const chat = observer(({session}) => {
                     postChat.execute({query, persona: findPersona, history: params})
                 } else {
                     const query = input.toLowerCase()
-                    postChat.execute({query, history: params})
+                    postChat.execute({query, conversationId, history: params})
                 }
             }
         }
-    }, [input, persona, history]);
+    }, [input, persona, history, conversationId]);
 
     /* Watcher Image */
     useEffect(() => {
@@ -375,27 +376,19 @@ const chat = observer(({session}) => {
     /* Watcher Text */
     useEffect(() => {
         if(postChat.response){
-            const response = JSON.parse(JSON.stringify(answer))
-            setAnswer(`${response + postChat.response}`)
+            const parsedHistory = JSON.parse(JSON.stringify(history))
+            console.log(postChat.response, 'ini postchat response')
+            setHistory([...parsedHistory, {role: 'assistant', content: postChat.response.data}])
+            setConversationId(postChat.response.conversationId)
             setInput('')
+            setIsLoading(false)
             postChat.reset()
         } else if (postChat.error) {
             showErrorSnackbar('Our chat feature is currently down, please come back later')
+            setIsLoading(false)
             postChat.reset();
         }
     }, [postChat.response, postChat.error, postChat.reset])
-
-    /* Watcher Finish */
-    useEffect(() => {
-        if(postChat.finished){
-            const parsedHistory = JSON.parse(JSON.stringify(history))
-            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
-            setIsLoading(false)
-            setAnswer('')
-            setInput('')
-            postChat.reset()
-        }
-    }, [postChat.finished])
     //#endregion
 
     //#region HANDLER
@@ -497,7 +490,7 @@ const chat = observer(({session}) => {
                             ) : (
                                 <div>
                                     {plugins && plugins.find(a => a.selected)?.name ? <p className='text-xs py-2 px-3 rounded bg-green-200 text-green-500 font-sans font-bold w-[fit-content] mb-2'>Plugin: {plugins.find(a => a.selected).name}</p> : undefined}
-                                    <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
+                                    <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content}} />
                                 </div>
                             )}
                             <div className='flex flex-row items-center justify-start mt-4'>
@@ -509,13 +502,13 @@ const chat = observer(({session}) => {
                 })}
                 {answer && !isPluginChatLoading && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full'>
-                            <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
+                            <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer}} />
                     </div>
                 )}
                 {isPluginChatLoading && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
                         {plugins && plugins.find(a => a.selected)?.name ? <p className='text-xs flex flex-row items-center justify-center py-2 px-3 rounded bg-green-200 text-green-500 font-sans font-bold w-[fit-content] mb-4'>Plugin: {plugins.find(a => a.selected).name} <ReactLoading className='ml-2 flex items-center' type='spin' color={'#939393'} height={'auto'} width={15} /></p> : undefined}
-                        {answer && <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />}
+                        {answer && <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer}} />}
                         <ChatSkeleton />
                     </div>
                 )}
