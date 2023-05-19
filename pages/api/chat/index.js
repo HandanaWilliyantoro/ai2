@@ -85,7 +85,7 @@ const createPersona = (persona, input) => {
 
 export default async function handler(req, res) {
     try {
-    const {conversationId, query, persona} = await req.body;
+    const {history, query, persona} = await req.body;
 
     let q = query;
 
@@ -100,7 +100,7 @@ export default async function handler(req, res) {
             'X-RapidAPI-Host': 'chatgpt-ai-chat-bot.p.rapidapi.com',
             'content-type': 'application/json',
         },
-        body: JSON.stringify({query: `You are a helpful assistant named Handana AI that accurately answers the user's question. QUESTION: ${q}?`, wordLimit: 4096, conversationId})
+        body: JSON.stringify({query: `You are a helpful assistant named Handana AI that accurately answers the user's question based on the previous conversationz. QUESTION: ${q}? PREVIOUS CONVERSATION: ${history && history.length >= 3 ? history.map(a => a.role === 'user' ? `USER: ${a.content.input ? a.content.input.replace(/\{/g, '[').replace(/}/g, ']') : a.content}\n` : `ASSISTANT: ${a.content.replace(/\{/g, '[').replace(/}/g, ']Z')}\n`).toString() : `USER: ${history[0].content.input}`}`, wordLimit: 4096})
     })
     const completion = await data.json();
 

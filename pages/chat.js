@@ -136,7 +136,6 @@ const chat = observer(({session}) => {
     const [plugins, setPlugins] = useState(Plugins.map(a => ({...a, selected: false})))
     const [answer, setAnswer] = useState('');
     const [search, setSearch] = useState('');
-    const [conversationId, setConversationId] = useState('');
     const [isLoading, setIsLoading] = useState(false)
     const [isModalPersonaOpened, setIsModalPersonaOpened] = useState(false)
     const [isModalActionOpened, setIsModalActionOpened] = useState(false)
@@ -341,19 +340,17 @@ const chat = observer(({session}) => {
                 const query = input.toLowerCase()
                 return pluginChatHandler(query, selectedPlugins)
             } else {
-                console.log('masuk')
                 if(history.length < 1){
-                    console.log('masuk atas')
                     const query = input.toLowerCase()
                     const findPersona = persona.find(a => a.selected).title
                     postChat.execute({query, persona: findPersona, history: params})
                 } else {
                     const query = input.toLowerCase()
-                    postChat.execute({query, conversationId, history: params})
+                    postChat.execute({query, history: params})
                 }
             }
         }
-    }, [input, persona, history, conversationId]);
+    }, [input, persona, history]);
 
     /* Watcher Image */
     useEffect(() => {
@@ -376,7 +373,6 @@ const chat = observer(({session}) => {
         if(postChat.response){
             const parsedHistory = JSON.parse(JSON.stringify(history))
             setHistory([...parsedHistory, {role: 'assistant', content: postChat.response.data}])
-            setConversationId(postChat.response.conversationId)
             setInput('')
             setIsLoading(false)
             postChat.reset()
