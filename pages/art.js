@@ -3,7 +3,7 @@ import DefaultImg from '@/util/assets/default_art.png'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { getSession, useSession } from 'next-auth/react'
-import {Head} from 'next/document'
+import {Head} from 'next/head'
 
 import createArt from '@/stores/Art.store'
 import getModels from '@/stores/FetchModels.store'
@@ -205,10 +205,6 @@ const Art = observer(({session}) => {
 
     return (
         <div className='max-w-screen-lg mx-auto border-x-2 overflow-y-scroll bg-white h-screen relative max-md:flex max-md:flex-col'>
-            <Head>
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6332345664092406"
-                crossOrigin="anonymous"></script>
-            </Head>
             {/* Modal Authentication */}
             {!isAuthenticated && <ModalAuthentication setIsAuthenticated={setIsAuthenticated} />}
 
