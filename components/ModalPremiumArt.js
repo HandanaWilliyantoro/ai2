@@ -31,7 +31,7 @@ const ModalPremiumArt = ({
                         Our AI-powered art generator allows you to create stunning and unique artworks with over <br/><span className='text-black font-bold'>50+ available models</span> in a matter of seconds. 
                     </p>
                     <div className='text-black flex flex-col items-start justify-start mb-auto mt-1 w-full'>
-                        <p className='text-black flex flex-row font-serif text-xs items-center justify-start mt-3'><AiOutlineCheckCircle className='text-green-600 mr-1' />No more ads: premium plan, pure content.</p>
+                        <p className='text-black flex flex-row font-serif text-xs items-center justify-start mt-3'><AiOutlineCheckCircle className='text-green-600 mr-1' />Available when demand is high</p>
                         <p className='text-black flex flex-row font-serif text-xs items-center justify-start mt-3'><AiOutlineCheckCircle className='text-green-600 mr-1' />Priority access to new features</p>
                         <p className='text-black flex flex-row font-serif text-xs items-center justify-start mt-3'><AiOutlineCheckCircle className='text-green-600 mr-1' />Unlock over 50+ art generator model</p>
                         <select placeholder='See all models' className='text-black text-xs w-full border-gray-400 rounded border-2 bg-white outline-none py-2 mt-2'>

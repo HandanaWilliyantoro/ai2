@@ -5,7 +5,6 @@ class ArtStore {
     response = undefined;
     error = undefined;
     loading = false;
-    text = undefined
     
     constructor(){
         makeAutoObservable(this)
@@ -28,8 +27,9 @@ class ArtStore {
             .then(res => res.json())
             .then((response) => {
                 if(response.data){
-                    createArt.success(response.data, limitedAccess.text)
+                    createArt.success(response.data)
                 } else {
+                    console.log(response)
                     createArt.failed(response.text)
                 }
             })
@@ -42,9 +42,8 @@ class ArtStore {
         }
     }
     
-    success(data, text){
+    success(data){
         createArt.response = data
-        createArt.text = text
         createArt.error = undefined
         createArt.loading = false
     }
