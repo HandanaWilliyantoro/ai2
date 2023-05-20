@@ -11,9 +11,9 @@ import Plugins from '@/util/assets/plugins.json'
 
 // Stores
 import { observer } from 'mobx-react-lite'
-import postChat from '@/stores/Chat.store'
-import createArt from '@/stores/Art.store'
-import getPluginIntents from '@/stores/plugins/GetPluginIntent.store'
+import postChat from '../stores/Chat.store'
+import createArt from "../stores/Art.store"
+import getPluginIntents from '../stores/plugins/GetPluginIntent.store'
 
 // Components
 import ModalPersona from '@/components/ModalPersona'
@@ -23,8 +23,8 @@ import ImageSkeleton from '@/components/ImageSkeleton'
 import ChatSkeleton from '@/components/ChatSkeleton'
 import ModalAuthentication from '@/components/ModalAuthentication'
 import ModalUserPlugin from '@/components/ModalUserPlugin'
-import getPluginOperation from '@/stores/plugins/GetPluginOperation.store'
-import postPluginAnswer from '@/stores/plugins/PostPluginAnswer.store'
+import getPluginOperation from '../stores/plugins/GetPluginOperation.store'
+import postPluginAnswer from '../stores/plugins/PostPluginAnswer.store'
 
 const chat = observer(({session}) => {
     const {status} = useSession()

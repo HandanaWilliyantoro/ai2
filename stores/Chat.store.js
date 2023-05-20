@@ -34,7 +34,7 @@ class ChatStore {
         .catch(e => postChat.failed(e))
     }
 
-    success(data, premium){
+    success(data){
         postChat.response = data
         postChat.error = undefined
         postChat.loading = false
@@ -55,5 +55,4 @@ class ChatStore {
 }
 
 const postChat = new ChatStore()
-
 export default postChat
