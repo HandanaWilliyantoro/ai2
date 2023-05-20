@@ -128,7 +128,6 @@ const Art = observer(({session}) => {
             adsScript.setAttribute('id','interstitial-ads');
             adsScript.setAttribute('data-cfasync','false');
             document.body.appendChild(adsScript);
-            fetch('https://my.rtmark.net/gid.js?userId=h7rz284677ws396775596v1d1cfmw687')
         }
 
         if(createArt.response){

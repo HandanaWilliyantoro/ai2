@@ -4,6 +4,7 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
+        <meta name="monetag" content="6a265d4f3402439b3de9430f9c5cb365"></meta>
       </Head>
       <body>
         <Main />
