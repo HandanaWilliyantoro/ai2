@@ -3,7 +3,6 @@ import DefaultImg from '@/util/assets/default_art.png'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { getSession, useSession } from 'next-auth/react'
-import {Head} from 'next/head'
 
 import createArt from '@/stores/Art.store'
 import getModels from '@/stores/FetchModels.store'
@@ -120,17 +119,25 @@ const Art = observer(({session}) => {
 
     /* Watcher */
     useEffect(() => {
+
+        /* Display ads on generating AI Art */
+        if(createArt.loading && createArt.text !== 'Continue using premium'){
+            var adsScript = document.createElement('script');
+            adsScript.setAttribute('src','//ophoacit.com/1?z=5966193');
+            adsScript.setAttribute('async','async');
+            adsScript.setAttribute('id','interstitial-ads');
+            adsScript.setAttribute('data-cfasync','false');
+            document.body.appendChild(adsScript);
+        }
+
         if(createArt.response){
             setImage(createArt.response)
             createArt.reset()
         } else if (createArt.error) {
-            if(createArt.error === "We're at maximum capacity at this moment"){
-                handleOpenModalPremium()
-            }
             showErrorSnackbar(createArt.error)
             createArt.reset()
         }
-    }, [createArt.reset, createArt.response, createArt.error, isAuthenticated])
+    }, [createArt.reset, createArt.response, createArt.error, isAuthenticated, createArt.loading])
     //#endregion
 
     //#region INITIATE PAYMENT
