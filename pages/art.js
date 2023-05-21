@@ -15,7 +15,6 @@ import { showErrorSnackbar } from '@/util/toast'
 import Loading from '@/components/Loading'
 import Header from '@/components/Header'
 import ModalAuthentication from '@/components/ModalAuthentication'
-import { ModalPopupOnGenerate } from '@/components/Ads'
 import ModalPremiumArt from '@/components/ModalPremiumArt'
 import initiatePayment from '@/stores/InitiatePayment.store'
 
@@ -34,7 +33,6 @@ const Art = observer(({session}) => {
     const [height, setHeight] = useState(1024)
     const [premiumModelOptions, setPremiumModelOptions] = useState([])
     const [user, setUser] = useState({})
-    const [isModalAdsOpened, setIsModalAdsOpened] = useState(false)
 
     const router = useRouter();
 
@@ -121,16 +119,16 @@ const Art = observer(({session}) => {
 
     /* Watcher */
     useEffect(() => {
-
-        if(createArt.loading){
-            setTimeout(() => (
-                setIsModalAdsOpened(true)
-            ), 2000)
-        }
-
         if(createArt.response){
             setImage(createArt.response)
-            createArt.reset()
+            localStorage.setItem('art-image', createArt.response);
+            localStorage.setItem('art-prompt', prompt);
+            localStorage.setItem('art-model', model)
+            if(user.premium){
+                createArt.reset()
+            } else {
+                window.location.reload();
+            }
         } else if (createArt.error) {
             showErrorSnackbar(createArt.error)
             createArt.reset()
@@ -163,6 +161,28 @@ const Art = observer(({session}) => {
     useEffect(() => {
         const item = localStorage.getItem('token')
         if(item){
+            const artImage = localStorage.getItem('art-image')
+            const artPrompt = localStorage.getItem('art-prompt')
+            const artModel = localStorage.getItem('art-model')
+            const userStorage = localStorage.getItem('user');
+            const user = JSON.parse(userStorage);
+            if(!user.premium){
+                var adsScript = document.createElement('script');
+                adsScript.setAttribute('src','//ophoacit.com/1?z=5966193');
+                adsScript.setAttribute('async','async');
+                adsScript.setAttribute('id','interstitial-ads');
+                adsScript.setAttribute('data-cfasync','false');
+                document.body.appendChild(adsScript);
+            }
+            if(artImage){
+                setImage(artImage)
+            }
+            if(artPrompt){
+                setPrompt(artPrompt)
+            }
+            if(artModel){
+                setModel(artModel)
+            }
             handleFetchModels()
             handleFetchUser()
             setIsAuthenticated(true)
@@ -211,9 +231,6 @@ const Art = observer(({session}) => {
         <div className='max-w-screen-lg mx-auto border-x-2 overflow-y-scroll bg-white h-screen relative max-md:flex max-md:flex-col'>
             {/* Modal Authentication */}
             {!isAuthenticated && <ModalAuthentication setIsAuthenticated={setIsAuthenticated} />}
-
-            {/* Modal Popup Art */}
-            <ModalPopupOnGenerate isOpen={isModalAdsOpened} onRequestClose={() => setIsModalAdsOpened(!isModalAdsOpened)} />
 
             {/* Modal premium art */}
             <ModalPremiumArt 
