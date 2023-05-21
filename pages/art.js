@@ -119,17 +119,6 @@ const Art = observer(({session}) => {
 
     /* Watcher */
     useEffect(() => {
-
-        /* Display ads on generating AI Art */
-        if(createArt.loading && createArt.text !== 'Continue using premium'){
-            var adsScript = document.createElement('script');
-            adsScript.setAttribute('src','//ophoacit.com/1?z=5966193');
-            adsScript.setAttribute('async','async');
-            adsScript.setAttribute('id','interstitial-ads');
-            adsScript.setAttribute('data-cfasync','false');
-            document.body.appendChild(adsScript);
-        }
-
         if(createArt.response){
             setImage(createArt.response)
             createArt.reset()
