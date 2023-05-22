@@ -276,7 +276,7 @@ const Art = observer(({session}) => {
                             <button onClick={handleOpenModalPremium} className='font-serif text-transparent animate-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 w-full ml-2 bg-black text-white text-xs py-2 rounded outline-none transition hover:opacity-50'>Go Extra</button>
                         )}
                     </div>
-                    {!user.premium && <p className='font-sans text-xs w-full text-center mt-2'>To offset the expenses of the AI art generator, advertisements will be displayed.</p>}
+                    {!user.premium && <p className='font-sans text-xs w-full text-center mt-2 text-black max-md:mt-0.5'>To offset the expenses of the AI art generator,<br/>advertisements will be displayed.</p>}
                 </div>
                 <div className='flex-[0.5] max-md:w-full flex flex-col max-md:mt-4 max-md:min-h-[auto] max-md:py-4 items-start justify-start px-2'>
                     {createArt.loading ? (
