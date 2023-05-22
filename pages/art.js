@@ -166,7 +166,7 @@ const Art = observer(({session}) => {
             const artModel = localStorage.getItem('art-model')
             const userStorage = localStorage.getItem('user');
             const user = JSON.parse(userStorage);
-            if(!user.premium){
+            if(!user.premium && artModel && artImage && artPrompt){
                 var adsScript = document.createElement('script');
                 adsScript.setAttribute('src','//ophoacit.com/1?z=5966193');
                 adsScript.setAttribute('async','async');
@@ -276,6 +276,7 @@ const Art = observer(({session}) => {
                             <button onClick={handleOpenModalPremium} className='font-serif text-transparent animate-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 w-full ml-2 bg-black text-white text-xs py-2 rounded outline-none transition hover:opacity-50'>Go Extra</button>
                         )}
                     </div>
+                    {!user.premium && <p className='font-sans text-xs w-full text-center mt-2'>To offset the expenses of the AI art generator, advertisements will be displayed.</p>}
                 </div>
                 <div className='flex-[0.5] max-md:w-full flex flex-col max-md:mt-4 max-md:min-h-[auto] max-md:py-4 items-start justify-start px-2'>
                     {createArt.loading ? (
