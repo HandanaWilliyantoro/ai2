@@ -8,15 +8,16 @@ import createArt from '@/stores/Art.store'
 import getModels from '@/stores/FetchModels.store'
 import getAllModels from '@/stores/FetchAllModels.store'
 import getProfile from '@/stores/Profile.store'
+import initiatePayment from '@/stores/InitiatePayment.store'
+import intlPayment from '@/stores/InternationPayment.store'
 
 // Components
 import {RxArrowLeft} from 'react-icons/rx'
-import { showErrorSnackbar } from '@/util/toast'
+import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast'
 import Loading from '@/components/Loading'
 import Header from '@/components/Header'
 import ModalAuthentication from '@/components/ModalAuthentication'
 import ModalPremiumArt from '@/components/ModalPremiumArt'
-import initiatePayment from '@/stores/InitiatePayment.store'
 
 const Art = observer(({session}) => {
     const {status} = useSession()
@@ -33,6 +34,7 @@ const Art = observer(({session}) => {
     const [height, setHeight] = useState(1024)
     const [premiumModelOptions, setPremiumModelOptions] = useState([])
     const [user, setUser] = useState({})
+    const [selectedCurrency, setSelectedCurrency] = useState('USD')
 
     const router = useRouter();
 
@@ -98,6 +100,28 @@ const Art = observer(({session}) => {
     }, [getAllModels.response, getAllModels.error, getAllModels.reset])
     //#endregion
 
+    //#region INTL PAYMENT
+    const handleIntlPayment = useCallback(() => {
+        const token = localStorage.getItem('token');
+        if((session && session.accessToken) || token){
+            intlPayment.execute({gross_amount: 5, accessToken: session?.accessToken || token})
+        }
+    }, [])
+
+    /* Watcher */
+    useEffect(() => {
+        if(intlPayment.response){
+            showSuccessSnackbar('Create transaction success');
+            intlPayment.reset();
+            window.location.reload()
+        } else if (intlPayment.error) {
+            console.log(intlPayment.error);
+            showErrorSnackbar('Transaction failed')
+            intlPayment.reset()
+        }
+    }, [intlPayment.response, intlPayment.error, intlPayment.reset]);
+    //#endregion
+
     //#region FETCH IMAGE
     const handleFetchImage = useCallback(async (e) => {
         e.preventDefault()
@@ -142,7 +166,7 @@ const Art = observer(({session}) => {
         if((session && session.accessToken) || token){
             initiatePayment.execute({gross_amount: 50000, accessToken: session?.accessToken || token})
         }
-    }, [session, session?.accessToken]);
+    }, [session, session?.accessToken, selectedCurrency]);
 
     /* Watcher */
     useEffect(() => {
@@ -238,6 +262,9 @@ const Art = observer(({session}) => {
                 onRequestClose={() => setIsPremiumArtOpened(false)} 
                 options={premiumModelOptions}
                 onClickUnlockPremium={onClickUnlockPremium}
+                setSelectedCurrency={setSelectedCurrency}
+                selectedCurrency={selectedCurrency}
+                handleIntlPayment={handleIntlPayment}
             />
 
             <Header onSubmitHandler={onSubmitHandler} onSubmitHandlerKeyDown={onSubmitHandlerKeydown} value={search} setValue={setSearch} />
