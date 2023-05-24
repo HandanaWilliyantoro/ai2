@@ -42,7 +42,7 @@ const ModalPremiumArt = ({
                         </select>
                     </div>
                     <div className='flex flex-row items-end justify-between w-full mb-1.5'>
-                        <select onChange={(e) => setSelectedCurrency(e.target.value)} className='border cursor-pointer border-black rounded font-serif outline-none text-xs pr-1 py-0.5'>
+                        <select onChange={(e) => setSelectedCurrency(e.target.value)} className='border cursor-pointer border-black rounded bg-white font-serif outline-none text-xs pr-1 py-0.5'>
                             <option value={'USD'}>USD</option>
                             <option value={'IDR'}>IDR</option>
                         </select>

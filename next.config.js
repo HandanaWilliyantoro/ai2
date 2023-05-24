@@ -49,6 +49,9 @@ const nextConfig = {
       },
     ];
   },
+  env: {
+    PAYPAL_CLIENT_ID: 'AfjYHfieOAq6OpQyGrtQFHqcVooUAIx1pnxdQSOZFtmKKEJUpr6woB-Wys1NzP5JhGWMLRhu9d4nJiad'
+  }
 }
 
 module.exports = nextConfig
