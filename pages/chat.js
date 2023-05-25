@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast'
 import { getSession, useSession } from 'next-auth/react'
 import ReactLoading from 'react-loading';
+import Head from 'next/head'
 
 // Data
 import Plugins from '@/util/assets/plugins.json'

@@ -3,6 +3,7 @@ import DefaultImg from '@/util/assets/default_art.png'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { getSession, useSession } from 'next-auth/react'
+import Head from 'next/head'
 
 import createArt from '@/stores/Art.store'
 import getModels from '@/stores/FetchModels.store'
@@ -184,13 +185,13 @@ const Art = observer(({session}) => {
     //#region HANDLER
     useEffect(() => {
         const item = localStorage.getItem('token')
-        if(item){
+        const userStorage = localStorage.getItem('user');
+        if(item && user){
             const artImage = localStorage.getItem('art-image')
             const artPrompt = localStorage.getItem('art-prompt')
             const artModel = localStorage.getItem('art-model')
-            const userStorage = localStorage.getItem('user');
             const user = JSON.parse(userStorage);
-            if(!user.premium && artModel && artImage && artPrompt){
+            if(user && !user.premium && artModel && artImage && artPrompt){
                 var adsScript = document.createElement('script');
                 adsScript.setAttribute('src','//ophoacit.com/1?z=5966193');
                 adsScript.setAttribute('async','async');
@@ -253,6 +254,9 @@ const Art = observer(({session}) => {
 
     return (
         <div className='max-w-screen-lg mx-auto border-x-2 overflow-y-scroll bg-white h-screen relative max-md:flex max-md:flex-col'>
+            <Head>
+                <title>Handana | AI Art Generator</title>
+            </Head>
             {/* Modal Authentication */}
             {!isAuthenticated && <ModalAuthentication setIsAuthenticated={setIsAuthenticated} />}
 

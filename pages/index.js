@@ -4,6 +4,9 @@ import Logo from "@/components/Logo";
 import Search from "@/components/Search";
 import Tagline from "@/components/Tagline";
 import {RxChatBubble, RxPencil2, RxImage, RxMagicWand} from 'react-icons/rx'
+import Head from "next/head";
+
+
 
 export default function Home() {
 
