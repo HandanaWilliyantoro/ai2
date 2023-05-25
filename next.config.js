@@ -50,8 +50,7 @@ const nextConfig = {
     ];
   },
   env: {
-    PAYPAL_CLIENT_ID: 'AfjYHfieOAq6OpQyGrtQFHqcVooUAIx1pnxdQSOZFtmKKEJUpr6woB-Wys1NzP5JhGWMLRhu9d4nJiad'
+    PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID
   }
 }
-
 module.exports = nextConfig
