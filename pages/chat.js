@@ -50,16 +50,18 @@ function getRequestMethod(inputString) {
     return null;
 }
 
-function getRequestBody(inputString) {
-    const bodyPattern = /BODY:\s(.*?)$/;
-    const match = bodyPattern.exec(inputString);
-  
-    if (match && match.length > 1) {
-      return match[1];
+async function getRequestBody(requestString) {
+    const startIndex = requestString.indexOf('{');
+    const endIndex = requestString.lastIndexOf('}') + 1;
+    const requestBodyString = requestString.substring(startIndex, endIndex);
+    
+    try {
+      return requestBodyString;
+    } catch (error) {
+      console.error('Invalid request body string.');
+      return null;
     }
-  
-    return null;
-  }
+}
 
 const chat = observer(({session}) => {
     const {status} = useSession()
@@ -255,11 +257,16 @@ const chat = observer(({session}) => {
     /* Handle plugin operations */
     const handleOperations = useCallback(async (res) => {
         try {
-            const url = getUrlValue(res);
-            const method = getRequestMethod(res);
-            const body = getRequestBody(res);
+
+            console.log(res, 'ini resnya ya')
+
+            const url = await getUrlValue(res);
+            const method = await getRequestMethod(res);
+            const body = await getRequestBody(res);
 
             let responseOperation;
+
+            // console.log(`URL: ${url}; METHOD: ${method}; BODY: ${body}`)
     
             if(url && method){
                 switch(method){
