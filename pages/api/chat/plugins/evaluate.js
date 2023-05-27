@@ -1,14 +1,20 @@
-import { ChatOpenAI } from "langchain/chat_models/openai";
-import { initializeAgentExecutorWithOptions } from "langchain/agents";
-import {
-  AIPluginTool,
-  RequestsGetTool,
-  RequestsPostTool
-} from "langchain/tools";
+async function removeQueryString(url) {
+    const urlObj = new URL(url);
+    const params = urlObj.searchParams;
+  
+    for (const [key, value] of params.entries()) {
+      if (value.startsWith("<")) {
+        params.delete(key);
+      }
+    }
+  
+    urlObj.search = params.toString();
+    return urlObj.toString();
+}
 
 export default async function handler (req, res) {
     try {
-        let {url} = req.query;
+        let url = await removeQueryString(req.url.split('url=')[1])
 
         const body = req.method == 'POST' ? req.body : undefined;
         const method = body?.method?.toUpperCase() ?? req.method;

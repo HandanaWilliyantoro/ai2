@@ -12,13 +12,15 @@ class PluginAnswerStore {
 
     async execute(params){
         postPluginAnswer.loading = true
+        const token = localStorage.getItem('token')
         fetch(`/api/chat/plugins`, {
             'method': "POST",
             'headers': {
-                'Content-Type': 'application/json',
+                'Content-Type': 'text/event-stream',
                 'Connection': 'keep-alive',
                 'Accept': '*/*',
-                'Accept-Encoding': 'gzip, deflate, br'
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Authorization': token
             },
             'body': JSON.stringify(params)
         }).then(res => {

@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 import { showErrorSnackbar, showSuccessSnackbar } from '@/util/toast'
 import { getSession, useSession } from 'next-auth/react'
 import ReactLoading from 'react-loading';
-import Head from 'next/head'
 
 // Data
 import Plugins from '@/util/assets/plugins.json'
@@ -26,6 +25,41 @@ import ModalAuthentication from '@/components/ModalAuthentication'
 import ModalUserPlugin from '@/components/ModalUserPlugin'
 import getPluginOperation from '@/stores/plugins/GetPluginOperation.store'
 import postPluginAnswer from '@/stores/plugins/PostPluginAnswer.store'
+
+function getUrlValue(inputString) {
+    const urlPattern = /URL:\s(.*?)\n/;
+    const match = urlPattern.exec(inputString);
+    
+    if (match && match.length > 1) {
+      const url = match[1];
+      const urlObject = new URL(url);
+      return urlObject.href;
+    }
+    
+    return null;
+}
+
+function getRequestMethod(inputString) {
+    const methodPattern = /METHOD:\s(.*?)\n/;
+    const match = methodPattern.exec(inputString);
+  
+    if (match && match.length > 1) {
+      return match[1];
+    }
+  
+    return null;
+}
+
+function getRequestBody(inputString) {
+    const bodyPattern = /BODY:\s(.*?)$/;
+    const match = bodyPattern.exec(inputString);
+  
+    if (match && match.length > 1) {
+      return match[1];
+    }
+  
+    return null;
+  }
 
 const chat = observer(({session}) => {
     const {status} = useSession()
@@ -136,7 +170,7 @@ const chat = observer(({session}) => {
     ])
     const [plugins, setPlugins] = useState(Plugins.map(a => ({...a, selected: false})))
     const [answer, setAnswer] = useState('');
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [isModalPersonaOpened, setIsModalPersonaOpened] = useState(false)
     const [isModalActionOpened, setIsModalActionOpened] = useState(false)
@@ -145,6 +179,7 @@ const chat = observer(({session}) => {
     const [isAuthenticated, setIsAuthenticated] = useState(status === 'authenticated' ? true : undefined)
     const [pluginIntents, setPluginIntents] = useState()
     const [isPluginChatLoading, setIsPluginChatLoading] = useState(false)
+    const [pluginPath, setPluginPath] = useState("")
 
     const divRef = useRef(null);
     const router = useRouter();
@@ -162,8 +197,6 @@ const chat = observer(({session}) => {
         setIsPluginChatLoading(true);
         const actions = await selectedPlugins.map(p => `${p.manifest.name_for_model}: "${p.manifest.description_for_model}"`);
         const userQuery = `
-        You are an assistant bot designed to deduce the intent of a given text. Treat the provided objective as your goal and adhere to the instructions.
-
         User query: "${query}"
         Your objective: As an assistant bot is to help the machine comprehend human intentions based on user input and available tools.
         Your goal is to identify the best action to directly address the user's inquiry. 
@@ -189,7 +222,7 @@ const chat = observer(({session}) => {
         if(intents[0].action != 'N/A'){
             const chosenPlugin = Plugins.find(a => a.manifest.name_for_model === intents[0].action)
 
-            const data = await fetch(`/api/chat/plugins/evaluate?url=${chosenPlugin.manifest.api.url}`, {method: 'GET', headers: {
+            const data = await fetch(chosenPlugin.manifest.api.url, {method: 'GET', headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json',
                 'Connection': 'keep-alive',
@@ -200,20 +233,17 @@ const chat = observer(({session}) => {
             const openApiDefinition = await data.text()
 
             const userQuery = `
-            You are an assistant bot designed to extract and generate suitable actions based on the given text and chat history. Treat the provided objective as your goal and adhere to the instructions. To assist you in connecting to the internet, we have included excerpts from the web, which you can utilize to respond to user inquiries.
-
-            User query: \n"${input}".
-            Plugin description: \n"${chosenPlugin.manifest.description_for_model}".
-            Usage thought: \n"${intents[0].thought}".
-            OpenAPI definition: \n"${openApiDefinition}".
-            Your objective: As an assistant bot, your purpose is to help the machine comprehend human intentions based on user input and the available open-API definition file. Respond only with the URL, method, and parameters that best align with the user's query. Ensure that any placeholders are replaced with relevant data according to the given query, thought, and context. The outputted thought should be highly specific and explicit to best match the user's expectations. If there is only one endpoint available, select it.
+            User query: \n"${input}". 
+            Plugin description: \n"${chosenPlugin.manifest.description_for_model}". 
+            Usage thought: \n"${intents[0].thought}". 
+            OpenAPI definition: \n"${openApiDefinition}". 
+			Your objective: As an assistant bot, your purpose is to help the machine comprehend human intentions based on user input and the available open-API definition file. Respond only with the URL, method, and parameters that best align with the user's query. Ensure that any placeholders are replaced with relevant data according to the given query, thought, and context. The outputted thought should be highly specific and explicit to best match the user's expectations. If there is only one endpoint available, select it. Make sure to incorporate the plugin settings into the output.
             
             Output exactly with this format, avoid any other text as this will be parsed by a machine: 
-            URL: <url + parameters, respecting plugin settings>
-            METHOD: <method (GET/POST/etc)>
-            BODY: <body in case of POST>
-            [END]`
-
+			URL: <url + parameters, respecting plugin settings>
+			METHOD: <method (GET/POST/etc)>
+			BODY: <body in case of POST>
+			[END]`
             getPluginOperation.execute({query: userQuery})
         } else {
             postPluginAnswer.execute({query: input, history})
@@ -225,10 +255,9 @@ const chat = observer(({session}) => {
     /* Handle plugin operations */
     const handleOperations = useCallback(async (res) => {
         try {
-            const lines = res.split(/\n+/);
-            const url = lines[0].split(/\s*URL\s*:\s*/)?.[1];
-            const method = lines[1]?.split(/\s*METHOD\s*:\s*/)?.[1];
-            const body = lines[2]?.split(/\s*BODY\s*:\s*/)?.[1];
+            const url = getUrlValue(res);
+            const method = getRequestMethod(res);
+            const body = getRequestBody(res);
 
             let responseOperation;
     
@@ -256,13 +285,10 @@ const chat = observer(({session}) => {
 
             const response = await responseOperation.json();
 
-            const userQuery = `
-                User query: \n"${input}".
-                Thoughts: \n"${pluginIntents.map(x => x.thought).join('.')}."
-                Context from the web: \n"${response ? JSON.stringify(response) : ''}".
-            `
+            const userQuery = `User query: \n"${input}". Thoughts: \n"${pluginIntents.map(x => x.thought).join('.')}." Context from the web: \n"${response ? JSON.stringify(response) : ''}".`
 
-            postPluginAnswer.execute({query: userQuery, history})
+            postPluginAnswer.execute({query: userQuery, history});
+
             setIsPluginChatLoading(false)
             setIsLoading(false)
         } catch(e) {
@@ -271,7 +297,7 @@ const chat = observer(({session}) => {
             setIsPluginChatLoading(false)
             setIsLoading(false)
         }
-    }, [input, history, pluginIntents, answer]);
+    }, [input, history, pluginIntents, answer, pluginPath]);
 
     /* Watcher plugin chat feature */
     useEffect(() => {
@@ -372,17 +398,27 @@ const chat = observer(({session}) => {
     /* Watcher Text */
     useEffect(() => {
         if(postChat.response){
-            const parsedHistory = JSON.parse(JSON.stringify(history))
-            setHistory([...parsedHistory, {role: 'assistant', content: postChat.response.data}])
+            const response = JSON.parse(JSON.stringify(answer))
+            setAnswer(`${response + postChat.response}`)
             setInput('')
-            setIsLoading(false)
             postChat.reset()
         } else if (postChat.error) {
             showErrorSnackbar('Our chat feature is currently down, please come back later')
-            setIsLoading(false)
             postChat.reset();
         }
     }, [postChat.response, postChat.error, postChat.reset])
+
+    /* Watcher Finish */
+    useEffect(() => {
+        if(postChat.finished){
+            const parsedHistory = JSON.parse(JSON.stringify(history))
+            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
+            setIsLoading(false)
+            setAnswer('')
+            setInput('')
+            postChat.reset()
+        }
+    }, [postChat.finished])
     //#endregion
 
     //#region HANDLER
@@ -484,7 +520,7 @@ const chat = observer(({session}) => {
                             ) : (
                                 <div>
                                     {plugins && plugins.find(a => a.selected)?.name ? <p className='text-xs py-2 px-3 rounded bg-green-200 text-green-500 font-sans font-bold w-[fit-content] mb-2'>Plugin: {plugins.find(a => a.selected).name}</p> : undefined}
-                                    <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content}} />
+                                    <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: a.content.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
                                 </div>
                             )}
                             <div className='flex flex-row items-center justify-start mt-4'>
@@ -496,13 +532,13 @@ const chat = observer(({session}) => {
                 })}
                 {answer && !isPluginChatLoading && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full'>
-                            <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer}} />
+                            <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />
                     </div>
                 )}
                 {isPluginChatLoading && (
                     <div className='text-left text-sm p-4 bg-gray-100 whitespace-pre-line w-full relative'>
                         {plugins && plugins.find(a => a.selected)?.name ? <p className='text-xs flex flex-row items-center justify-center py-2 px-3 rounded bg-green-200 text-green-500 font-sans font-bold w-[fit-content] mb-4'>Plugin: {plugins.find(a => a.selected).name} <ReactLoading className='ml-2 flex items-center' type='spin' color={'#939393'} height={'auto'} width={15} /></p> : undefined}
-                        {answer && <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer}} />}
+                        {answer && <div className='font-serif text-black' dangerouslySetInnerHTML={{__html: answer.replace(/\n?```([\s\S]*?)```/g, "\n<pre><code>$1</code></pre>")}} />}
                         <ChatSkeleton />
                     </div>
                 )}

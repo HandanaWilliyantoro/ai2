@@ -16,25 +16,40 @@ class ChatStore {
         fetch(`/api/chat`, {
             'method': "POST",
             'headers': {
-                'Content-Type': 'application/json',
+                'Content-Type': 'text/event-stream',
                 'Connection': 'keep-alive',
                 'Accept': '*/*',
                 'Accept-Encoding': 'gzip, deflate, br',
                 'Authorization': token
             },
             'body': JSON.stringify(params)
-        }).then(res => res.json())
-        .then(response => {
-            if(response.data){
-                postChat.success({data: response.data, conversationId: response.conversationId})
-            } else {
-                postChat.failed(response.text)
-            }
+        }).then(res => {
+            const reader = res.body.getReader();
+
+            const read = () => {
+            // read the data
+            reader.read().then(async ({ done, value }) => {
+                const decoder = new TextDecoder();
+                if (done) {
+                    postChat.finished = true;
+                    return;
+                }
+                if(decoder.decode(value) === 'initiate | stop'){
+                    console.log('initiate | stop')
+                    return;
+                } else {
+                    const decoded = decoder.decode(value);
+                    postChat.success(decoded)
+                }
+                read();
+            });
+            };
+            read();
         })
         .catch(e => postChat.failed(e))
     }
 
-    success(data){
+    success(data, premium){
         postChat.response = data
         postChat.error = undefined
         postChat.loading = false
@@ -55,4 +70,5 @@ class ChatStore {
 }
 
 const postChat = new ChatStore()
+
 export default postChat

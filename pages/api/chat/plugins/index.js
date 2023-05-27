@@ -1,20 +1,11 @@
-import { NextResponse } from "next/server";
-import { ChatOpenAI } from "langchain/chat_models/openai";
-import { LLMChain } from "langchain/chains";
-import { CallbackManager } from "langchain/callbacks";
-import {
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
-} from "langchain/prompts";
+import { OpenAIStream } from "../../../../util/stream";
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error("Missing env var from OpenAI");
+}
 
 export const config = {
-    api: {
-      bodyParser: false,
-    },
-    runtime: "edge",
+  runtime: "edge",
 };
 
 const createPersona = (persona, input) => {
@@ -101,90 +92,48 @@ const createPersona = (persona, input) => {
     }
 }
 
-export default async function handler(req, res) {
-    const body = await req.json()
+const handler = async (req) => {
+    const { history, query } = (await req.json());
 
-    try {
-        if (!OPENAI_API_KEY) {
-            throw new Error("OPENAI_API_KEY is not defined.");
+    let messages = history.map((a, i) => {
+        if(i === history.length - 1) {
+            if(a.content.input) {
+                const contentIncludePersona = createPersona(a.content.persona, query)
+                return {role: a.role, content: contentIncludePersona}
+            } else {
+                return {role: a.role, content: query}
+            }
+        } else {
+            if(a.content.input) {
+                const contentIncludePersona = createPersona(a.content.persona, a.content.input)
+                return {role: a.role, content: contentIncludePersona}
+            } else {
+                return {role: a.role, content: a.content}
+            }
         }
+    })
 
-        let query = body.query
-        if(body.query && body.persona){
-            query = await createPersona(body.persona, body.query)
-        }
-
-        const encoder = new TextEncoder();
-        const stream = new TransformStream();
-        const writer = stream.writable.getWriter();
-
-        const llm = new ChatOpenAI({
-            openAIApiKey: OPENAI_API_KEY,
-            temperature: 0.9,
-            streaming: true,
-            modelName: "gpt-3.5-turbo",
-            temperature: 0.7,
-            topP: 1,
-            frequencyPenalty: 0,
-            presencePenalty: 0,
-            maxTokens: 750,
-            streaming: true,
-            callbackManager: CallbackManager.fromHandlers({
-                handleLLMNewToken: async (token) => {
-                    await writer.ready;
-                    await writer.write(encoder.encode(`${token}`));
-                },
-                handleLLMEnd: async () => {
-                    await writer.ready;
-                    await writer.close();
-                },
-                handleLLMError: async (e) => {
-                    await writer.ready;
-                    await writer.abort(e);
-                },
-            }),
-        });
-
-        if(body.history && body.history.length > 1){
-            body.history.pop()
-        }
-
-        const chatPrompt = ChatPromptTemplate.fromPromptMessages([
-            SystemMessagePromptTemplate.fromTemplate(
-                `You are a helpful assistant named Handana AI that accurately answers the user's queries based on the previous conversation.
-
-                PREVIOUS CONVERSATION:
-                ${body.history && body.history.length >= 3 ? body.history.map(a => a.role === 'user' ? `USER: ${a.content.input ? a.content.input : a.content}\n` : `ASSISTANT: ${a.content}\n`).toString() : `USER: ${body.history[0].content.input}`}
-                `
-            ),
-            HumanMessagePromptTemplate.fromTemplate("{input}"),
-        ]);
-
-        const chain = new LLMChain({
-            prompt: chatPrompt,
-            llm: llm,
-        });
-
-        chain
-            .call({input: query})
-            .catch(console.error);
-
-        return new NextResponse(stream.readable, {
-            headers: {
-                "Content-Type": "text/event-stream",
-                "Cache-Control": "no-cache",
-            },
-        });
-    } catch (error) {
-        console.log(error)
-        return new Response(
-            JSON.stringify(
-                { error: error.message },
-                {
-                    status: 500,
-                    headers: { "Content-Type": "application/json" },
-                }
-            )
-        );
+    if (!history) {
+        return new Response("No prompt in the request", { status: 400 });
     }
-}
+
+    const payload = {
+        model: "gpt-3.5-turbo",
+        messages: [
+        {role: "system", content: `You are an assistant bot named Handana AI, you are designed to extract and generate suitable actions based on the given text. Treat the provided objective as your goal and adhere to the instructions. To assist you in connecting to the internet, we have included excerpts from the web, which you can utilize to respond to user inquiries.`},
+        ...messages
+        ],
+        temperature: 0.9,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        max_tokens: 2000,
+        stream: true,
+        n: 1,
+    };
+
+    const stream = await OpenAIStream(payload);
+    return new Response(stream);
+};
+
+export default handler;

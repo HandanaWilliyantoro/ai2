@@ -1,3 +1,12 @@
+import { OpenAIStream } from "../../../util/stream";
+
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error("Missing env var from OpenAI");
+}
+
+export const config = {
+  runtime: "edge",
+};
 
 const createPersona = (persona, input) => {
     switch(persona){
@@ -83,35 +92,39 @@ const createPersona = (persona, input) => {
     }
 }
 
-export default async function handler(req, res) {
-    try {
-    const {history, query, persona} = await req.body;
+const handler = async (req) => {
+  const { history } = (await req.json())
 
-    let q = query;
-
-    if(query && persona){
-        q = await createPersona(persona, query)
-    }
-
-    const data = await fetch(`https://chatgpt-ai-chat-bot.p.rapidapi.com/ask`, {
-        method: 'POST',
-        headers: {
-            'X-RapidAPI-Key': process.env.RAPID_API_KEY,
-            'X-RapidAPI-Host': 'chatgpt-ai-chat-bot.p.rapidapi.com',
-            'content-type': 'application/json',
-        },
-        body: JSON.stringify({query: `You are a helpful assistant named Handana AI that accurately answers the user's question based on the previous conversationz. QUESTION: ${q}? PREVIOUS CONVERSATION: ${history && history.length >= 3 ? history.map(a => a.role === 'user' ? `USER: ${a.content.input ? a.content.input.replace(/\{/g, '[').replace(/}/g, ']') : a.content}\n` : `ASSISTANT: ${a.content.replace(/\{/g, '[').replace(/}/g, ']Z')}\n`).toString() : `USER: ${history[0].content.input}`}`, wordLimit: 4096})
-    })
-    const completion = await data.json();
-
-    if(completion && completion.response){
-        res.status(200).json({text: 'fetch chat operation success', code: 200, data: completion.response, conversationId: completion.conversationId})
+  const messages = history.map(a => {
+    if(a.content.input) {
+        const contentIncludePersona = createPersona(a.content.persona, a.content.input)
+        return {role: a.role, content: contentIncludePersona}
     } else {
-        res.status(404).json({text: 'failed to fetch chat operation', code: 404})
+        return {role: a.role, content: a.content}
     }
+})
 
-    } catch(e) {
-        console.log(e)
-        res.status(500).json({text: 'Internal server error', code: 500, error: e.message})
-    }
-}
+  if (!history) {
+    return new Response("No prompt in the request", { status: 400 });
+  }
+
+  const payload = {
+    model: "gpt-3.5-turbo",
+    messages: [
+      {role: "system", content: `You are a helpful assistant named Handana AI that accurately answers the user's queries based on the given text. answer based on given query language`},
+      ...messages
+    ],
+    temperature: 0.9,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+    max_tokens: 1000,
+    stream: true,
+    n: 1,
+  };
+
+  const stream = await OpenAIStream(payload);
+  return new Response(stream);
+};
+
+export default handler;
