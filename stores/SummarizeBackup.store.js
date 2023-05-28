@@ -35,7 +35,6 @@ class SummarizerBackupStore {
                     return;
                 }
                 if(decoder.decode(value) === 'initiate | stop'){
-                    console.log('initiate | stop')
                 } else {
                     const decoded = decoder.decode(value);
                     summarizerBackup.success(decoded)

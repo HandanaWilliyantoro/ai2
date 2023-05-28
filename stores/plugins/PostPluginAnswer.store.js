@@ -35,7 +35,6 @@ class PluginAnswerStore {
                     return;
                 }
                 if(decoder.decode(value) === 'initiate | stop'){
-                    console.log('initiate | stop')
                     return;
                 } else {
                     const decoded = decoder.decode(value);

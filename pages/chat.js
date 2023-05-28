@@ -26,7 +26,7 @@ import ModalUserPlugin from '@/components/ModalUserPlugin'
 import getPluginOperation from '@/stores/plugins/GetPluginOperation.store'
 import postPluginAnswer from '@/stores/plugins/PostPluginAnswer.store'
 
-function getUrlValue(inputString) {
+async function getUrlValue(inputString) {
     const urlPattern = /URL:\s(.*?)\n/;
     const match = urlPattern.exec(inputString);
     
@@ -39,7 +39,7 @@ function getUrlValue(inputString) {
     return null;
 }
 
-function getRequestMethod(inputString) {
+async function getRequestMethod(inputString) {
     const methodPattern = /METHOD:\s(.*?)\n/;
     const match = methodPattern.exec(inputString);
   
@@ -257,8 +257,6 @@ const chat = observer(({session}) => {
     /* Handle plugin operations */
     const handleOperations = useCallback(async (res) => {
         try {
-
-            console.log(res, 'ini resnya ya')
 
             const url = await getUrlValue(res);
             const method = await getRequestMethod(res);
