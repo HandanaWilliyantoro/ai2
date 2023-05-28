@@ -9,9 +9,9 @@ const ThankYou = observer(({channel}) => {
     const renderBody = useCallback(() => {
         if(channel === 'subscription'){
             return (
-                <div className="flex items-center justify-center h-screen">
+                <div className="flex items-center justify-center h-screen bg-gray-100">
                     <div className="bg-grey border border-gray max-w-md p-8 rounded-lg shadow-xl">
-                        <h2 className="text-2xl font-bold mb-4">Thank You!</h2>
+                        <h2 className="text-2xl font-bold mb-4 text-black">Thank You!</h2>
                         <p className="text-gray-700 mb-4">
                             We appreciate your support. Your subscription has been successfully
                             processed.
@@ -30,9 +30,9 @@ const ThankYou = observer(({channel}) => {
             )
         } else if (channel === 'transaction'){
             return (
-                <div className="flex items-center justify-center h-screen">
+                <div className="flex items-center justify-center h-screen bg-gray-100">
                     <div className="bg-white max-w-md p-8 rounded-lg shadow-md">
-                        <h2 className="text-2xl font-bold mb-4">Thank You for Your Transaction!</h2>
+                        <h2 className="text-2xl font-bold mb-4 text-black">Thank You!</h2>
                         <p className="text-gray-700 mb-6">
                             Your payment has been successfully processed. We appreciate your business and hope you enjoy your purchase.
                         </p>
