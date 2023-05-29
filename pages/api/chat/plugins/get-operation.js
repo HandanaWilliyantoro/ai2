@@ -2,19 +2,33 @@ export default async function handler(req, res) {
     try {
         const {query} = req.body;
 
-        const data = await fetch(`https://chatgpt-ai-chat-bot.p.rapidapi.com/ask`, {
+        const payload = {
+            model: "gpt-3.5-turbo",
+            messages: [
+            {role: "system", content: `You are an assistant bot named Handana AI, you are designed to extract and generate suitable actions based on the given text. Treat the provided objective as your goal and adhere to the instructions. To assist you in connecting to the internet, we have included excerpts from the web, which you can utilize to respond to user inquiries.`},
+            {role: 'user', content: query}
+            ],
+            temperature: 0.9,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            max_tokens: 1000,
+            n: 1,
+        };
+
+        const data = await fetch(`https://api.openai.com/v1/chat/completions`, {
             method: 'POST',
             headers: {
-                'X-RapidAPI-Key': process.env.RAPID_API_KEY,
-                'X-RapidAPI-Host': 'chatgpt-ai-chat-bot.p.rapidapi.com',
+                Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
                 'content-type': 'application/json',
             },
-            body: JSON.stringify({query, wordLimit: 4096})
+            body: JSON.stringify(payload)
         })
+
         const completion = await data.json();
 
-        if(completion && completion.response){
-            res.status(200).json({text: 'fetch plugin operation success', code: 200, data: completion.response})
+        if(completion && completion.choices[0] && completion.choices[0].message && completion.choices[0].message.content){
+            res.status(200).json({text: 'fetch plugin operation success', code: 200, data: completion.choices[0].message.content})
         } else {
             res.status(404).json({text: 'failed to fetch plugin operation', code: 404})
         }

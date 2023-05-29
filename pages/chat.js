@@ -321,9 +321,8 @@ const chat = observer(({session}) => {
     /* Watcher if plugin has finished */
     useEffect(() => {
         if(postPluginAnswer.finished){
-            const parsedHistory = JSON.parse(JSON.stringify(history))
             setIsPluginChatLoading(false)
-            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
+            setHistory([...history, {role: 'assistant', content: answer}])
             setAnswer('')
             setInput('')
             postPluginAnswer.reset()
@@ -387,8 +386,7 @@ const chat = observer(({session}) => {
     /* Watcher Image */
     useEffect(() => {
         if(createArt.response){
-            const parsedHistory = JSON.parse(JSON.stringify(history))
-            setHistory([...parsedHistory, {role: 'assistant', content: createArt.response}])
+            setHistory([...history, {role: 'assistant', content: createArt.response}])
             setInput('')
             setIsLoading(false)
             createArt.reset()
@@ -403,21 +401,19 @@ const chat = observer(({session}) => {
     /* Watcher Text */
     useEffect(() => {
         if(postChat.response){
-            const response = JSON.parse(JSON.stringify(answer))
-            setAnswer(`${response + postChat.response}`)
+            setAnswer(`${answer + postChat.response}`)
             setInput('')
             postChat.reset()
         } else if (postChat.error) {
             showErrorSnackbar('Our chat feature is currently down, please come back later')
             postChat.reset();
         }
-    }, [postChat.response, postChat.error, postChat.reset])
+    }, [postChat.response, postChat.error, postChat.reset, answer])
 
     /* Watcher Finish */
     useEffect(() => {
         if(postChat.finished){
-            const parsedHistory = JSON.parse(JSON.stringify(history))
-            setHistory([...parsedHistory, {role: 'assistant', content: answer}])
+            setHistory([...history, {role: 'assistant', content: answer}])
             setIsLoading(false)
             setAnswer('')
             setInput('')
@@ -463,15 +459,14 @@ const chat = observer(({session}) => {
                 return
             };
 
-            const parsedHistory = JSON.parse(JSON.stringify(history))
             const selectedPersona = persona?.find(a => a.selected)?.title ?? undefined
-            if(parsedHistory.length > 1){
-                setHistory([...parsedHistory, {role: 'user', content: input}])
-                const params = [...parsedHistory, {role: 'user', content: input}]
+            if(history.length > 1){
+                setHistory([...history, {role: 'user', content: input}])
+                const params = [...history, {role: 'user', content: input}]
                 handleFetchAnswer(params)
             } else {
                 setHistory([{role: 'user', content: {input, persona: selectedPersona}}])
-                const params = [...parsedHistory, {role: 'user', content: {input, persona: selectedPersona}}]
+                const params = [...history, {role: 'user', content: {input, persona: selectedPersona}}]
                 handleFetchAnswer(params)
             }
         }
@@ -491,15 +486,14 @@ const chat = observer(({session}) => {
         };
 
         const selectedPersona = persona.find(a => a.selected).title
-        const parsedHistory = JSON.parse(JSON.stringify(history))
         scrollToBottom()
-        if(parsedHistory.length > 0){
-            setHistory([...parsedHistory, {role: 'user', content: input}])
-            const params = [...parsedHistory, {role: 'user', content: input}]
+        if(history.length > 0){
+            setHistory([...history, {role: 'user', content: input}])
+            const params = [...history, {role: 'user', content: input}]
             handleFetchAnswer(params)
         } else {
-            setHistory([...parsedHistory, {role: 'user', content: {input, persona: selectedPersona}}])
-            const params = [...parsedHistory, {role: 'user', content: {input, persona: selectedPersona}}]
+            setHistory([...history, {role: 'user', content: {input, persona: selectedPersona}}])
+            const params = [...history, {role: 'user', content: {input, persona: selectedPersona}}]
             handleFetchAnswer(params)
         }
     }, [input, history, persona, isAuthenticated]);
