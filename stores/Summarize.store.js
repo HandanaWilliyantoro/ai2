@@ -1,7 +1,7 @@
 import {makeAutoObservable} from "mobx"
 import getProfile from "./Profile.store";
 
-class SummarizerStore {
+class SummarizerBackupStore {
     response = "";
     error = undefined;
     loading = false;
@@ -12,7 +12,7 @@ class SummarizerStore {
     }
 
     async execute(params){
-        summarizer.loading = true
+        summarizerBackup.loading = true
         fetch(`/api/tldr`, {
             'method': "POST",
             'headers': {
@@ -22,39 +22,52 @@ class SummarizerStore {
                 'Accept-Encoding': 'gzip, deflate, br'
             },
             'body': JSON.stringify(params)
+        }).then(res => {
+            const reader = res.body.getReader();
+
+            const read = () => {
+            // read the data
+            reader.read().then(async ({ done, value }) => {
+                const decoder = new TextDecoder();
+
+                if (done) {
+                    summarizerBackup.finished = true;
+                    return;
+                }
+                if(decoder.decode(value) === 'initiate | stop'){
+                } else {
+                    const decoded = decoder.decode(value);
+                    summarizerBackup.success(decoded)
+                }
+                read();
+            });
+            };
+            read();
         })
-        .then(res => res.json())
-        .then(response => {
-            if(response.data){
-                summarizer.success(response.data)
-            } else {
-                summarizer.failed(response.text)
-            }
-        })
-        .catch(e => summarizer.failed(e))
+        .catch(e => summarizerBackup.failed(e))
     }
 
     success(data, premium){
         getProfile.premium = premium;
-        summarizer.response = data
-        summarizer.error = undefined
-        summarizer.loading = false
+        summarizerBackup.response = data
+        summarizerBackup.error = undefined
+        summarizerBackup.loading = false
     }
 
     failed(data){
-        summarizer.error = data;
-        summarizer.loading = false;
-        summarizer.response = "";
+        summarizerBackup.error = data;
+        summarizerBackup.loading = false;
+        summarizerBackup.response = "";
     }
 
     reset() {
-        summarizer.response = "";
-        summarizer.loading = false;
-        summarizer.error = undefined
-        summarizer.finished = false;
+        summarizerBackup.response = "";
+        summarizerBackup.loading = false;
+        summarizerBackup.error = undefined
+        summarizerBackup.finished = false;
     }
 }
 
-const summarizer = new SummarizerStore()
+const summarizerBackup = new SummarizerBackupStore()
 
-export default summarizer
+export default summarizerBackup

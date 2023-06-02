@@ -1,37 +1,36 @@
+import { OpenAIStream } from "@/util/stream";
+
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("Missing env var from OpenAI");
 }
 
-const handler = async (req, res) => {
-  const { q, summaryContent } = req.body
+export const config = {
+  runtime: "edge",
+};
+
+const handler = async (req) => {
+  const { q, summaryContent } = (await req.json())
 
   if (!q) {
     return new Response("No prompt in the request", { status: 400 });
   }
 
-  const query = `Provide a 5-10 sentence rephrased answer to the query based on the sources without citing the sources. \n###\nSOURCES\n\n${summaryContent.toString()}\n###\nQUERY\n${q}\n###\nANSWER`
+  const payload = {
+    model: "gpt-3.5-turbo",
+    messages: [
+      {role: "system", content: `You are a helpful assistant named Handana AI that accurately answers the user's queries based on the given SOURCE.`},
+      {role: "user", content: `Provide a long summary based on the given sources if the source is relevant to the asked question and do not cite the sources. \nSOURCES:\n${summaryContent.toString()} \n\n QUESTION: ${q}`}
+    ],
+    temperature: 0.9,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+    max_tokens: 500,
+    stream: true,
+    n: 1,
+  };
 
-  try {
-    const data = await fetch(`https://chatgpt-ai-chat-bot.p.rapidapi.com/ask`, {
-      method: 'POST',
-      headers: {
-        'X-RapidAPI-Key': process.env.RAPID_API_KEY,
-        'X-RapidAPI-Host': 'chatgpt-ai-chat-bot.p.rapidapi.com',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({query, wordLimit: 4096})
-    })
-
-    const response = await data.json()
-    if(response && response.response){
-      res.status(200).json({ code: 200, text: 'fetch summary successful', data: response.response.replace(/\n/g,'\n\n')})
-    } else {
-      res.status(404).json({text: 'failed to fetch summary', code: 404})
-    }
-  } catch(e) {
-    console.log(e)
-    res.status(500).json({text: 'internal server error', code: 500, error: e})
-  }
+  const stream = await OpenAIStream(payload);
+  return new Response(stream);
 };
 
 export default handler;

@@ -60,7 +60,7 @@ const search = observer(() => {
     /* Watcher */
     useEffect(() => {
         if(summarizerBackup.response){
-            handleSummary(summarizerBackup.response)
+            setSummary(summarizerBackup.response)
             summarizerBackup.reset()
         } else if (summarizerBackup.error) {
             showErrorSnackbar(summarizerBackup.error)
@@ -82,7 +82,7 @@ const search = observer(() => {
     /* Watcher */
     useEffect(() => {
         if(summarizer.response){
-            setSummary(summarizer.response)
+            handleSummary(summarizer.response)
             summarizer.reset()
         } else if (summarizer.error) {
             handleFetchSummarizerBackup()
