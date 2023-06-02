@@ -45,22 +45,31 @@ export default async function handler (req, res) {
     try {
         const prompt = await promptGenerator(req.body)
 
-        const options = {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-                'X-RapidAPI-Key': '4eb68c2ad1msh2c6664f78ca391ep11b4bajsnfb0317b70d3f',
-                'X-RapidAPI-Host': 'chatgpt-ai-chat-bot.p.rapidapi.com'
-            },
-            body: JSON.stringify({query: prompt, wordLimit: 4096})
+        const payload = {
+            model: "gpt-3.5-turbo",
+            messages: [
+              {role: "system", content: `You are a helpful assistant named Handana AI that accurately answers the user's queries based on the given SOURCE.`},
+              {role: "user", content: prompt}
+            ],
+            temperature: 0.9,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            max_tokens: 500,
         };
 
-        let data = await fetch('https://chatgpt-ai-chat-bot.p.rapidapi.com/ask', options)
+        const completion = await fetch("https://api.openai.com/v1/chat/completions", {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
+            },
+            method: "POST",
+            body: JSON.stringify(payload),
+        });
 
-        data = await data.json();
+        const data = await completion.json();
 
-        if(data && data.response){
-            res.status(200).json({text: 'Fetch successfull', code: 200, data: data.response})
+        if(data && data.choices.length > 0 && data.choices[0].message.content){
+            res.status(200).json({text: 'Fetch successfull', code: 200, data: data.choices[0].message.content})
         } else {
             res.status(404).json({text: 'Failed to fetch response', code: 404})
         }

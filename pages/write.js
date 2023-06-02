@@ -133,7 +133,7 @@ const Write = observer(() => {
                         </div>
                         <div className='flex-[0.5] border h-full border-l-1 overflow-y-scroll'>
                             {answer ? (
-                                <p className={'font-sans text-black text-xs whitespace-pre-line p-4'}>{answer.replace(/\n/g,'\n\n')}</p>
+                                <p className={'font-sans text-black text-xs whitespace-pre-line p-4'}>{answer}</p>
                             ) : (
                                 <Loading text={postWrite.loading ? 'Generating Answer' : 'Answer will be displayed here'} />
                             )}
