@@ -364,7 +364,7 @@ const chat = observer(({session}) => {
         const contentChecker = params && params.length > 1 ? params[params.length - 1].content :  params[params.length - 1].content.input
         if(contentChecker && contentChecker.includes(' ') && contentChecker.split(' ')[0] === '!image'){
             const processedPrompt = contentChecker.replace('!image ', '')
-            createArt.execute({prompt: processedPrompt ?? 'dummy'})
+            createArt.execute({prompt: processedPrompt ?? 'dummy', src: 'chat'})
         } else {
             const selectedPlugins = plugins.filter(a => a.selected);
             if(selectedPlugins && selectedPlugins.length > 0){

@@ -9,7 +9,11 @@ async function encodeBufferAsBase64(buffer) {
 
 export default async function handler (req, res) {
     try {
-        const {prompt, model} = req.body
+        const {prompt, model, src} = req.body
+
+        if(!src){
+            throw new Error('You are not authorized to do this!')
+        }
 
         const encodedParams = new URLSearchParams();
         encodedParams.append("prompt", prompt);
@@ -44,9 +48,8 @@ export default async function handler (req, res) {
     } catch(e) {
         console.log(e)
         res.status(500).json({
-            text: 'internal server error',
+            text: e.message,
             code: 500,
-            data: e.message
         })
     }
 }
