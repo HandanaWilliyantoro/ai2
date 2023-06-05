@@ -100,13 +100,12 @@ const Search = observer(() => {
                     <input checked={commercial} onClick={checkCommercial} className="rounded-full text-white cursor-pointer" name='commercial-use' type={'checkbox'} />
                     <label for='commercial-use' className="ml-1 font-serif text-xs text-black">Royalty Free</label>
                 </div>
-                <button onClick={() => router.push('/art')} className='p-2 text-white border bg-black font-serif text-xs rounded transition hover:bg-white hover:border-black hover:text-black'>Generate AI Art</button>
             </div>
             {images.length > 0 && !findImage.loading ? (
                 <div className='w-full flex flex-row flex-wrap items-start pb-4'>
                     {images.map(a => (
                         <div onClick={() => window.open(a.source_url, '_blank')} className='flex flex-col p-2 m-auto my-4 cursor-pointer transition hover:opacity-50 max-md:max-w-[45%]'>
-                            <img className='w-[250px] h-[320px] object-cover rounded object-center max-md:w-[150px] max-md:h-[150px]' src={a.thumbnail_url} alt={a.title} key={a.id} />
+                            <img className='w-[275px] h-[300px] object-cover rounded object-center max-md:w-[150px] max-md:h-[150px]' src={a.thumbnail_url} alt={a.title} key={a.id} />
                             <p className="font-sans text-black font-bold text-xs truncate w-56 my-1 mt-2 max-md:max-w-full max-md:max-h-xs">{a.source}</p>
                             <p className="truncate text-xs w-56 text-black max-md:max-w-full max-md:max-h-xs">{a.title}</p>
                         </div>
