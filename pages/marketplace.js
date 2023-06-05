@@ -73,6 +73,11 @@ const Profile = observer(({session}) => {
           localStorage.setItem('token', session)
       }
   }, [data, isAuthenticated])
+
+  /* Component Did Mount */
+  useEffect(() => {
+    handleFetchContent(market_category_menus[0].label)
+  }, []);
   //#endregion
 
   const render = useCallback(() => {
