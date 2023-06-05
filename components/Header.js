@@ -1,19 +1,21 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 import { useRouter } from 'next/router'
 import { IoMdLogOut } from 'react-icons/io'
 import {menus} from '@/util/menus'
 import { signOut } from 'next-auth/react'
-import { RxMagnifyingGlass, RxUpdate } from 'react-icons/rx'
+import { RxMagnifyingGlass } from 'react-icons/rx'
+import { useSession } from 'next-auth/react'
 
 import Logo from './Logo'
 
 const Header = ({onSubmitHandler, value, setValue, onSubmitHandlerKeyDown}) => {
 
-    const router = useRouter()
+    const router = useRouter();
+    const {data} = useSession();
 
     const logout = useCallback(async () => {
         await signOut()
-        await localStorage.clear()
+        localStorage.clear()
         window.location.reload()
     }, [signOut]);
 

@@ -1,5 +1,6 @@
-import {RxMagnifyingGlass, RxChatBubble, RxPencil2, RxImage, RxMagicWand} from 'react-icons/rx'
-import {BsCardList} from 'react-icons/bs'
+import {RxMagnifyingGlass, RxChatBubble, RxPencil2, RxImage, RxMagicWand, RxRocket} from 'react-icons/rx'
+import {BsPlugin, BsApp, BsBoxArrowInDown} from 'react-icons/bs'
+import {MdWebhook} from 'react-icons/md'
 
 const menus = [
     {
@@ -32,6 +33,31 @@ const menus = [
         icon: <RxMagicWand className='w-3 h-3' />,
         premium: false
     },
+    {
+        label: 'Market',
+        slug: '/marketplace',
+        icon: <RxRocket className='w-3 h-3' />,
+        premium: false
+    },
+]
+
+const market_category_menus = [
+    {
+        label: 'My Apps',
+        icon: <BsBoxArrowInDown className='w-5 h-5' />,
+    },
+    {
+        label: 'Plugin',
+        icon: <BsPlugin className='w-5 h-5' />,
+    },
+    {
+        label: 'Application',
+        icon: <BsApp className='w-5 h-5' />
+    },
+    {
+        label: 'Webhook',
+        icon: <MdWebhook className='w-5 h-5' />
+    }
 ]
 
 const writeOptions = [
@@ -244,4 +270,5 @@ const writeOptions = [
 export {
     menus,
     writeOptions,
+    market_category_menus
 }
