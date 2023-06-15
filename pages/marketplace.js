@@ -1,8 +1,6 @@
 import React, {useState, useCallback, useEffect} from 'react'
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
 import { useSession, getSession } from 'next-auth/react'
-import {IoMdArrowDropleft, IoMdLogOut} from 'react-icons/io'
 
 // Components
 import MyApps from '@/components/MyApps'
@@ -18,27 +16,18 @@ import { market_category_menus } from '@/util/menus'
 import getMarketContent from '@/stores/FetchMarketplaceContent.store'
 import { showErrorSnackbar } from '@/util/toast'
 import { signOut } from 'next-auth/react'
+import Header from '@/components/Header'
+import { sendError } from 'next/dist/server/api-utils'
 
-const Profile = observer(({session}) => {
-  const [selected, setSelected] = useState('My Apps');
+const Marketplace = observer(({session}) => {
   const [content, setContent] = useState();
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [search, setSearch] = useState('');
+  const [selected, setSelected] = useState(market_category_menus[0].label)
 
-  const router = useRouter()
   const {data} = useSession();
 
   //#region HANDLER
-  const handleOnSelect = useCallback((a) => {
-    setSelected(a)
-    handleFetchContent(a)
-  }, [setSelected]);
-
-  const handleSignOut = useCallback(async () => {
-    await signOut();
-    localStorage.clear();
-    window.location.reload()
-  }, []);
-
   useEffect(() => {
     const token = localStorage.getItem('token');
     if(token || session){
@@ -47,6 +36,19 @@ const Profile = observer(({session}) => {
       setIsAuthenticated(false)
     }
   }, [isAuthenticated, session]);
+
+  const renderBody = useCallback(() => {
+    switch(selected){
+      case "My Apps":
+        return <MyApps />
+      case "Plugin":
+        return <Plugin />
+      case "Application":
+        return <Application />
+      case "Webhook":
+        return <Webhook />
+    }
+  }, [selected]);
 
   /* Handle Authentication Feature */
   const handleRelog = useCallback(async () => {
@@ -76,28 +78,17 @@ const Profile = observer(({session}) => {
 
   /* Component Did Mount */
   useEffect(() => {
-    handleFetchContent(market_category_menus[0].label)
-  }, []);
-  //#endregion
-
-  const render = useCallback(() => {
-    switch(selected){
-      case "My Apps":
-        return <MyApps content={content}  />
-      case "Plugin":
-        return <Plugin content={content} />;
-      case "Application":
-        return <Application content={content} />;
-      case "Webhook":
-        return <Webhook content={content} />
+    if(isAuthenticated){
+      handleFetchContent(market_category_menus[0].label)
     }
-  }, [selected, content]);
+  }, [isAuthenticated]);
+  //#endregion
 
   //#regino FETCH MARKETPLACE CONTENT
   /* Functions */
   const handleFetchContent = useCallback((a) => {
     getMarketContent.execute({type: a})
-  }, [selected]);
+  }, []);
 
   /* Watcher */
   useEffect(() => {
@@ -105,43 +96,45 @@ const Profile = observer(({session}) => {
       setContent(getMarketContent.response);
       getMarketContent.reset();
     } else if (getMarketContent.error) {
-      showErrorSnackbar(getMarketContent.error)
+      console.log(getMarketContent.error)
       getMarketContent.reset();
     }
   }, [getMarketContent.response, getMarketContent.error, getMarketContent.reset]);
   //#endregion  
 
   return (
-    <div className='max-w-screen-xl border-x-2 flex flex-col w-full h-screen mx-auto'>
+    <div className='max-w-screen-lg border-x-2 flex flex-col w-full h-screen mx-auto relative'>
       {!isAuthenticated && <ModalAuthentication setIsAuthenticated={setIsAuthenticated} />}
-      <div className='w-full flex flex-row items-center justify-between px-4 py-3 border-b-4'>
-        <p onClick={() => router.push('/')} className='flex flex-row items-center justify-start font-serif hover:opacity-70 transition cursor-pointer'><IoMdArrowDropleft className='mr-1' />Back</p>
-        <p>AI Marketplace</p>
-      </div>
-      <div className='w-full h-full flex flex-row items-start justify-start'>
-        <div className='flex flex-col h-full flex-[0.15] border-r-2'>
-          {market_category_menus.map(a => (
-            <div onClick={() => handleOnSelect(a.label)} className='px-3 py-4 flex flex-row items-center justify-start transition hover:opacity-60 cursor-pointer'>
-              {a.icon}
-              <p className={`font-serif text-sm mb-0 ml-2 ${selected === a.label && 'opacity-40'}`}>{a.label}</p>
+      <Header value={search} setValue={setSearch} />
+      <div className='w-full flex flex-row items-start justify-start h-full'>
+        <div className='flex-[0.2] h-full border-r-2 max-md:border-none max-md:hidden'>
+          {renderBody()}
+        </div>
+        <div className='flex=[0.8] max-md:flex-[1] h-[calc(100vh-230px)] flex items-center flex-col justify-center max-md:py-2 max-md:px-5'>
+          {content && content.length > 0 ? content.map(a => (
+            <div>
+
             </div>
-          ))}
-          {isAuthenticated && (
-            <div onClick={handleSignOut} className='px-3 py-4 mt-auto flex flex-row items-center justify-start transition hover:opacity-60 cursor-pointer'>
-              <IoMdLogOut className="w-5 h-5" color="red" />
-              <p className={`font-serif text-sm mb-0 ml-2 text-red-500`}>Sign Out</p>
+          )) : (
+            <div className='w-full flex items-center justify-center'>
+              <p>Nothing to be shown here.</p>
             </div>
           )}
         </div>
-        <div className='flex flex-col h-full flex-[0.85] border-l-2'>
-            {render}
-        </div>
+      </div>
+      <div id='footer' className='hidden max-md:flex max-w-screen-lg flex-row items-center justify-between w-full fixed bottom-0 mx-auto'>
+        {market_category_menus.map(a => (
+          <div onClick={() => setSelected(a.label)} style={{opacity: a.label === selected ? '0.4' : '1'}} className='py-5 border-2 border-gray-300 border-x-0 border-b-0 w-1/4 flex flex-col bg-white items-center justify-center'>
+            {a.icon}
+            <p className='text-sm mt-1 font-serif'>{a.label}</p>
+          </div>
+        ))}
       </div>
     </div>
   )
 })
 
-export default Profile
+export default Marketplace
 
 export const getServerSideProps = async (context) => {
   const session = await getSession(context);

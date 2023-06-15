@@ -4,12 +4,6 @@ import {MdWebhook} from 'react-icons/md'
 
 const menus = [
     {
-        label: 'Search',
-        slug: '/',
-        icon: <RxMagnifyingGlass className='w-3 h-3 ml-2' />,
-        premium: false
-    },
-    {
         label: 'Chat',
         slug: '/chat',
         icon: <RxChatBubble className='w-3 h-3' />,
@@ -38,19 +32,19 @@ const menus = [
 const market_category_menus = [
     {
         label: 'My Apps',
-        icon: <BsBoxArrowInDown className='w-5 h-5' />,
+        icon: <BsBoxArrowInDown className='w-7 h-7' />,
     },
     {
         label: 'Plugin',
-        icon: <BsPlugin className='w-5 h-5' />,
+        icon: <BsPlugin className='w-7 h-7' />,
     },
     {
         label: 'Application',
-        icon: <BsApp className='w-5 h-5' />
+        icon: <BsApp className='w-7 h-7' />
     },
     {
         label: 'Webhook',
-        icon: <MdWebhook className='w-5 h-5' />
+        icon: <MdWebhook className='w-7 h-7' />
     }
 ]
 

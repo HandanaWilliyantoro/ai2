@@ -43,9 +43,9 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/image/art',
-        destination: '/art',
-        permanent: true,
+        source: "/((?!maintenance).*)",
+        destination: "/maintenance",
+        permanent: false, //!!!IMPORTANT!!!
       },
     ];
   },
