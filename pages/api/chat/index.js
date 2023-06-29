@@ -1,4 +1,4 @@
-import { OpenAIStream } from "../../../util/stream";
+import { OpenAIStream } from "@/util/stream";
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("Missing env var from OpenAI");
@@ -102,7 +102,9 @@ const handler = async (req) => {
     } else {
         return {role: a.role, content: a.content}
     }
-})
+  })
+
+  console.log(history, 'ini history')
 
   if (!history) {
     return new Response("No prompt in the request", { status: 400 });
